@@ -1,4 +1,6 @@
 .container {
-  position: fixed;
+  position: fixed !important;
   inset: 0;
+  width: 100vw !important;
+  height: 100dvh !important;
 }
