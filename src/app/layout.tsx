@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { buildColorVars } from "@/styles/tokens";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SkateMap",
-  description: "Map your skate routes",
+  description: "Interactieve kaart met wegkwaliteit voor inline skating",
 };
 
 export default function RootLayout({
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="nl" style={buildColorVars()}>
       <body>{children}</body>
     </html>
   );
