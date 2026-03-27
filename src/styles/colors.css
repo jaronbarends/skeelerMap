@@ -1,0 +1,9 @@
+:root {
+  /* Palette */
+  --color-blue: #4285f4;
+  --color-white: #ffffff;
+
+  /* Location dot */
+  --color-location-dot-fill: var(--color-blue);
+  --color-location-dot-border: var(--color-white);
+}

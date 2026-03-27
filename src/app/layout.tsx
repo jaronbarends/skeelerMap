@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { buildColorVars } from "@/styles/tokens";
 import "leaflet/dist/leaflet.css";
+import "@/styles/colors.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nl" style={buildColorVars()}>
+    <html lang="nl">
       <body>{children}</body>
     </html>
   );

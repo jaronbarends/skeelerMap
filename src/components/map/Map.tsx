@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import L from "leaflet";
-import { colors } from "@/styles/tokens";
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
@@ -13,6 +12,10 @@ export default function Map() {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    const cssVars = getComputedStyle(document.documentElement);
+    const locationDotFill = cssVars.getPropertyValue("--color-location-dot-fill").trim();
+    const locationDotBorder = cssVars.getPropertyValue("--color-location-dot-border").trim();
 
     const map = L.map(container, { zoomControl: false }).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
@@ -42,9 +45,9 @@ export default function Map() {
           if (!locationMarker) {
             locationMarker = L.circleMarker(latlng, {
               radius: 8,
-              color: colors.locationDotBorder,
+              color: locationDotBorder,
               weight: 2,
-              fillColor: colors.locationDotFill,
+              fillColor: locationDotFill,
               fillOpacity: 1,
             }).addTo(map);
           } else {
