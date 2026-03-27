@@ -1,26 +1,20 @@
 # Project status
 
-**Last updated:** 2026-03-26
-**Current phase:** Map renders correctly. Cleanup pending before next feature work.
+**Last updated:** 2026-03-27
+**Current phase:** Scaffold complete. Ready to implement segment creation flow.
 
 ---
 
 ## What exists
-- Next.js 15 + App Router + TypeScript scaffolded
-- `src/` directory structure
-- Leaflet (plain, not react-leaflet) installed and working
-- Full-screen map, centered on Netherlands by default (zoom 12)
-- User location dot (blue circle, white border) via `watchPosition`
-- CartoDB Voyager tile layer (no API key required)
-- Color token system (`src/styles/tokens.ts`) injected as CSS custom properties via `layout.tsx`
-
-## What was resolved this session
-- Tile rendering bug (tiles at wrong positions): root cause was `leaflet/dist/leaflet.css` being imported inside the client component (`Map.tsx`). In Next.js dev mode this CSS loads after `useEffect` fires. Fixed by moving the import to `layout.tsx`.
-- Switched from react-leaflet to plain Leaflet to eliminate SSR/rendering timing issues. react-leaflet may be re-evaluated next session.
-- Left some cleanup in `Map.tsx` (diagnostic `console.log`, inner div wrapper, unnecessary `box-sizing` override in `globals.css`) — to be done next session.
+- Next.js 15 + App Router + TypeScript
+- Leaflet (plain, not react-leaflet) — full-screen map, Netherlands default, user location dot
+- CartoDB Voyager tile layer
+- Color system: `src/styles/colors.css` (CSS custom properties), read in TSX via `getComputedStyle`
+- `leaflet/dist/leaflet.css` imported in `layout.tsx` (required — see decisions.md)
 
 ## What's decided
-- Stack: Next.js + App Router + TypeScript + Leaflet
+- Stack: Next.js + App Router + TypeScript + Leaflet (plain)
+- react-leaflet: decided against — imperative pattern is sufficient for this app
 - Backend: BaaS TBD (Supabase or Firebase), chosen when auth is needed
 - MVP scope and explicit out-of-scope items (see requirements.md)
 - Segment creation flow (see decisions.md)
@@ -28,15 +22,19 @@
 - Data model: store routed geometry, not control points
 
 ## What's open
-- Whether to re-add react-leaflet (discuss next session, now that root cause is known)
-- Rating UI visibility during drawing (test both options on iPhone SE)
+- Rating UI visibility during drawing: Option A (greyed out until 2+ points) vs Option B (hidden until 2+ points) — test on iPhone SE before implementing
 - How to indicate current rating in edit panel (TBD)
 - Location permission flow (deferred)
 - BaaS choice (deferred)
 - Tile provider for production (deferred)
 
 ## Next step
-1. Clean up `Map.tsx`: remove console.log, remove inner div wrapper, simplify
-2. Remove unnecessary `.leaflet-container` box-sizing override from `globals.css`
-3. Discuss re-adding react-leaflet
-4. If react-leaflet is back: implement segment creation flow
+Implement segment creation flow:
+1. Floating + button (bottom-right)
+2. Tapping + enters drawing mode: panel appears with instruction text, map listens for taps
+3. Each tap places a control point dot
+4. After 2+ points: road-following polyline drawn via OSRM between consecutive points
+5. Rating picker (5 options) — resolve Option A vs B first
+6. Tapping a rating saves the segment in that color, closes panel
+7. Tapping × cancels: removes all points/lines, closes panel
+8. Persist segments to localStorage

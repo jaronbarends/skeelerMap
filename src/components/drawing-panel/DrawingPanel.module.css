@@ -1,0 +1,76 @@
+.panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 16px 16px 0 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.instruction {
+  margin: 0;
+  font-size: 14px;
+  color: #333333;
+  line-height: 1.4;
+}
+
+.cancelButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #888888;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.ratings {
+  display: flex;
+  gap: 8px;
+}
+
+.ratingButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  background: #ffffff;
+  border: 2px solid var(--rating-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.15s;
+}
+
+.ratingButton:not(.ratingButtonDisabled):hover {
+  background: color-mix(in srgb, var(--rating-color) 15%, transparent);
+}
+
+.ratingButtonDisabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.label {
+  font-size: 11px;
+  color: #333333;
+  font-weight: 600;
+}

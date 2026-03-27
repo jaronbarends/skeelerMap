@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
+import { Open_Sans } from "next/font/google";
 import "leaflet/dist/leaflet.css";
 import "@/styles/colors.css";
 import "./globals.css";
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "SkateMap",
@@ -15,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl">
-      <body>{children}</body>
+      <body className={openSans.variable}>{children}</body>
     </html>
   );
 }

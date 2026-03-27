@@ -1,75 +1,261 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import L from "leaflet";
+import { useEffect, useRef, useState } from 'react';
+import L from 'leaflet';
+import styles from './Map.module.css';
+import DrawingPanel from '../drawing-panel/DrawingPanel';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
+const STORAGE_KEY = 'skatemap_segments';
+
+interface Segment {
+  id: string;
+  rating: number;
+  coordinates: [number, number][];
+}
+
+interface DrawingState {
+  controlPoints: L.LatLng[];
+  controlMarkers: L.CircleMarker[];
+  routePolylines: (L.Polyline | null)[];
+  routeCoordinates: ([number, number][] | null)[];
+}
 
 export default function Map() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const cssVarsRef = useRef<CSSStyleDeclaration | null>(null);
+  const drawingActiveRef = useRef(false);
+  const drawingStateRef = useRef<DrawingState>({
+    controlPoints: [],
+    controlMarkers: [],
+    routePolylines: [],
+    routeCoordinates: [],
+  });
+  const segmentsRef = useRef<Segment[]>([]);
+
+  const [drawingModeActive, setDrawingModeActive] = useState(false);
+  const [controlPointCount, setControlPointCount] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const cssVars = getComputedStyle(document.documentElement);
-    const locationDotFill = cssVars.getPropertyValue("--color-location-dot-fill").trim();
-    const locationDotBorder = cssVars.getPropertyValue("--color-location-dot-border").trim();
+    cssVarsRef.current = cssVars;
 
     const map = L.map(container, { zoomControl: false }).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-      DEFAULT_ZOOM,
+      DEFAULT_ZOOM
     );
+    mapRef.current = map;
 
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
-      },
-    ).addTo(map);
+    createTileLayer(map);
 
-    let locationMarker: L.CircleMarker | null = null;
-    let watchId: number | null = null;
+    const saved = loadSegments();
+    segmentsRef.current = saved;
+    saved.forEach((seg) => renderSegment(seg, map, cssVars));
 
-    if (navigator.geolocation) {
-      let firstFix = true;
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          const latlng: L.LatLngExpression = [
-            pos.coords.latitude,
-            pos.coords.longitude,
-          ];
-          if (!locationMarker) {
-            locationMarker = L.circleMarker(latlng, {
-              radius: 8,
-              color: locationDotBorder,
-              weight: 2,
-              fillColor: locationDotFill,
-              fillOpacity: 1,
-            }).addTo(map);
-          } else {
-            locationMarker.setLatLng(latlng);
-          }
-          if (firstFix) {
-            map.setView(latlng, Math.max(map.getZoom(), 15));
-            firstFix = false;
-          }
-        },
-        () => {
-          // Permission denied or unavailable — stay on default Netherlands view
-        },
-        { enableHighAccuracy: true },
-      );
-    }
+    map.on('click', (e) => {
+      if (!drawingActiveRef.current) return;
+
+      const latlng = e.latlng;
+      const state = drawingStateRef.current;
+
+      const marker = L.circleMarker(latlng, {
+        radius: 6,
+        color: '#ffffff',
+        weight: 2,
+        fillColor: '#1a1a1a',
+        fillOpacity: 1,
+      }).addTo(map);
+
+      state.controlPoints.push(latlng);
+      state.controlMarkers.push(marker);
+
+      const count = state.controlPoints.length;
+      setControlPointCount(count);
+
+      if (count >= 2) {
+        const legIndex = count - 2;
+        const from = state.controlPoints[count - 2];
+        const to = latlng;
+
+        state.routePolylines[legIndex] = null;
+        state.routeCoordinates[legIndex] = null;
+
+        fetchRoute(from, to).then((coords) => {
+          if (!drawingActiveRef.current) return;
+          state.routeCoordinates[legIndex] = coords;
+          const polyline = L.polyline(coords, {
+            color: '#555555',
+            weight: 5,
+            opacity: 0.85,
+          }).addTo(map);
+          state.routePolylines[legIndex] = polyline;
+        });
+      }
+    });
+
+    const watchId = createWatchedLocationMarker(map, cssVars);
 
     return () => {
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
       map.remove();
+      mapRef.current = null;
     };
   }, []);
 
-  return <div ref={containerRef} style={{ position: "fixed", inset: 0 }} />;
+  useEffect(() => {
+    drawingActiveRef.current = drawingModeActive;
+  }, [drawingModeActive]);
+
+  return (
+    <>
+      <div ref={containerRef} className={styles.container} />
+      {!drawingModeActive && (
+        <button
+          className={styles.addButton}
+          onClick={() => setDrawingModeActive(true)}
+          aria-label="Add segment"
+        >
+          +
+        </button>
+      )}
+      {drawingModeActive && (
+        <DrawingPanel
+          controlPointCount={controlPointCount}
+          onCancel={handleCancel}
+          onRatingSelect={handleRatingSelect}
+        />
+      )}
+    </>
+  );
+
+  function clearDrawingState() {
+    const state = drawingStateRef.current;
+    const map = mapRef.current;
+    if (map) {
+      state.controlMarkers.forEach((m) => m.remove());
+      state.routePolylines.forEach((p) => p?.remove());
+    }
+    drawingStateRef.current = {
+      controlPoints: [],
+      controlMarkers: [],
+      routePolylines: [],
+      routeCoordinates: [],
+    };
+  }
+
+  function handleCancel() {
+    clearDrawingState();
+    setDrawingModeActive(false);
+    setControlPointCount(0);
+  }
+
+  function handleRatingSelect(rating: number) {
+    const state = drawingStateRef.current;
+    const map = mapRef.current;
+    const cssVars = cssVarsRef.current;
+    if (!map || !cssVars) return;
+
+    const allCoords = (
+      state.routeCoordinates.filter((c): c is [number, number][] => c !== null)
+    ).flat();
+
+    if (allCoords.length > 0) {
+      const segment: Segment = {
+        id: crypto.randomUUID(),
+        rating,
+        coordinates: allCoords,
+      };
+      renderSegment(segment, map, cssVars);
+      segmentsRef.current = [...segmentsRef.current, segment];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
+    }
+
+    clearDrawingState();
+    setDrawingModeActive(false);
+    setControlPointCount(0);
+  }
+}
+
+function loadSegments(): Segment[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Segment[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function renderSegment(segment: Segment, map: L.Map, cssVars: CSSStyleDeclaration) {
+  const color = cssVars.getPropertyValue(`--color-rating-${segment.rating}`).trim();
+  L.polyline(segment.coordinates as [number, number][], {
+    color,
+    weight: 5,
+    opacity: 0.85,
+  }).addTo(map);
+}
+
+async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number][]> {
+  const url =
+    `https://router.project-osrm.org/route/v1/driving/` +
+    `${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    // GeoJSON coordinates are [lng, lat]; Leaflet needs [lat, lng]
+    const geoCoords = data.routes[0].geometry.coordinates as [number, number][];
+    return geoCoords.map(([lng, lat]) => [lat, lng]);
+  } catch {
+    return [
+      [from.lat, from.lng],
+      [to.lat, to.lng],
+    ];
+  }
+}
+
+function createTileLayer(map: L.Map) {
+  const tilesUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  const attribution = '&copy; <a href="https://carto.com/attributions">CARTO</a>';
+  L.tileLayer(tilesUrl, { attribution, maxZoom: 19 }).addTo(map);
+}
+
+function createWatchedLocationMarker(map: L.Map, cssVars: CSSStyleDeclaration) {
+  if (!navigator.geolocation) return null;
+
+  const locationDotFill = cssVars.getPropertyValue('--color-location-dot-fill').trim();
+  const locationDotBorder = cssVars.getPropertyValue('--color-location-dot-border').trim();
+
+  let locationMarker: L.CircleMarker | null = null;
+  let firstFix = true;
+
+  const watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const latlng: L.LatLngExpression = [pos.coords.latitude, pos.coords.longitude];
+      if (!locationMarker) {
+        locationMarker = L.circleMarker(latlng, {
+          radius: 8,
+          color: locationDotBorder,
+          weight: 2,
+          fillColor: locationDotFill,
+          fillOpacity: 1,
+        }).addTo(map);
+      } else {
+        locationMarker.setLatLng(latlng);
+      }
+      if (firstFix) {
+        map.setView(latlng, Math.max(map.getZoom(), 15));
+        firstFix = false;
+      }
+    },
+    () => {
+      // Permission denied or unavailable — stay on default Netherlands view
+    },
+    { enableHighAccuracy: true }
+  );
+
+  return watchId;
 }
