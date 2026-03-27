@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildColorVars } from "@/styles/tokens";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
