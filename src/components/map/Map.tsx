@@ -14,7 +14,7 @@ interface Segment {
   coordinates: [number, number][];
 }
 
-interface DrawingState {
+interface TempSegment {
   controlPoints: L.LatLng[];
   controlMarkers: L.CircleMarker[];
   routePolylines: (L.Polyline | null)[];
@@ -36,7 +36,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const drawingActiveRef = useRef(false);
-  const drawingStateRef = useRef<DrawingState>({
+  const tempSegmentRef = useRef<TempSegment>({
     controlPoints: [],
     controlMarkers: [],
     routePolylines: [],
@@ -44,7 +44,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
   });
   const segmentsRef = useRef<Segment[]>([]);
 
-  useImperativeHandle(ref, () => ({ cancelDrawing: clearDrawingState, saveSegment }), []);
+  useImperativeHandle(ref, () => ({ cancelDrawing: clearTempSegment, saveSegment }), []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -65,7 +65,9 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     const watchId = createWatchedLocationMarker(map, cssVars);
 
     return () => {
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
       map.remove();
       mapRef.current = null;
     };
@@ -78,55 +80,28 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
   return <div ref={containerRef} className={styles.container} />;
 
   function renderAllSegments(map: L.Map, cssVars: CSSStyleDeclaration) {
-    const saved = loadSegments();
-    segmentsRef.current = saved;
-    saved.forEach((seg) => renderSegment(seg, map, cssVars));
+    const segments = loadSegments();
+    segmentsRef.current = segments;
+    segments.forEach((segment) => renderSegment(segment, map, cssVars));
   }
 
   function addMapListeners(map: L.Map) {
     map.on('click', (e) => {
-      if (!drawingActiveRef.current) return;
-      addControlMarker({ latlng: e.latlng, state: drawingStateRef.current, map });
-    });
-  }
+      if (!drawingActiveRef.current) {
+        return;
+      }
 
-  function addPolyline({
-    count,
-    state,
-    map,
-    latlng,
-  }: {
-    count: number;
-    state: DrawingState;
-    map: L.Map;
-    latlng: L.LatLng;
-  }) {
-    const legIndex = count - 2;
-    const from = state.controlPoints[count - 2];
-    const to = latlng;
-
-    state.routePolylines[legIndex] = null;
-    state.routeCoordinates[legIndex] = null;
-
-    fetchRoute(from, to).then((coords) => {
-      if (!drawingActiveRef.current) return;
-      state.routeCoordinates[legIndex] = coords;
-      const polyline = L.polyline(coords, {
-        color: '#555555',
-        weight: 5,
-        opacity: 0.85,
-      }).addTo(map);
-      state.routePolylines[legIndex] = polyline;
+      addControlMarker({ latlng: e.latlng, tempSegment: tempSegmentRef.current, map });
     });
   }
 
   function addControlMarker({
     latlng,
-    state,
+    tempSegment,
     map,
   }: {
     latlng: L.LatLng;
-    state: DrawingState;
+    tempSegment: TempSegment;
     map: L.Map;
   }) {
     const marker = L.circleMarker(latlng, {
@@ -137,25 +112,55 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
       fillOpacity: 1,
     }).addTo(map);
 
-    state.controlPoints.push(latlng);
-    state.controlMarkers.push(marker);
+    tempSegment.controlPoints.push(latlng);
+    tempSegment.controlMarkers.push(marker);
 
-    const count = state.controlPoints.length;
+    const count = tempSegment.controlPoints.length;
     onControlPointCountChange(count);
 
     if (count >= 2) {
-      addPolyline({ count, state, map, latlng });
+      addPolyline({ count, tempSegment, map, latlng });
     }
   }
 
-  function clearDrawingState() {
-    const state = drawingStateRef.current;
+  function addPolyline({
+    count,
+    tempSegment,
+    map,
+    latlng,
+  }: {
+    count: number;
+    tempSegment: TempSegment;
+    map: L.Map;
+    latlng: L.LatLng;
+  }) {
+    const legIndex = count - 2;
+    const from = tempSegment.controlPoints[count - 2];
+    const to = latlng;
+
+    tempSegment.routePolylines[legIndex] = null;
+    tempSegment.routeCoordinates[legIndex] = null;
+
+    fetchRoute(from, to).then((coords) => {
+      if (!drawingActiveRef.current) return;
+      tempSegment.routeCoordinates[legIndex] = coords;
+      const polyline = L.polyline(coords, {
+        color: '#555555',
+        weight: 5,
+        opacity: 0.85,
+      }).addTo(map);
+      tempSegment.routePolylines[legIndex] = polyline;
+    });
+  }
+
+  function clearTempSegment() {
+    const tempSegment = tempSegmentRef.current;
     const map = mapRef.current;
     if (map) {
-      state.controlMarkers.forEach((m) => m.remove());
-      state.routePolylines.forEach((p) => p?.remove());
+      tempSegment.controlMarkers.forEach((m) => m.remove());
+      tempSegment.routePolylines.forEach((p) => p?.remove());
     }
-    drawingStateRef.current = {
+    tempSegmentRef.current = {
       controlPoints: [],
       controlMarkers: [],
       routePolylines: [],
@@ -164,27 +169,27 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
   }
 
   function saveSegment(rating: number) {
-    const state = drawingStateRef.current;
+    const tempSegment = tempSegmentRef.current;
     const map = mapRef.current;
     if (!map) return;
     const cssVars = getComputedStyle(document.documentElement);
 
-    const allCoords = state.routeCoordinates
+    const allCoords = tempSegment.routeCoordinates
       .filter((c): c is [number, number][] => c !== null)
       .flat();
 
     if (allCoords.length > 0) {
-      const segment: Segment = {
+      const newSegment: Segment = {
         id: crypto.randomUUID(),
         rating,
         coordinates: allCoords,
       };
-      renderSegment(segment, map, cssVars);
-      segmentsRef.current = [...segmentsRef.current, segment];
+      renderSegment(newSegment, map, cssVars);
+      segmentsRef.current = [...segmentsRef.current, newSegment];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
     }
 
-    clearDrawingState();
+    clearTempSegment();
   }
 }
 
