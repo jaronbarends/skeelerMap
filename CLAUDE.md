@@ -27,6 +27,7 @@ Read this before every session, along with the other files in docs/.
 ## After every session
 
 Update `docs/status.md`:
+
 - What was completed
 - What's still in progress or broken
 - Any new open questions or decisions that need to be made
@@ -105,6 +106,12 @@ Update `docs/status.md`:
 - Use class selectors over ID selectors for styling
 - Use Flexbox and Grid for layout
 - Use CSS variables for consistent theming
+
+---
+
+## importing files
+
+- Use absolute paths for imports with the `@/` prefix (e.g. `@/app/components/Foo`), unless you are importing CSS files from the same directory (use relative `./` then)
 
 ---
 

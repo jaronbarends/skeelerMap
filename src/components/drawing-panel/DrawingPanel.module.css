@@ -1,39 +1,49 @@
 .panel {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  background: #ffffff;
-  border-radius: 16px 16px 0 0;
-  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
-  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
+  background: #1a1a1a;
+  padding: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top));
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   z-index: 1000;
 }
 
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeIcon {
+  font-size: 18px;
+  transform: rotate(45deg);
 }
 
 .instruction {
-  margin: 0;
-  font-size: 14px;
-  color: #333333;
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #aaaaaa;
   line-height: 1.4;
-}
-
-.cancelButton {
-  background: none;
-  border: none;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  color: #888888;
-  padding: 0;
-  flex-shrink: 0;
 }
 
 .ratings {
@@ -46,9 +56,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 4px 8px;
-  background: #ffffff;
+  gap: 2px;
+  padding: 8px 4px;
+  background: #2a2a2a;
   border: 2px solid var(--rating-color);
   border-radius: 10px;
   cursor: pointer;
@@ -56,7 +66,7 @@
 }
 
 .ratingButton:not(.ratingButtonDisabled):hover {
-  background: color-mix(in srgb, var(--rating-color) 15%, transparent);
+  background: color-mix(in srgb, var(--rating-color) 20%, #2a2a2a);
 }
 
 .ratingButtonDisabled {
@@ -65,12 +75,19 @@
 }
 
 .emoji {
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.stars {
+  font-size: 8px;
+  color: var(--rating-color);
+  letter-spacing: 1px;
   line-height: 1;
 }
 
 .label {
-  font-size: 11px;
-  color: #333333;
+  font-size: 10px;
+  color: #ffffff;
   font-weight: 600;
 }

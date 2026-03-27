@@ -1,5 +1,5 @@
-import MapLoader from "@/components/map/MapLoader";
+import MapUIContainer from '@/components/map/MapUIContainer';
 
 export default function Home() {
-  return <MapLoader />;
+  return <MapUIContainer />;
 }

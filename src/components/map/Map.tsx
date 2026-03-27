@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import styles from './Map.module.css';
-import DrawingPanel from '../drawing-panel/DrawingPanel';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
@@ -22,10 +21,20 @@ interface DrawingState {
   routeCoordinates: ([number, number][] | null)[];
 }
 
-export default function Map() {
+export interface MapHandle {
+  cancelDrawing: () => void;
+  saveSegment: (rating: number) => void;
+}
+
+interface Props {
+  ref?: React.Ref<MapHandle>;
+  drawingModeActive: boolean;
+  onControlPointCountChange: (count: number) => void;
+}
+
+export default function Map({ ref, drawingModeActive, onControlPointCountChange }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const cssVarsRef = useRef<CSSStyleDeclaration | null>(null);
   const drawingActiveRef = useRef(false);
   const drawingStateRef = useRef<DrawingState>({
     controlPoints: [],
@@ -35,15 +44,13 @@ export default function Map() {
   });
   const segmentsRef = useRef<Segment[]>([]);
 
-  const [drawingModeActive, setDrawingModeActive] = useState(false);
-  const [controlPointCount, setControlPointCount] = useState(0);
+  useImperativeHandle(ref, () => ({ cancelDrawing: clearDrawingState, saveSegment }), []);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const cssVars = getComputedStyle(document.documentElement);
-    cssVarsRef.current = cssVars;
 
     const map = L.map(container, { zoomControl: false }).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
@@ -52,51 +59,8 @@ export default function Map() {
     mapRef.current = map;
 
     createTileLayer(map);
-
-    const saved = loadSegments();
-    segmentsRef.current = saved;
-    saved.forEach((seg) => renderSegment(seg, map, cssVars));
-
-    map.on('click', (e) => {
-      if (!drawingActiveRef.current) return;
-
-      const latlng = e.latlng;
-      const state = drawingStateRef.current;
-
-      const marker = L.circleMarker(latlng, {
-        radius: 6,
-        color: '#ffffff',
-        weight: 2,
-        fillColor: '#1a1a1a',
-        fillOpacity: 1,
-      }).addTo(map);
-
-      state.controlPoints.push(latlng);
-      state.controlMarkers.push(marker);
-
-      const count = state.controlPoints.length;
-      setControlPointCount(count);
-
-      if (count >= 2) {
-        const legIndex = count - 2;
-        const from = state.controlPoints[count - 2];
-        const to = latlng;
-
-        state.routePolylines[legIndex] = null;
-        state.routeCoordinates[legIndex] = null;
-
-        fetchRoute(from, to).then((coords) => {
-          if (!drawingActiveRef.current) return;
-          state.routeCoordinates[legIndex] = coords;
-          const polyline = L.polyline(coords, {
-            color: '#555555',
-            weight: 5,
-            opacity: 0.85,
-          }).addTo(map);
-          state.routePolylines[legIndex] = polyline;
-        });
-      }
-    });
+    renderAllSegments(map, cssVars);
+    addMapListeners(map);
 
     const watchId = createWatchedLocationMarker(map, cssVars);
 
@@ -111,27 +75,78 @@ export default function Map() {
     drawingActiveRef.current = drawingModeActive;
   }, [drawingModeActive]);
 
-  return (
-    <>
-      <div ref={containerRef} className={styles.container} />
-      {!drawingModeActive && (
-        <button
-          className={styles.addButton}
-          onClick={() => setDrawingModeActive(true)}
-          aria-label="Add segment"
-        >
-          +
-        </button>
-      )}
-      {drawingModeActive && (
-        <DrawingPanel
-          controlPointCount={controlPointCount}
-          onCancel={handleCancel}
-          onRatingSelect={handleRatingSelect}
-        />
-      )}
-    </>
-  );
+  return <div ref={containerRef} className={styles.container} />;
+
+  function renderAllSegments(map: L.Map, cssVars: CSSStyleDeclaration) {
+    const saved = loadSegments();
+    segmentsRef.current = saved;
+    saved.forEach((seg) => renderSegment(seg, map, cssVars));
+  }
+
+  function addMapListeners(map: L.Map) {
+    map.on('click', (e) => {
+      if (!drawingActiveRef.current) return;
+      addControlMarker({ latlng: e.latlng, state: drawingStateRef.current, map });
+    });
+  }
+
+  function addPolyline({
+    count,
+    state,
+    map,
+    latlng,
+  }: {
+    count: number;
+    state: DrawingState;
+    map: L.Map;
+    latlng: L.LatLng;
+  }) {
+    const legIndex = count - 2;
+    const from = state.controlPoints[count - 2];
+    const to = latlng;
+
+    state.routePolylines[legIndex] = null;
+    state.routeCoordinates[legIndex] = null;
+
+    fetchRoute(from, to).then((coords) => {
+      if (!drawingActiveRef.current) return;
+      state.routeCoordinates[legIndex] = coords;
+      const polyline = L.polyline(coords, {
+        color: '#555555',
+        weight: 5,
+        opacity: 0.85,
+      }).addTo(map);
+      state.routePolylines[legIndex] = polyline;
+    });
+  }
+
+  function addControlMarker({
+    latlng,
+    state,
+    map,
+  }: {
+    latlng: L.LatLng;
+    state: DrawingState;
+    map: L.Map;
+  }) {
+    const marker = L.circleMarker(latlng, {
+      radius: 6,
+      color: '#ffffff',
+      weight: 2,
+      fillColor: '#1a1a1a',
+      fillOpacity: 1,
+    }).addTo(map);
+
+    state.controlPoints.push(latlng);
+    state.controlMarkers.push(marker);
+
+    const count = state.controlPoints.length;
+    onControlPointCountChange(count);
+
+    if (count >= 2) {
+      addPolyline({ count, state, map, latlng });
+    }
+  }
 
   function clearDrawingState() {
     const state = drawingStateRef.current;
@@ -148,21 +163,15 @@ export default function Map() {
     };
   }
 
-  function handleCancel() {
-    clearDrawingState();
-    setDrawingModeActive(false);
-    setControlPointCount(0);
-  }
-
-  function handleRatingSelect(rating: number) {
+  function saveSegment(rating: number) {
     const state = drawingStateRef.current;
     const map = mapRef.current;
-    const cssVars = cssVarsRef.current;
-    if (!map || !cssVars) return;
+    if (!map) return;
+    const cssVars = getComputedStyle(document.documentElement);
 
-    const allCoords = (
-      state.routeCoordinates.filter((c): c is [number, number][] => c !== null)
-    ).flat();
+    const allCoords = state.routeCoordinates
+      .filter((c): c is [number, number][] => c !== null)
+      .flat();
 
     if (allCoords.length > 0) {
       const segment: Segment = {
@@ -176,8 +185,6 @@ export default function Map() {
     }
 
     clearDrawingState();
-    setDrawingModeActive(false);
-    setControlPointCount(0);
   }
 }
 

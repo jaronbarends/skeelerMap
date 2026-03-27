@@ -1,7 +1,7 @@
 # Project status
 
 **Last updated:** 2026-03-27
-**Current phase:** Scaffold complete. Ready to implement segment creation flow.
+**Current phase:** Segment creation flow implemented. Ready for testing on iPhone SE.
 
 ---
 
@@ -11,6 +11,9 @@
 - CartoDB Voyager tile layer
 - Color system: `src/styles/colors.css` (CSS custom properties), read in TSX via `getComputedStyle`
 - `leaflet/dist/leaflet.css` imported in `layout.tsx` (required — see decisions.md)
+- Open Sans via `next/font/google`
+- `react-icons` (fa6) for FAB and panel close button
+- Segment creation flow: FAB → drawing mode → control points → OSRM routing → rating → localStorage
 
 ## What's decided
 - Stack: Next.js + App Router + TypeScript + Leaflet (plain)
@@ -20,21 +23,17 @@
 - Segment creation flow (see decisions.md)
 - Segment selection, edit, and delete flow (see decisions.md)
 - Data model: store routed geometry, not control points
+- Rating UI: Option A (greyed out until 2+ points placed)
 
 ## What's open
-- Rating UI visibility during drawing: Option A (greyed out until 2+ points) vs Option B (hidden until 2+ points) — test on iPhone SE before implementing
+- Rating UI Option A — validate on iPhone SE (panel is at top, FAB at bottom-right)
 - How to indicate current rating in edit panel (TBD)
+- Mobile browser emulation: page is larger than the device viewport in Chrome/Firefox devtools mobile mode, causing the FAB to be out of view — needs investigation before mobile testing
 - Location permission flow (deferred)
 - BaaS choice (deferred)
 - Tile provider for production (deferred)
 
 ## Next step
-Implement segment creation flow:
-1. Floating + button (bottom-right)
-2. Tapping + enters drawing mode: panel appears with instruction text, map listens for taps
-3. Each tap places a control point dot
-4. After 2+ points: road-following polyline drawn via OSRM between consecutive points
-5. Rating picker (5 options) — resolve Option A vs B first
-6. Tapping a rating saves the segment in that color, closes panel
-7. Tapping × cancels: removes all points/lines, closes panel
-8. Persist segments to localStorage
+Test segment creation flow on iPhone SE, then implement:
+1. Location button (FAB, below add-segment button) — centers map on user
+2. Segment selection flow (tap segment → panel at top → length, edit, delete, close)
