@@ -2,6 +2,7 @@
 
 import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
+import { mapColors } from '@/styles/mapColorTokens';
 import styles from './Map.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
@@ -50,8 +51,6 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     const container = containerRef.current;
     if (!container) return;
 
-    const cssVars = getComputedStyle(document.documentElement);
-
     const map = L.map(container, { zoomControl: false }).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
       DEFAULT_ZOOM
@@ -59,10 +58,10 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     mapRef.current = map;
 
     createTileLayer(map);
-    renderAllSegments(map, cssVars);
+    renderAllSegments(map);
     addMapListeners(map);
 
-    const watchId = createWatchedLocationMarker(map, cssVars);
+    const watchId = createWatchedLocationMarker(map);
 
     return () => {
       if (watchId !== null) {
@@ -79,10 +78,10 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
 
   return <div ref={containerRef} className={styles.container} />;
 
-  function renderAllSegments(map: L.Map, cssVars: CSSStyleDeclaration) {
+  function renderAllSegments(map: L.Map) {
     const segments = loadSegments();
     segmentsRef.current = segments;
-    segments.forEach((segment) => renderSegment(segment, map, cssVars));
+    segments.forEach((segment) => renderSegment(segment, map));
   }
 
   function addMapListeners(map: L.Map) {
@@ -108,7 +107,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
       radius: 6,
       color: '#ffffff',
       weight: 2,
-      fillColor: '#1a1a1a',
+      fillColor: mapColors.rating.unknown,
       fillOpacity: 1,
     }).addTo(map);
 
@@ -145,7 +144,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
       if (!drawingActiveRef.current) return;
       tempSegment.routeCoordinates[legIndex] = coords;
       const polyline = L.polyline(coords, {
-        color: '#555555',
+        color: mapColors.rating.unknown,
         weight: 5,
         opacity: 0.85,
       }).addTo(map);
@@ -172,7 +171,6 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     const tempSegment = tempSegmentRef.current;
     const map = mapRef.current;
     if (!map) return;
-    const cssVars = getComputedStyle(document.documentElement);
 
     const allCoords = tempSegment.routeCoordinates
       .filter((c): c is [number, number][] => c !== null)
@@ -184,7 +182,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
         rating,
         coordinates: allCoords,
       };
-      renderSegment(newSegment, map, cssVars);
+      renderSegment(newSegment, map);
       segmentsRef.current = [...segmentsRef.current, newSegment];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
     }
@@ -202,8 +200,8 @@ function loadSegments(): Segment[] {
   }
 }
 
-function renderSegment(segment: Segment, map: L.Map, cssVars: CSSStyleDeclaration) {
-  const color = cssVars.getPropertyValue(`--color-rating-${segment.rating}`).trim();
+function renderSegment(segment: Segment, map: L.Map) {
+  const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
   L.polyline(segment.coordinates as [number, number][], {
     color,
     weight: 5,
@@ -235,11 +233,8 @@ function createTileLayer(map: L.Map) {
   L.tileLayer(tilesUrl, { attribution, maxZoom: 19 }).addTo(map);
 }
 
-function createWatchedLocationMarker(map: L.Map, cssVars: CSSStyleDeclaration) {
+function createWatchedLocationMarker(map: L.Map) {
   if (!navigator.geolocation) return null;
-
-  const locationDotFill = cssVars.getPropertyValue('--color-location-dot-fill').trim();
-  const locationDotBorder = cssVars.getPropertyValue('--color-location-dot-border').trim();
 
   let locationMarker: L.CircleMarker | null = null;
   let firstFix = true;
@@ -250,9 +245,9 @@ function createWatchedLocationMarker(map: L.Map, cssVars: CSSStyleDeclaration) {
       if (!locationMarker) {
         locationMarker = L.circleMarker(latlng, {
           radius: 8,
-          color: locationDotBorder,
+          color: mapColors.locationDot.border,
           weight: 2,
-          fillColor: locationDotFill,
+          fillColor: mapColors.locationDot.fill,
           fillOpacity: 1,
         }).addTo(map);
       } else {
