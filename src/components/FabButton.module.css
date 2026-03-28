@@ -1,0 +1,14 @@
+.component {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 22px;
+}

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { mapColorCSSVars } from '@/styles/mapColorTokens';
+import MenuBar from '@/components/MenuBar';
+
 import 'leaflet/dist/leaflet.css';
 import './main.css';
 
@@ -13,7 +15,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="nl">
-      <body style={mapColorStyles}>{children}</body>
+      <body style={mapColorStyles}>
+        <MenuBar />
+        <main className="main">{children}</main>
+      </body>
     </html>
   );
 }

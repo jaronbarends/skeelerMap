@@ -1,5 +1,5 @@
 import styles from './MenuBar.module.css';
 
 export default function MenuBar() {
-  return <div className={styles.menuBar} />;
+  return <div className={styles.menuBar}>menu bar</div>;
 }
