@@ -1,0 +1,10 @@
+.fabContainer {
+  position: absolute;
+  bottom: calc(var(--fab-margin) + env(safe-area-inset-bottom));
+  right: var(--fab-margin);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-12);
+  z-index: var(--z-fab);
+}

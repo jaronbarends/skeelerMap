@@ -4,7 +4,6 @@ import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
-import styles from './Map.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
@@ -30,12 +29,12 @@ export interface MapHandle {
 
 interface Props {
   ref?: React.Ref<MapHandle>;
+  containerRef: React.RefObject<HTMLDivElement>;
   drawingModeActive: boolean;
   onControlPointCountChange: (count: number) => void;
 }
 
-export default function Map({ ref, drawingModeActive, onControlPointCountChange }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export default function Map({ ref, containerRef, drawingModeActive, onControlPointCountChange }: Props) {
   const mapRef = useRef<L.Map | null>(null);
   const drawingActiveRef = useRef(false);
   const tempSegmentRef = useRef<TempSegment>({
@@ -77,7 +76,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     drawingActiveRef.current = drawingModeActive;
   }, [drawingModeActive]);
 
-  return <div ref={containerRef} className={styles.container} />;
+  return null;
 
   function renderAllSegments(map: L.Map) {
     const segments = loadSegments();

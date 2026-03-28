@@ -1,55 +1,54 @@
 .panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #1a1a1a;
-  padding: 16px;
-  /* `env(safe-area-inset-top)` adds space for notches or status bars on iOS and some mobile browsers */
-  padding-top: calc(16px + env(safe-area-inset-top));
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
-  z-index: 1000;
+  position: absolute;
+  top: calc(var(--panel-margin) + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 2 * var(--panel-margin-min)), var(--panel-max-width));
+  background: var(--color-surface-1);
+  padding: var(--space-16);
+  box-shadow: 0 2px 20px var(--color-shadow);
+  z-index: var(--z-panel);
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-8);
 }
 
 .title {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .closeButton {
   background: none;
   border: none;
   cursor: pointer;
-  color: #ffffff;
-  padding: 4px;
+  color: var(--color-text-primary);
+  padding: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .closeIcon {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   transform: rotate(45deg);
 }
 
 .instruction {
-  margin: 0 0 16px;
-  font-size: 13px;
-  color: #aaaaaa;
+  margin: 0 0 var(--space-16);
+  font-size: var(--font-size-13);
+  color: var(--color-text-secondary);
   line-height: 1.4;
 }
 
 .ratings {
   display: flex;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .ratingButton {
@@ -57,11 +56,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
-  background: #2a2a2a;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-4);
+  background: var(--color-surface-2);
   border: 2px solid var(--rating-color);
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   cursor: pointer;
   transition:
     opacity 0.2s,
@@ -69,7 +68,7 @@
 }
 
 .ratingButton:not(.ratingButtonDisabled):hover {
-  background: color-mix(in srgb, var(--rating-color) 20%, #2a2a2a);
+  background: color-mix(in srgb, var(--rating-color) 20%, var(--color-surface-2));
 }
 
 .ratingButtonDisabled {
@@ -78,19 +77,19 @@
 }
 
 .emoji {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1;
 }
 
 .stars {
-  font-size: 8px;
+  font-size: var(--font-size-10);
   color: var(--rating-color);
   letter-spacing: 1px;
   line-height: 1;
 }
 
 .label {
-  font-size: 10px;
-  color: #ffffff;
+  font-size: var(--font-size-10);
+  color: var(--color-text-primary);
   font-weight: 600;
 }

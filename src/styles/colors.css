@@ -1,3 +1,9 @@
 :root {
   /* NOTE: map-related colors are defined in  map-color-tokens.ts and injected into :root in layout.tsx */
+
+  --color-surface-1: #1a1a1a;
+  --color-surface-2: #2a2a2a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #aaaaaa;
+  --color-shadow: rgba(0, 0, 0, 0.4);
 }
