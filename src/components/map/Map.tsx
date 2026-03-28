@@ -105,9 +105,9 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
   }) {
     const marker = L.circleMarker(latlng, {
       radius: 6,
-      color: '#ffffff',
+      color: mapColors.tempControlMarker.border,
       weight: 2,
-      fillColor: mapColors.rating.unknown,
+      fillColor: mapColors.tempControlMarker.fill,
       fillOpacity: 1,
     }).addTo(map);
 
@@ -144,7 +144,7 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
       if (!drawingActiveRef.current) return;
       tempSegment.routeCoordinates[legIndex] = coords;
       const polyline = L.polyline(coords, {
-        color: mapColors.rating.unknown,
+        color: mapColors.rating.neutral,
         weight: 5,
         opacity: 0.85,
       }).addTo(map);

@@ -3,6 +3,7 @@
 // Palette
 const blue = '#4285f4';
 const white = '#ffffff';
+const black = '#000000';
 
 // Rating palette
 const red = '#ff3b3b';
@@ -19,7 +20,12 @@ export const ratingColors = {
   3: yellow,
   4: lightgreen,
   5: green,
-  unknown: turquoise,
+  neutral: turquoise,
+} as const;
+
+export const tempControlMarkerColors = {
+  border: black,
+  fill: ratingColors.neutral,
 } as const;
 
 // Location dot
@@ -30,6 +36,7 @@ export const locationDotColors = {
 
 export const mapColors = {
   rating: ratingColors,
+  tempControlMarker: tempControlMarkerColors,
   locationDot: locationDotColors,
 } as const;
 
@@ -40,5 +47,5 @@ export const mapColorCSSVars = {
   '--color-rating-3': ratingColors[3],
   '--color-rating-4': ratingColors[4],
   '--color-rating-5': ratingColors[5],
-  '--color-rating-unknown': ratingColors.unknown,
+  '--color-rating-neutral': ratingColors.neutral,
 } as const;

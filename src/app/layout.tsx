@@ -1,14 +1,7 @@
 import type { Metadata } from 'next';
-import { Open_Sans } from 'next/font/google';
 import { mapColorCSSVars } from '@/styles/mapColorTokens';
 import 'leaflet/dist/leaflet.css';
-import '@/styles/colors.css';
-import './globals.css';
-
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  variable: '--font-sans',
-});
+import './main.css';
 
 export const metadata: Metadata = {
   title: 'SkateMap',
@@ -20,9 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="nl">
-      <body className={openSans.variable} style={mapColorStyles}>
-        {children}
-      </body>
+      <body style={mapColorStyles}>{children}</body>
     </html>
   );
 }
