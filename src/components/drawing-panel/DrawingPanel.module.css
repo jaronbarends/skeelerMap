@@ -5,6 +5,7 @@
   right: 0;
   background: #1a1a1a;
   padding: 16px;
+  /* `env(safe-area-inset-top)` adds space for notches or status bars on iOS and some mobile browsers */
   padding-top: calc(16px + env(safe-area-inset-top));
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
   z-index: 1000;
@@ -62,7 +63,9 @@
   border: 2px solid var(--rating-color);
   border-radius: 10px;
   cursor: pointer;
-  transition: opacity 0.2s, background 0.15s;
+  transition:
+    opacity 0.2s,
+    background 0.15s;
 }
 
 .ratingButton:not(.ratingButtonDisabled):hover {

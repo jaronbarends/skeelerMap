@@ -2,6 +2,7 @@
 
 import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
+import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
 import styles from './Map.module.css';
 
@@ -210,9 +211,7 @@ function renderSegment(segment: Segment, map: L.Map) {
 }
 
 async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number][]> {
-  const url =
-    `https://router.project-osrm.org/route/v1/driving/` +
-    `${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
+  const url = `${tilesProvider.routingUrl}${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
   try {
     const res = await fetch(url);
     const data = await res.json();
@@ -228,9 +227,9 @@ async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number
 }
 
 function createTileLayer(map: L.Map) {
-  const tilesUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-  const attribution = '&copy; <a href="https://carto.com/attributions">CARTO</a>';
-  L.tileLayer(tilesUrl, { attribution, maxZoom: 19 }).addTo(map);
+  L.tileLayer(tilesProvider.url, { attribution: tilesProvider.attribution, maxZoom: 19 }).addTo(
+    map
+  );
 }
 
 function createWatchedLocationMarker(map: L.Map) {
