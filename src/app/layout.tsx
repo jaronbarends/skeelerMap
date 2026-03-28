@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { mapColorCSSVars } from '@/styles/mapColorTokens';
 import MenuBar from '@/components/MenuBar';
 
@@ -8,6 +8,12 @@ import './main.css';
 export const metadata: Metadata = {
   title: 'SkateMap',
   description: 'Interactieve kaart met wegkwaliteit voor inline skating',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

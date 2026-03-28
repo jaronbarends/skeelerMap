@@ -1,5 +1,5 @@
 .fabContainer {
-  position: absolute;
+  position: fixed;
   bottom: calc(var(--fab-margin) + env(safe-area-inset-bottom));
   right: var(--fab-margin);
   display: flex;

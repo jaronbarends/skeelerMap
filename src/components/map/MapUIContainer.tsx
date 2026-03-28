@@ -22,7 +22,6 @@ export default function MapUIContainer() {
         drawingModeActive={drawingModeActive}
         onControlPointCountChange={setControlPointCount}
       />
-
       <FabContainer>
         <FabButton
           onClick={() => setDrawingModeActive(true)}
