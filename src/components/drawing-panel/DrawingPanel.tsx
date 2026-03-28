@@ -3,11 +3,12 @@ import styles from './DrawingPanel.module.css';
 
 const RATINGS = [
   { value: 1, label: 'Kansloos', emoji: '💀', stars: '★' },
-  { value: 2, label: 'Slecht',   emoji: '😬', stars: '★★' },
+  { value: 2, label: 'Slecht', emoji: '😬', stars: '★★' },
   { value: 3, label: 'Redelijk', emoji: '🙂', stars: '★★★' },
-  { value: 4, label: 'Goed',     emoji: '😎', stars: '★★★★' },
+  { value: 4, label: 'Goed', emoji: '😎', stars: '★★★★' },
   { value: 5, label: 'Geweldig', emoji: '🔥', stars: '★★★★★' },
 ] as const;
+type Rating = (typeof RATINGS)[number];
 
 interface Props {
   controlPointCount: number;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function DrawingPanel({ controlPointCount, onCancel, onRatingSelect }: Props) {
+  const disabled = controlPointCount < 2;
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
@@ -26,21 +28,32 @@ export default function DrawingPanel({ controlPointCount, onCancel, onRatingSele
       </div>
       <p className={styles.instruction}>{getInstruction(controlPointCount)}</p>
       <div className={styles.ratings}>
-        {RATINGS.map(({ value, label, emoji, stars }) => (
-          <button
-            key={value}
-            className={`${styles.ratingButton} ${controlPointCount < 2 ? styles.ratingButtonDisabled : ''}`}
-            disabled={controlPointCount < 2}
-            onClick={() => onRatingSelect(value)}
-            style={{ '--rating-color': `var(--color-rating-${value})` } as React.CSSProperties}
-          >
-            <span className={styles.emoji}>{emoji}</span>
-            <span className={styles.stars}>{stars}</span>
-            <span className={styles.label}>{label}</span>
-          </button>
+        {RATINGS.map((rating) => (
+          <RatingButton key={rating.value} {...{ rating, disabled, onRatingSelect }} />
         ))}
       </div>
     </div>
+  );
+}
+
+interface RatingButtonProps {
+  rating: Rating;
+  disabled: boolean;
+  onRatingSelect: (rating: number) => void;
+}
+
+function RatingButton({ rating, disabled, onRatingSelect }: RatingButtonProps) {
+  return (
+    <button
+      className={styles.ratingButton}
+      onClick={() => onRatingSelect(rating.value)}
+      data-rating={rating.value}
+      {...{ disabled }}
+    >
+      <span className={styles.emoji}>{rating.emoji}</span>
+      <span className={styles.stars}>{rating.stars}</span>
+      <span className={styles.label}>{rating.label}</span>
+    </button>
   );
 }
 

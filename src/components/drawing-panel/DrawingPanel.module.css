@@ -2,12 +2,13 @@
   position: absolute;
   top: calc(var(--panel-margin) + env(safe-area-inset-top));
   left: 50%;
+  z-index: var(--z-panel);
   transform: translateX(-50%);
   width: min(calc(100% - 2 * var(--panel-margin-min)), var(--panel-max-width));
-  background: var(--color-surface-1);
+  border-radius: var(--radius-8);
   padding: var(--space-16);
+  background: var(--color-surface-1);
   box-shadow: 0 2px 20px var(--color-shadow);
-  z-index: var(--z-panel);
 }
 
 .header {
@@ -65,13 +66,29 @@
   transition:
     opacity 0.2s,
     background 0.15s;
+
+  &[data-rating='1'] {
+    --rating-color: var(--color-rating-1);
+  }
+  &[data-rating='2'] {
+    --rating-color: var(--color-rating-2);
+  }
+  &[data-rating='3'] {
+    --rating-color: var(--color-rating-3);
+  }
+  &[data-rating='4'] {
+    --rating-color: var(--color-rating-4);
+  }
+  &[data-rating='5'] {
+    --rating-color: var(--color-rating-5);
+  }
 }
 
-.ratingButton:not(.ratingButtonDisabled):hover {
+.ratingButton:not([disabled]):hover {
   background: color-mix(in srgb, var(--rating-color) 20%, var(--color-surface-2));
 }
 
-.ratingButtonDisabled {
+.ratingButton[disabled] {
   opacity: 0.3;
   cursor: default;
 }
