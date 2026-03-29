@@ -8,6 +8,9 @@
   left: 50%;
   z-index: var(--z-panel);
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
   width: min(calc(100% - 2 * var(--panel-margin-min)), var(--panel-max-width));
   border-radius: var(--radius-8);
   padding: var(--space-16);

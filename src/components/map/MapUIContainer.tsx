@@ -32,7 +32,7 @@ export default function MapUIContainer() {
         <FabButton
           onClick={() => setDrawingModeActive(true)}
           ariaLabel="Segment toevoegen"
-          disabled={drawingModeActive}
+          disabled={drawingModeActive || selectedSegment !== null}
           iconName="plus"
         />
       </FabContainer>
