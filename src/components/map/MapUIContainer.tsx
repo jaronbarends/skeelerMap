@@ -7,9 +7,9 @@ import FabContainer from '@/components/FabContainer';
 import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
 import SegmentEditPanel from '@/components/panel/SegmentEditPanel';
 import styles from './MapUIContainer.module.css';
-import type { MapHandle, Segment } from './Map';
+import type { MapHandle, Segment } from './LeafletMap';
 
-const Map = dynamic(() => import('./Map'), { ssr: false });
+const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
 
 type SelectionMode = 'view' | 'edit' | 'delete';
 
@@ -22,7 +22,7 @@ export default function MapUIContainer() {
 
   return (
     <div className={styles.component}>
-      <Map
+      <LeafletMap
         ref={mapRef}
         drawingModeActive={drawingModeActive}
         onControlPointCountChange={setControlPointCount}
@@ -34,6 +34,12 @@ export default function MapUIContainer() {
           ariaLabel="Segment toevoegen"
           disabled={drawingModeActive || selectedSegment !== null}
           iconName="plus"
+        />
+        <FabButton
+          onClick={() => mapRef.current?.centerOnLocation()}
+          ariaLabel="Centreer op locatie"
+          disabled={false}
+          iconName="userLocation"
         />
       </FabContainer>
 

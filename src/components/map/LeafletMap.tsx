@@ -4,7 +4,7 @@ import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
-import styles from './Map.module.css';
+import styles from './LeafletMap.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
@@ -29,21 +29,23 @@ export interface MapHandle {
   deselectSegment: () => void;
   updateSegmentRating: (id: string, rating: number) => void;
   deleteSegment: (id: string) => void;
+  centerOnLocation: () => void;
 }
 
-interface Props {
+interface MapProps {
   ref?: React.Ref<MapHandle>;
   drawingModeActive: boolean;
   onControlPointCountChange: (count: number) => void;
   onSegmentSelect: (segment: Segment) => void;
 }
 
+// we can't name this component Map, because that might conflict with javascript's Map object
 export default function LeafletMap({
   ref,
   drawingModeActive,
   onControlPointCountChange,
   onSegmentSelect,
-}: Props) {
+}: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const drawingActiveRef = useRef(false);
@@ -57,7 +59,9 @@ export default function LeafletMap({
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
   const selectedSegmentIdRef = useRef<string | null>(null);
   const selectionMarkersRef = useRef<{ start: L.CircleMarker; end: L.CircleMarker } | null>(null);
+  const lastPositionRef = useRef<L.LatLngExpression | null>(null);
 
+  // expose methods to the ref in parent component
   useImperativeHandle(
     ref,
     () => ({
@@ -66,29 +70,22 @@ export default function LeafletMap({
       deselectSegment: clearSelectionVisuals,
       updateSegmentRating,
       deleteSegment,
+      centerOnLocation,
     }),
     []
   );
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
-    const map = L.map(container, { zoomControl: false }).setView(
-      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-      DEFAULT_ZOOM
-    );
-    mapRef.current = map;
-
-    createTileLayer(map);
-    renderAllSegments(map);
-    addMapListeners(map);
-
-    const watchId = createWatchedLocationMarker(map);
+    const { map, userLocationWatchId } = initMap(container);
 
     return () => {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
+      if (userLocationWatchId !== null) {
+        navigator.geolocation.clearWatch(userLocationWatchId);
       }
       map.remove();
       mapRef.current = null;
@@ -99,7 +96,37 @@ export default function LeafletMap({
     drawingActiveRef.current = drawingModeActive;
   }, [drawingModeActive]);
 
+  // return the component's DOM element
   return <div ref={containerRef} className={styles.container} />;
+
+  // internal functions
+
+  function initMap(container: HTMLDivElement): { map: L.Map; userLocationWatchId: number | null } {
+    const map = L.map(container, { zoomControl: false }).setView(
+      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
+      DEFAULT_ZOOM
+    );
+    mapRef.current = map;
+
+    createTileLayer(map);
+    renderAllSegments(map);
+    addMapListeners(map);
+
+    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
+
+    return { map, userLocationWatchId };
+  }
+
+  function centerOnLocation() {
+    const map = mapRef.current;
+    const position = lastPositionRef.current;
+    if (!map || !position) return;
+    map.setView(position, Math.max(map.getZoom(), 15));
+  }
+
+  function onPositionUpdate(latlng: L.LatLngExpression) {
+    lastPositionRef.current = latlng;
+  }
 
   function renderAllSegments(map: L.Map) {
     const segments = loadSegments();
@@ -144,7 +171,7 @@ export default function LeafletMap({
     const markerOptions: L.CircleMarkerOptions = {
       radius: 6,
       color,
-      weight: 2,
+      weight: 3,
       fillColor: '#000000',
       fillOpacity: 1,
     };
@@ -340,15 +367,19 @@ function createTileLayer(map: L.Map) {
   );
 }
 
-function createWatchedLocationMarker(map: L.Map) {
+function createWatchedLocationMarker(
+  map: L.Map,
+  onPositionUpdate: (latlng: L.LatLngExpression) => void
+) {
   if (!navigator.geolocation) return null;
 
   let locationMarker: L.CircleMarker | null = null;
   let firstFix = true;
 
-  const watchId = navigator.geolocation.watchPosition(
+  const userLocationWatchId = navigator.geolocation.watchPosition(
     (pos) => {
       const latlng: L.LatLngExpression = [pos.coords.latitude, pos.coords.longitude];
+      onPositionUpdate(latlng);
       if (!locationMarker) {
         locationMarker = L.circleMarker(latlng, {
           radius: 8,
@@ -371,5 +402,5 @@ function createWatchedLocationMarker(map: L.Map) {
     { enableHighAccuracy: true }
   );
 
-  return watchId;
+  return userLocationWatchId;
 }

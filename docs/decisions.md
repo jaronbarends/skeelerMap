@@ -94,7 +94,7 @@
 **Date:** 2025-06
 **Decision:**
 1. Tapping edit shows the rating picker (same UI as creation panel)
-2. Current rating must be visually indicated — how to show this is TBD (options: highlighted/active state on current rating button; current rating label in panel header; combination of both)
+2. Current rating is indicated with an outline + filled background on the active rating button (CSS `.current` class)
 3. Tapping a rating saves the new rating and closes the panel
 
 ### Delete flow
