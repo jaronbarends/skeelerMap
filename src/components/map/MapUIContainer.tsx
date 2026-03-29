@@ -5,15 +5,20 @@ import { useRef, useState } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
+import SegmentEditPanel from '@/components/panel/SegmentEditPanel';
 import styles from './MapUIContainer.module.css';
-import type { MapHandle } from './Map';
+import type { MapHandle, Segment } from './Map';
 
 const Map = dynamic(() => import('./Map'), { ssr: false });
+
+type SelectionMode = 'view' | 'edit' | 'delete';
 
 export default function MapUIContainer() {
   const mapRef = useRef<MapHandle>(null);
   const [drawingModeActive, setDrawingModeActive] = useState(false);
   const [controlPointCount, setControlPointCount] = useState(0);
+  const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>('view');
 
   return (
     <div className={styles.component}>
@@ -21,6 +26,7 @@ export default function MapUIContainer() {
         ref={mapRef}
         drawingModeActive={drawingModeActive}
         onControlPointCountChange={setControlPointCount}
+        onSegmentSelect={handleSegmentSelect}
       />
       <FabContainer>
         <FabButton
@@ -38,6 +44,20 @@ export default function MapUIContainer() {
           onRatingSelect={handleRatingSelect}
         />
       )}
+
+      {selectedSegment && (
+        <SegmentEditPanel
+          lengthLabel={formatLength(calculateLength(selectedSegment.coordinates))}
+          currentRating={selectedSegment.rating}
+          mode={selectionMode}
+          onClose={handleSegmentClose}
+          onEditStart={handleEditStart}
+          onDeleteStart={handleDeleteStart}
+          onDeleteCancel={handleDeleteCancel}
+          onDeleteConfirm={handleDeleteConfirm}
+          onRatingSelect={handleRatingUpdate}
+        />
+      )}
     </div>
   );
 
@@ -52,4 +72,63 @@ export default function MapUIContainer() {
     setDrawingModeActive(false);
     setControlPointCount(0);
   }
+
+  function handleSegmentSelect(segment: Segment) {
+    setSelectedSegment(segment);
+    setSelectionMode('view');
+  }
+
+  function handleSegmentClose() {
+    mapRef.current?.deselectSegment();
+    setSelectedSegment(null);
+  }
+
+  function handleEditStart() {
+    setSelectionMode('edit');
+  }
+
+  function handleRatingUpdate(rating: number) {
+    if (!selectedSegment) return;
+    mapRef.current?.updateSegmentRating(selectedSegment.id, rating);
+    setSelectedSegment(null);
+  }
+
+  function handleDeleteStart() {
+    setSelectionMode('delete');
+  }
+
+  function handleDeleteCancel() {
+    setSelectionMode('view');
+  }
+
+  function handleDeleteConfirm() {
+    if (!selectedSegment) return;
+    mapRef.current?.deleteSegment(selectedSegment.id);
+    setSelectedSegment(null);
+  }
+}
+
+function calculateLength(coordinates: [number, number][]): number {
+  let total = 0;
+  for (let i = 1; i < coordinates.length; i++) {
+    total += haversineDistance(coordinates[i - 1], coordinates[i]);
+  }
+  return total;
+}
+
+function haversineDistance([lat1, lon1]: [number, number], [lat2, lon2]: [number, number]): number {
+  const R = 6371000;
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatLength(meters: number): string {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1)} km`;
+  }
+  return `${Math.round(meters)} m`;
 }

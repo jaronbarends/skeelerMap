@@ -10,7 +10,7 @@ const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
 const STORAGE_KEY = 'skatemap_segments';
 
-interface Segment {
+export interface Segment {
   id: string;
   rating: number;
   coordinates: [number, number][];
@@ -26,15 +26,24 @@ interface TempSegment {
 export interface MapHandle {
   cancelDrawing: () => void;
   saveSegment: (rating: number) => void;
+  deselectSegment: () => void;
+  updateSegmentRating: (id: string, rating: number) => void;
+  deleteSegment: (id: string) => void;
 }
 
 interface Props {
   ref?: React.Ref<MapHandle>;
   drawingModeActive: boolean;
   onControlPointCountChange: (count: number) => void;
+  onSegmentSelect: (segment: Segment) => void;
 }
 
-export default function Map({ ref, drawingModeActive, onControlPointCountChange }: Props) {
+export default function LeafletMap({
+  ref,
+  drawingModeActive,
+  onControlPointCountChange,
+  onSegmentSelect,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const drawingActiveRef = useRef(false);
@@ -45,8 +54,21 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     routeCoordinates: [],
   });
   const segmentsRef = useRef<Segment[]>([]);
+  const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
+  const selectedSegmentIdRef = useRef<string | null>(null);
+  const selectionMarkersRef = useRef<{ start: L.CircleMarker; end: L.CircleMarker } | null>(null);
 
-  useImperativeHandle(ref, () => ({ cancelDrawing: clearTempSegment, saveSegment }), []);
+  useImperativeHandle(
+    ref,
+    () => ({
+      cancelDrawing: clearTempSegment,
+      saveSegment,
+      deselectSegment: clearSelectionVisuals,
+      updateSegmentRating,
+      deleteSegment,
+    }),
+    []
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -83,6 +105,67 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
     const segments = loadSegments();
     segmentsRef.current = segments;
     segments.forEach((segment) => renderSegment(segment, map));
+  }
+
+  function renderSegment(segment: Segment, map: L.Map) {
+    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+    const polyline = L.polyline(segment.coordinates, {
+      color,
+      weight: 5,
+      opacity: 0.85,
+    }).addTo(map);
+
+    polyline.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      if (!drawingActiveRef.current) {
+        handleSelectSegment(segment, polyline);
+      }
+    });
+
+    segmentLayersRef.current.set(segment.id, polyline);
+  }
+
+  function handleSelectSegment(segment: Segment, polyline: L.Polyline) {
+    if (selectedSegmentIdRef.current === segment.id) return;
+
+    const map = mapRef.current;
+    if (!map) return;
+
+    const current = segmentsRef.current.find((s) => s.id === segment.id) ?? segment;
+
+    clearSelectionVisuals();
+
+    selectedSegmentIdRef.current = current.id;
+    polyline.setStyle({ weight: 8 });
+
+    const color = mapColors.rating[String(current.rating) as keyof typeof mapColors.rating];
+    const startCoord = current.coordinates[0];
+    const endCoord = current.coordinates[current.coordinates.length - 1];
+    const markerOptions: L.CircleMarkerOptions = {
+      radius: 6,
+      color,
+      weight: 2,
+      fillColor: '#000000',
+      fillOpacity: 1,
+    };
+    const startMarker = L.circleMarker(startCoord, markerOptions).addTo(map);
+    const endMarker = L.circleMarker(endCoord, markerOptions).addTo(map);
+    selectionMarkersRef.current = { start: startMarker, end: endMarker };
+
+    onSegmentSelect(current);
+  }
+
+  function clearSelectionVisuals() {
+    if (selectedSegmentIdRef.current) {
+      const polyline = segmentLayersRef.current.get(selectedSegmentIdRef.current);
+      if (polyline) {
+        polyline.setStyle({ weight: 5 });
+      }
+    }
+    selectionMarkersRef.current?.start.remove();
+    selectionMarkersRef.current?.end.remove();
+    selectionMarkersRef.current = null;
+    selectedSegmentIdRef.current = null;
   }
 
   function addMapListeners(map: L.Map) {
@@ -190,6 +273,40 @@ export default function Map({ ref, drawingModeActive, onControlPointCountChange 
 
     clearTempSegment();
   }
+
+  function updateSegmentRating(id: string, rating: number) {
+    const idx = segmentsRef.current.findIndex((s) => s.id === id);
+    if (idx === -1) return;
+
+    const updated = { ...segmentsRef.current[idx], rating };
+    segmentsRef.current = [
+      ...segmentsRef.current.slice(0, idx),
+      updated,
+      ...segmentsRef.current.slice(idx + 1),
+    ];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
+
+    const polyline = segmentLayersRef.current.get(id);
+    if (polyline) {
+      const color = mapColors.rating[String(rating) as keyof typeof mapColors.rating];
+      polyline.setStyle({ color });
+    }
+
+    clearSelectionVisuals();
+  }
+
+  function deleteSegment(id: string) {
+    const polyline = segmentLayersRef.current.get(id);
+    if (polyline) {
+      polyline.remove();
+      segmentLayersRef.current.delete(id);
+    }
+
+    segmentsRef.current = segmentsRef.current.filter((s) => s.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
+
+    clearSelectionVisuals();
+  }
 }
 
 function loadSegments(): Segment[] {
@@ -199,15 +316,6 @@ function loadSegments(): Segment[] {
   } catch {
     return [];
   }
-}
-
-function renderSegment(segment: Segment, map: L.Map) {
-  const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
-  L.polyline(segment.coordinates as [number, number][], {
-    color,
-    weight: 5,
-    opacity: 0.85,
-  }).addTo(map);
 }
 
 async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number][]> {

@@ -12,15 +12,21 @@ type Rating = (typeof RATINGS)[number];
 
 interface Props {
   onRatingSelect: (rating: number) => void;
+  currentRating?: number;
 }
 
-export default function RatingButtons({ onRatingSelect }: Props) {
+export default function RatingButtons({ onRatingSelect, currentRating }: Props) {
   return (
     <>
       <PanelInstruction>Kies kwaliteit om op te slaan</PanelInstruction>
       <div className={styles.ratings}>
         {RATINGS.map((rating) => (
-          <RatingButton key={rating.value} {...{ rating, onRatingSelect }} />
+          <RatingButton
+            key={rating.value}
+            rating={rating}
+            onRatingSelect={onRatingSelect}
+            isCurrent={rating.value === currentRating}
+          />
         ))}
       </div>
     </>
@@ -30,12 +36,13 @@ export default function RatingButtons({ onRatingSelect }: Props) {
 interface RatingButtonProps {
   rating: Rating;
   onRatingSelect: (rating: number) => void;
+  isCurrent: boolean;
 }
 
-function RatingButton({ rating, onRatingSelect }: RatingButtonProps) {
+function RatingButton({ rating, onRatingSelect, isCurrent }: RatingButtonProps) {
   return (
     <button
-      className={styles.ratingButton}
+      className={`${styles.ratingButton}${isCurrent ? ` ${styles.current}` : ''}`}
       onClick={() => onRatingSelect(rating.value)}
       data-rating={rating.value}
     >

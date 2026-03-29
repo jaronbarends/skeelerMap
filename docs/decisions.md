@@ -75,10 +75,9 @@
 
 ### Rating UI visibility during drawing
 **Date:** 2025-06
-**Status:** OPEN — test both options on iPhone SE before deciding.
-**Option A:** Rating buttons visible but greyed out from step 2, activate once 2+ points are placed.
-**Option B:** Rating buttons only appear after 2+ points are placed.
-**Consideration:** iPhone SE has limited vertical space — option A may feel cramped. Test both.
+**Decision:** Option B — rating buttons only appear after 2+ points are placed.
+**Rationale:** Tested both on iPhone SE. Option A felt cramped; showing the drawing instruction only until 2+ points are placed keeps the panel compact and focused.
+**Option A (rejected):** Rating buttons visible but greyed out from step 2, activate once 2+ points are placed.
 
 ---
 

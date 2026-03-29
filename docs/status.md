@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-03-27
-**Current phase:** Segment creation flow implemented. Ready for testing on iPhone SE.
+**Last updated:** 2026-03-29
+**Current phase:** Segment creation flow tested and working on iPhone SE. Panel component structure refactored.
 
 ---
 
@@ -14,6 +14,7 @@
 - Open Sans via `next/font/google`
 - `react-icons` (fa6) for FAB and panel close button
 - Segment creation flow: FAB → drawing mode → control points → OSRM routing → rating → localStorage
+- Panel component system: `Panel`, `PanelHeader`, `PanelInstruction`, `PanelIconButton`, `RatingButtons`, `SegmentAddPanel` — all in `src/components/panel/`
 
 ## What's decided
 - Stack: Next.js + App Router + TypeScript + Leaflet (plain)
@@ -26,7 +27,6 @@
 - Rating UI: Option A (greyed out until 2+ points placed)
 
 ## What's open
-- Rating UI Option A — validate on iPhone SE (panel is at top, FAB at bottom-right)
 - How to indicate current rating in edit panel (TBD)
 - Mobile browser emulation: page is larger than the device viewport in Chrome/Firefox devtools mobile mode, causing the FAB to be out of view — needs investigation before mobile testing
 - Location permission flow (deferred)
@@ -34,6 +34,5 @@
 - Tile provider for production (deferred)
 
 ## Next step
-Test segment creation flow on iPhone SE, then implement:
 1. Location button (FAB, below add-segment button) — centers map on user
 2. Segment selection flow (tap segment → panel at top → length, edit, delete, close)

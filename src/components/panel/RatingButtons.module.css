@@ -11,7 +11,7 @@
   gap: var(--space-2);
   padding: var(--space-8) var(--space-4);
   background: var(--color-surface-2);
-  border: 2px solid var(--rating-color);
+  border: 1px solid var(--rating-color);
   border-radius: var(--radius-10);
   cursor: pointer;
   transition:
@@ -35,8 +35,14 @@
   }
 }
 
-.ratingButton:hover {
+.ratingButton:hover,
+.ratingButton.current {
   background: color-mix(in srgb, var(--rating-color) 20%, var(--color-surface-2));
+}
+
+.ratingButton.current {
+  outline: 2px solid var(--rating-color);
+  outline-offset: 2px;
 }
 
 .emoji {
@@ -47,7 +53,6 @@
 .stars {
   font-size: var(--font-size-10);
   color: var(--rating-color);
-  letter-spacing: 1px;
   line-height: 1;
 }
 

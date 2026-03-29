@@ -1,0 +1,26 @@
+.deleteActions {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.cancelButton,
+.confirmButton {
+  flex: 1;
+  padding: var(--space-8) var(--space-16);
+  border: none;
+  border-radius: var(--radius-8);
+  font-size: var(--font-size-14);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+}
+
+.confirmButton {
+  background: var(--color-rating-1);
+  color: #ffffff;
+}
