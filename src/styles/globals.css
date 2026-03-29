@@ -1,19 +1,6 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  margin: 0;
-  padding: 0;
-}
-
 body {
   display: flex;
   flex-direction: column;
-  margin: 0;
-  padding: 0;
   width: 100%;
   height: 100lvh; /* make body run behind the address bar on iOS */
   font-family: var(--font-sans), sans-serif;

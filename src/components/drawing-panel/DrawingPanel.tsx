@@ -21,7 +21,7 @@ export default function DrawingPanel({ controlPointCount, onCancel, onRatingSele
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <span className={styles.title}>Segment toevoegen</span>
+        <h2 className={styles.title}>Segment toevoegen</h2>
         <button className={styles.closeButton} onClick={onCancel} aria-label="Annuleren">
           <FaPlus className={styles.closeIcon} />
         </button>

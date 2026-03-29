@@ -22,8 +22,5 @@
   --radius-16: 1rem;
 
   /* layout */
-  --panel-max-width: 36rem;
-  --panel-margin: var(--space-16);
-  --panel-margin-min: var(--space-8);
   --fab-margin: var(--space-16);
 }

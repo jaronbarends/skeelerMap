@@ -1,4 +1,8 @@
 .panel {
+  --panel-max-width: 25rem;
+  --panel-margin: var(--space-16);
+  --panel-margin-min: var(--space-8);
+
   position: absolute;
   top: calc(var(--panel-margin) + env(safe-area-inset-top));
   left: 50%;
