@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useRef, useState } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
-import DrawingPanel from '@/components/drawing-panel/DrawingPanel';
+import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
 import styles from './MapUIContainer.module.css';
 import type { MapHandle } from './Map';
 
@@ -32,7 +32,7 @@ export default function MapUIContainer() {
       </FabContainer>
 
       {drawingModeActive && (
-        <DrawingPanel
+        <SegmentAddPanel
           controlPointCount={controlPointCount}
           onCancel={handleCancel}
           onRatingSelect={handleRatingSelect}

@@ -1,0 +1,16 @@
+.panel {
+  --panel-max-width: 25rem;
+  --panel-margin: var(--space-16);
+  --panel-margin-min: var(--space-8);
+
+  position: absolute;
+  top: calc(var(--panel-margin) + env(safe-area-inset-top));
+  left: 50%;
+  z-index: var(--z-panel);
+  transform: translateX(-50%);
+  width: min(calc(100% - 2 * var(--panel-margin-min)), var(--panel-max-width));
+  border-radius: var(--radius-8);
+  padding: var(--space-16);
+  background: var(--color-surface-1);
+  box-shadow: 0 2px 20px var(--color-shadow);
+}
