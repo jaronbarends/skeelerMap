@@ -25,10 +25,10 @@ interface TempSegment {
 
 export interface MapHandle {
   cancelDrawing: () => void;
-  saveSegment: (rating: number) => void;
+  saveSegment: (rating: number) => Promise<void>;
   deselectSegment: () => void;
-  updateSegmentRating: (id: string, rating: number) => void;
-  deleteSegment: (id: string) => void;
+  updateSegmentRating: (id: string, rating: number) => Promise<void>;
+  deleteSegment: (id: string) => Promise<void>;
   centerOnLocation: () => void;
 }
 
@@ -81,9 +81,11 @@ export default function LeafletMap({
       return;
     }
 
-    const { map, userLocationWatchId } = initMap(container);
+    const abortController = new AbortController();
+    const { map, userLocationWatchId } = initMap(container, abortController.signal);
 
     return () => {
+      abortController.abort();
       if (userLocationWatchId !== null) {
         navigator.geolocation.clearWatch(userLocationWatchId);
       }
@@ -101,7 +103,10 @@ export default function LeafletMap({
 
   // internal functions
 
-  function initMap(container: HTMLDivElement): { map: L.Map; userLocationWatchId: number | null } {
+  function initMap(
+    container: HTMLDivElement,
+    abortSignal: AbortSignal
+  ): { map: L.Map; userLocationWatchId: number | null } {
     const map = L.map(container, { zoomControl: false }).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
       DEFAULT_ZOOM
@@ -109,7 +114,7 @@ export default function LeafletMap({
     mapRef.current = map;
 
     createTileLayer(map);
-    renderAllSegments(map);
+    renderAllSegments(map, abortSignal);
     addMapListeners(map);
 
     const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
@@ -128,13 +133,20 @@ export default function LeafletMap({
     lastPositionRef.current = latlng;
   }
 
-  async function renderAllSegments(map: L.Map) {
-    const segments = await loadSegments();
+  async function renderAllSegments(map: L.Map, abortSignal: AbortSignal) {
+    const segments = await loadSegments(abortSignal);
+    if (abortSignal.aborted) {
+      // catches case where fetch completed just before abort
+      return;
+    }
     segmentsRef.current = segments;
     segments.forEach((segment) => renderSegment(segment, map));
   }
 
   function renderSegment(segment: Segment, map: L.Map) {
+    if (!map) {
+      console.error('Map not found');
+    }
     const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
     const polyline = L.polyline(segment.coordinates, {
       color,
@@ -313,17 +325,29 @@ export default function LeafletMap({
     clearTempSegment();
   }
 
-  function updateSegmentRating(id: string, rating: number) {
+  async function updateSegmentRating(id: string, rating: number) {
     const idx = segmentsRef.current.findIndex((s) => s.id === id);
     if (idx === -1) return;
 
-    const updated = { ...segmentsRef.current[idx], rating };
+    const res = await fetch('/api/segments', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        id,
+        rating,
+      }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      console.error(data.error);
+      throw new Error('Kan het segment niet aanpassen');
+    }
+
+    const updatedSegment = { ...segmentsRef.current[idx], rating };
     segmentsRef.current = [
       ...segmentsRef.current.slice(0, idx),
-      updated,
+      updatedSegment,
       ...segmentsRef.current.slice(idx + 1),
     ];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
 
     const polyline = segmentLayersRef.current.get(id);
     if (polyline) {
@@ -334,7 +358,30 @@ export default function LeafletMap({
     clearSelectionVisuals();
   }
 
-  function deleteSegment(id: string) {
+  async function deleteSegment(id: string) {
+    const res = await fetch('/api/segments', {
+      method: 'DELETE',
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      console.error(data.error);
+      throw new Error('Kan het segment niet verwijderen');
+    }
+
+    const polyline = segmentLayersRef.current.get(id);
+    if (polyline) {
+      polyline.remove();
+      segmentLayersRef.current.delete(id);
+    }
+
+    segmentsRef.current = segmentsRef.current.filter((s) => s.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
+
+    clearSelectionVisuals();
+  }
+
+  function deleteSegment_bak(id: string) {
     const polyline = segmentLayersRef.current.get(id);
     if (polyline) {
       polyline.remove();
@@ -348,9 +395,9 @@ export default function LeafletMap({
   }
 }
 
-async function loadSegments(): Promise<Segment[]> {
+async function loadSegments(abortSignal: AbortSignal): Promise<Segment[]> {
   try {
-    const res = await fetch('/api/segments');
+    const res = await fetch('/api/segments', { signal: abortSignal });
     return res.json();
   } catch {
     return [];

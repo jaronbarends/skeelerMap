@@ -75,11 +75,9 @@ export default function MapUIContainer() {
 
   async function handleRatingSelect(rating: number) {
     try {
-      const res = await mapRef.current?.saveSegment(rating);
-      if (res) {
-        setDrawingModeActive(false);
-        setControlPointCount(0);
-      }
+      await mapRef.current?.saveSegment(rating);
+      setDrawingModeActive(false);
+      setControlPointCount(0);
     } catch (error) {
       console.error(error);
       alert('Kan het segment niet opslaan');
@@ -100,10 +98,15 @@ export default function MapUIContainer() {
     setSelectionMode('edit');
   }
 
-  function handleRatingUpdate(rating: number) {
+  async function handleRatingUpdate(rating: number) {
     if (!selectedSegment) return;
-    mapRef.current?.updateSegmentRating(selectedSegment.id, rating);
-    setSelectedSegment(null);
+    try {
+      await mapRef.current?.updateSegmentRating(selectedSegment.id, rating);
+      setSelectedSegment(null);
+    } catch (error) {
+      console.error(error);
+      alert('Kan het segment niet aanpassen');
+    }
   }
 
   function handleDeleteStart() {
@@ -114,10 +117,15 @@ export default function MapUIContainer() {
     setSelectionMode('view');
   }
 
-  function handleDeleteConfirm() {
+  async function handleDeleteConfirm() {
     if (!selectedSegment) return;
-    mapRef.current?.deleteSegment(selectedSegment.id);
-    setSelectedSegment(null);
+    try {
+      await mapRef.current?.deleteSegment(selectedSegment.id);
+      setSelectedSegment(null);
+    } catch (error) {
+      console.error(error);
+      alert('Kan het segment niet verwijderen');
+    }
   }
 }
 
