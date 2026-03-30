@@ -128,8 +128,8 @@ export default function LeafletMap({
     lastPositionRef.current = latlng;
   }
 
-  function renderAllSegments(map: L.Map) {
-    const segments = loadSegments();
+  async function renderAllSegments(map: L.Map) {
+    const segments = await loadSegments();
     segmentsRef.current = segments;
     segments.forEach((segment) => renderSegment(segment, map));
   }
@@ -278,7 +278,7 @@ export default function LeafletMap({
     };
   }
 
-  function saveSegment(rating: number) {
+  async function saveSegment(rating: number) {
     const tempSegment = tempSegmentRef.current;
     const map = mapRef.current;
     if (!map) return;
@@ -287,16 +287,28 @@ export default function LeafletMap({
       .filter((c): c is [number, number][] => c !== null)
       .flat();
 
-    if (allCoords.length > 0) {
-      const newSegment: Segment = {
-        id: crypto.randomUUID(),
-        rating,
-        coordinates: allCoords,
-      };
-      renderSegment(newSegment, map);
-      segmentsRef.current = [...segmentsRef.current, newSegment];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
+    if (allCoords.length <= 1) {
+      throw new Error('Selecteer ten minste 2 punten');
     }
+
+    const res = await fetch('/api/segments', {
+      method: 'POST',
+      body: JSON.stringify({ rating, coordinates: allCoords }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      console.error(data.error);
+      throw new Error('Kan het segment niet opslaan');
+    }
+
+    const data = await res.json();
+    const newSegment: Segment = {
+      id: data.id,
+      rating,
+      coordinates: allCoords,
+    };
+    renderSegment(newSegment, map);
+    segmentsRef.current = [...segmentsRef.current, newSegment];
 
     clearTempSegment();
   }
@@ -336,10 +348,10 @@ export default function LeafletMap({
   }
 }
 
-function loadSegments(): Segment[] {
+async function loadSegments(): Promise<Segment[]> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Segment[]) : [];
+    const res = await fetch('/api/segments');
+    return res.json();
   } catch {
     return [];
   }

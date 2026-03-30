@@ -6,6 +6,7 @@
 ---
 
 ## What exists
+
 - Next.js 15 + App Router + TypeScript
 - Leaflet (plain, not react-leaflet) — full-screen map, Netherlands default, user location dot
 - CartoDB Voyager tile layer
@@ -19,9 +20,10 @@
 - Location button (FAB, below add-segment button): centers map on user's last known position
 
 ## What's decided
+
 - Stack: Next.js + App Router + TypeScript + Leaflet (plain)
 - react-leaflet: decided against — imperative pattern is sufficient for this app
-- Backend: BaaS TBD (Supabase or Firebase), chosen when auth is needed
+- Backend: BaaS TBD (Supabase or Firebase), chosen when auth is needed or when we want to store segments externally
 - MVP scope and explicit out-of-scope items (see requirements.md)
 - Segment creation flow (see decisions.md)
 - Segment selection, edit, and delete flow (see decisions.md)
@@ -29,10 +31,12 @@
 - Rating UI: Option A (greyed out until 2+ points placed)
 
 ## What's open
+
 - Mobile browser emulation: page is larger than the device viewport in Chrome/Firefox devtools mobile mode, causing the FAB to be out of view — needs investigation before mobile testing
 - Location permission flow (deferred)
 - BaaS choice (deferred)
 - Tile provider for production (deferred)
 
 ## Next step
+
 - TBD — review open items above or pick next feature from requirements.md

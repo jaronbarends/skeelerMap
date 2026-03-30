@@ -3,6 +3,7 @@
 ## MVP scope
 
 ### Core features
+
 - [ ] Full-screen map (Leaflet) centered on user location
 - [ ] User location dot marker
 - [ ] Add segment flow
@@ -22,9 +23,12 @@
 - [ ] Default map center (Netherlands) when location unavailable
 
 ### Pages (MVP)
+
 - / — map view (the entire app for now)
 
 ### Not in MVP
+
+- Store segments in a BaaS
 - User accounts / auth
 - FAQ or other pages
 - Drag-to-edit segment endpoints (v1.1)
@@ -32,11 +36,12 @@
 - Zoom-based visual scaling
 - Legend / info panel
 - Logo / branding
-- Segment list or statistics
+- keyboard shortcuts (esc to cancel, delete to delete segment in edit mode)
 
 ---
 
 ## Design constraints
+
 - Primary test device: iPhone SE (small screen — UI decisions must be validated here)
 - Full-screen map at all times — no persistent chrome
 - Minimize clicks — every interaction step must earn its place

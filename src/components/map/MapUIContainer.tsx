@@ -73,10 +73,17 @@ export default function MapUIContainer() {
     setControlPointCount(0);
   }
 
-  function handleRatingSelect(rating: number) {
-    mapRef.current?.saveSegment(rating);
-    setDrawingModeActive(false);
-    setControlPointCount(0);
+  async function handleRatingSelect(rating: number) {
+    try {
+      const res = await mapRef.current?.saveSegment(rating);
+      if (res) {
+        setDrawingModeActive(false);
+        setControlPointCount(0);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Kan het segment niet opslaan');
+    }
   }
 
   function handleSegmentSelect(segment: Segment) {
