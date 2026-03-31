@@ -5,7 +5,7 @@ import L from 'leaflet';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
 import { Segment } from '@/types/segment';
-import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
+import { createSegment, removeSegment, updateSegment } from '@/lib/segmentService';
 import styles from './LeafletMap.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
@@ -30,6 +30,8 @@ export interface MapHandle {
 interface MapProps {
   ref?: React.Ref<MapHandle>;
   drawingModeActive: boolean;
+  fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
+  segments: Segment[];
   onControlPointCountChange: (count: number) => void;
   onSegmentSelect: (segment: Segment) => void;
 }
@@ -38,6 +40,7 @@ interface MapProps {
 export default function LeafletMap({
   ref,
   drawingModeActive,
+  fetchSegments,
   onControlPointCountChange,
   onSegmentSelect,
 }: MapProps) {

@@ -7,7 +7,9 @@ import FabContainer from '@/components/FabContainer';
 import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
 import SegmentEditPanel from '@/components/panel/SegmentEditPanel';
 import styles from './MapUIContainer.module.css';
-import type { MapHandle, Segment } from './LeafletMap';
+import type { MapHandle } from './LeafletMap';
+import type { Segment } from '@/types/segment';
+import { fetchSegments } from '@/lib/segmentService';
 
 const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
 
@@ -19,12 +21,15 @@ export default function MapUIContainer() {
   const [controlPointCount, setControlPointCount] = useState(0);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('view');
+  const [segments, setSegments] = useState<Segment[]>([]);
 
   return (
     <div className={styles.component}>
       <LeafletMap
         ref={mapRef}
         drawingModeActive={drawingModeActive}
+        fetchSegments={fetchSegmentsForMap}
+        segments={segments}
         onControlPointCountChange={setControlPointCount}
         onSegmentSelect={handleSegmentSelect}
       />
@@ -66,6 +71,12 @@ export default function MapUIContainer() {
       )}
     </div>
   );
+
+  async function fetchSegmentsForMap(abortSignal: AbortSignal): Promise<Segment[]> {
+    const result = await fetchSegments(abortSignal);
+    setSegments(result);
+    return result;
+  }
 
   function handleCancel() {
     mapRef.current?.cancelDrawing();
