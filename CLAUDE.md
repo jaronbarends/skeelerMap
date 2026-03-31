@@ -8,10 +8,30 @@ Read this before every session, along with the other files in docs/.
 ## Before you start any session
 
 1. Read `docs/decisions.md` — what has been decided and why
-2. Read `docs/requirements.md` — what is in and out of scope
+2. Read `docs/requirements.md` — frozen MVP scope, do not modify
 3. Read `docs/design.md` — instructions on design and UI
 4. Read `docs/status.md` — current state and what to do next
-5. Do not start implementing until you understand the current state
+5. Read `docs/backlog.md` — prioritized post-MVP features
+6. Do not start implementing until you understand the current state
+
+## Doc workflow
+
+- `requirements.md` — frozen MVP scope, do not modify
+- `backlog.md` — prioritized post-MVP features; pick next item from here
+- `status.md` — update when phase changes or a feature ships
+- `decisions.md` — log non-obvious decisions when a feature ships
+
+Flow: backlog.md → status.md (in progress) → decisions.md (if needed)
+
+## Updating docs
+
+When asked to "update the docs" after completing a feature:
+
+1. `status.md` — update current phase and next step
+2. `decisions.md` — log any non-obvious decisions made during implementation
+3. `backlog.md` — mark the feature as done or remove it
+
+Do not modify `requirements.md` or `design.md` unless explicitly asked.
 
 ---
 

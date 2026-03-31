@@ -30,11 +30,11 @@
 **Rationale:** Already proven in the PoC, including road-following (routing/snapping) and draggable segment endpoints. No blocking limitations encountered.
 **Status:** Consider a formal evaluation if a specific limitation arises.
 
-### Backend: Backend-as-a-service (TBD)
-**Date:** 2025-06
-**Decision:** Use a BaaS (Supabase or Firebase, to be decided) rather than a custom API layer.
-**Rationale:** Keep focus on frontend. Auth and data persistence will be handled by a managed service.
-**Status:** Decide when auth becomes the next priority.
+### Backend: Supabase
+**Date:** 2025-06 (chosen and implemented 2026-03-31)
+**Decision:** Use Supabase as the BaaS for storage (and eventually auth).
+**Rationale:** Keep focus on frontend. Auth and data persistence handled by a managed service. Supabase chosen over Firebase for its Postgres-based data model and open-source nature.
+**Status:** Implemented — segments are stored in Supabase.
 
 ---
 
@@ -112,6 +112,14 @@
 **Date:** 2025-06
 **Decision:** Deferred to v1.1. Not in MVP.
 **Rationale:** Adds meaningful interaction complexity. The core "fix a mistake" use case is covered by edit rating + delete.
+
+---
+
+## FAB container positioning: `position: fixed`
+**Date:** 2026-03-31
+**Decision:** The FAB container uses `position: fixed`, not `position: absolute` within `MapUIContainer`.
+**Rationale:** `position: absolute` within the map container would be the natural choice, but iOS Safari's dynamic address bar overlaps the bottom of the viewport. `position: fixed` is resolved relative to the visual viewport, which shrinks to exclude the address bar — keeping the FAB visible and tappable.
+**Symptom it fixed:** FAB was out of view in mobile browser emulation and on iOS Safari due to the address bar overlapping the bottom of the page.
 
 ---
 
