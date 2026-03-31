@@ -30,6 +30,7 @@ export default function MapUIContainer() {
         drawingModeActive={drawingModeActive}
         fetchSegments={fetchSegmentsForMap}
         segments={segments}
+        selectedSegment={selectedSegment}
         onControlPointCountChange={setControlPointCount}
         onSegmentSelect={handleSegmentSelect}
       />
@@ -106,7 +107,6 @@ export default function MapUIContainer() {
   }
 
   function handleSegmentClose() {
-    mapRef.current?.deselectSegment();
     setSelectedSegment(null);
   }
 

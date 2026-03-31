@@ -22,7 +22,6 @@ export interface MapHandle {
   cancelDrawing: () => void;
   saveSegment: () => [number, number][];
   onSegmentSaved: () => void;
-  deselectSegment: () => void;
   updateSegmentRating: (id: string, rating: number) => Promise<void>;
   deleteSegment: (id: string) => Promise<void>;
   centerOnLocation: () => void;
@@ -33,6 +32,7 @@ interface MapProps {
   drawingModeActive: boolean;
   fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
   segments: Segment[];
+  selectedSegment: Segment | null;
   onControlPointCountChange: (count: number) => void;
   onSegmentSelect: (segment: Segment) => void;
 }
@@ -43,6 +43,7 @@ export default function LeafletMap({
   drawingModeActive,
   fetchSegments,
   segments,
+  selectedSegment,
   onControlPointCountChange,
   onSegmentSelect,
 }: MapProps) {
@@ -56,7 +57,6 @@ export default function LeafletMap({
     routeCoordinates: [],
   });
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
-  const selectedSegmentIdRef = useRef<string | null>(null);
   const selectionMarkersRef = useRef<{ start: L.CircleMarker; end: L.CircleMarker } | null>(null);
   const lastPositionRef = useRef<L.LatLngExpression | null>(null);
 
@@ -67,7 +67,6 @@ export default function LeafletMap({
       cancelDrawing: clearTempSegment,
       saveSegment,
       onSegmentSaved: clearTempSegment,
-      deselectSegment: clearSelectionVisuals,
       updateSegmentRating,
       deleteSegment,
       centerOnLocation,
@@ -121,6 +120,38 @@ export default function LeafletMap({
       }
     }
   }, [segments]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!selectedSegment) return;
+
+    const polyline = segmentLayersRef.current.get(selectedSegment.id);
+    if (!polyline) return;
+
+    polyline.setStyle({ weight: 8 });
+
+    const color = mapColors.rating[String(selectedSegment.rating) as keyof typeof mapColors.rating];
+    const startCoord = selectedSegment.coordinates[0];
+    const endCoord = selectedSegment.coordinates[selectedSegment.coordinates.length - 1];
+    const markerOptions: L.CircleMarkerOptions = {
+      radius: 6,
+      color,
+      weight: 3,
+      fillColor: '#000000',
+      fillOpacity: 1,
+    };
+    const startMarker = L.circleMarker(startCoord, markerOptions).addTo(map);
+    const endMarker = L.circleMarker(endCoord, markerOptions).addTo(map);
+    selectionMarkersRef.current = { start: startMarker, end: endMarker };
+
+    return () => {
+      polyline.setStyle({ weight: 5 });
+      selectionMarkersRef.current?.start.remove();
+      selectionMarkersRef.current?.end.remove();
+      selectionMarkersRef.current = null;
+    };
+  }, [selectedSegment]);
 
   // return the component's DOM element
   return <div ref={containerRef} className={styles.container} />;
@@ -180,52 +211,17 @@ export default function LeafletMap({
     polyline.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       if (!drawingActiveRef.current) {
-        handleSelectSegment(segment, polyline);
+        onSegmentSelect(segment);
       }
     });
 
     segmentLayersRef.current.set(segment.id, polyline);
   }
 
-  function handleSelectSegment(segment: Segment, polyline: L.Polyline) {
-    if (selectedSegmentIdRef.current === segment.id) return;
-
-    const map = mapRef.current;
-    if (!map) return;
-
-    clearSelectionVisuals();
-
-    selectedSegmentIdRef.current = segment.id;
-    polyline.setStyle({ weight: 8 });
-
-    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
-    const startCoord = segment.coordinates[0];
-    const endCoord = segment.coordinates[segment.coordinates.length - 1];
-    const markerOptions: L.CircleMarkerOptions = {
-      radius: 6,
-      color,
-      weight: 3,
-      fillColor: '#000000',
-      fillOpacity: 1,
-    };
-    const startMarker = L.circleMarker(startCoord, markerOptions).addTo(map);
-    const endMarker = L.circleMarker(endCoord, markerOptions).addTo(map);
-    selectionMarkersRef.current = { start: startMarker, end: endMarker };
-
-    onSegmentSelect(segment);
-  }
-
   function clearSelectionVisuals() {
-    if (selectedSegmentIdRef.current) {
-      const polyline = segmentLayersRef.current.get(selectedSegmentIdRef.current);
-      if (polyline) {
-        polyline.setStyle({ weight: 5 });
-      }
-    }
     selectionMarkersRef.current?.start.remove();
     selectionMarkersRef.current?.end.remove();
     selectionMarkersRef.current = null;
-    selectedSegmentIdRef.current = null;
   }
 
   function addMapListeners(map: L.Map) {
