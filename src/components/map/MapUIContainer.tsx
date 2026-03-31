@@ -21,6 +21,7 @@ export default function MapUIContainer() {
   const [controlPointCount, setControlPointCount] = useState(0);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('view');
+  // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
   const [segments, setSegments] = useState<Segment[]>([]);
 
   return (

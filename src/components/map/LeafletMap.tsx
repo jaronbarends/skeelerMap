@@ -93,9 +93,19 @@ export default function LeafletMap({
       return;
     }
 
-    // in React's strict mode, this function will be called twice. The map we create here will be passed to async renderAllSegments, and it may be destroyed before that function's await is done. So we need to abort the abortController when the component unmounts.
+    const map = L.map(container, { zoomControl: false }).setView(
+      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
+      DEFAULT_ZOOM
+    );
+    mapRef.current = map;
+
+    createTileLayer(map);
+    addControlMarkerListeners(map);
+    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
+
+    // in React's strict mode, this function will be called twice. In that case we want to abort the fetch request. Otherwise, we would end up with two parallel fetch requests.
     const abortController = new AbortController();
-    const { map, userLocationWatchId } = initMap(container, abortController.signal);
+    fetchSegments(abortController.signal);
 
     return () => {
       abortController.abort();
@@ -105,25 +115,6 @@ export default function LeafletMap({
       map.remove();
       mapRef.current = null;
     };
-  }
-
-  function initMap(
-    container: HTMLDivElement,
-    abortSignal: AbortSignal
-  ): { map: L.Map; userLocationWatchId: number | null } {
-    const map = L.map(container, { zoomControl: false }).setView(
-      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-      DEFAULT_ZOOM
-    );
-    mapRef.current = map;
-
-    createTileLayer(map);
-    renderAllSegments(map, abortSignal);
-    addMapListeners(map);
-
-    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
-
-    return { map, userLocationWatchId };
   }
 
   function updateRenderedSegments() {
@@ -193,15 +184,6 @@ export default function LeafletMap({
     lastPositionRef.current = latlng;
   }
 
-  async function renderAllSegments(map: L.Map, abortSignal: AbortSignal) {
-    const segments = await fetchSegments(abortSignal);
-    if (abortSignal.aborted) {
-      // catches case where fetch completed just before abort
-      return;
-    }
-    segments.forEach((segment) => renderSegment(segment, map));
-  }
-
   function renderSegment(segment: Segment, map: L.Map) {
     if (!map) {
       console.error('Map not found');
@@ -229,7 +211,7 @@ export default function LeafletMap({
     selectionMarkersRef.current = null;
   }
 
-  function addMapListeners(map: L.Map) {
+  function addControlMarkerListeners(map: L.Map) {
     map.on('click', (e) => {
       if (!drawingActiveRef.current) {
         return;
