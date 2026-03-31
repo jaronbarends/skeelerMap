@@ -6,7 +6,7 @@ import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
 import { Segment } from '@/types/segment';
 import { removeSegment, updateSegment } from '@/lib/segmentService';
-import styles from './LeafletMap.module.css';
+import styles from './MapView.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
@@ -36,7 +36,7 @@ interface MapProps {
 }
 
 // we can't name this component Map, because that might conflict with javascript's Map object
-export default function LeafletMap({
+export default function MapView({
   ref,
   drawingModeActive,
   fetchSegments,

@@ -7,11 +7,11 @@ import FabContainer from '@/components/FabContainer';
 import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import styles from './MapUIContainer.module.css';
-import type { MapHandle } from './LeafletMap';
+import type { MapHandle } from './MapView';
 import type { Segment } from '@/types/segment';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
 
-const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
+const MapView = dynamic(() => import('./MapView'), { ssr: false });
 
 type SelectionMode = 'view' | 'edit' | 'delete';
 
@@ -26,7 +26,7 @@ export default function MapUIContainer() {
 
   return (
     <div className={styles.component}>
-      <LeafletMap
+      <MapView
         ref={mapRef}
         drawingModeActive={drawingModeActive}
         fetchSegments={fetchSegmentsForMap}
