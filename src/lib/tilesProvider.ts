@@ -20,3 +20,4 @@ const CARTO: TilesProvider = {
 };
 
 export const tilesProvider = OSM; // ← switch here
+// export const tilesProvider = CARTO; // ← switch here
