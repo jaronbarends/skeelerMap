@@ -4,17 +4,12 @@ import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
+import { Segment } from '@/types/segment';
+import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
 import styles from './LeafletMap.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
 const DEFAULT_ZOOM = 12;
-const STORAGE_KEY = 'skatemap_segments';
-
-export interface Segment {
-  id: string;
-  rating: number;
-  coordinates: [number, number][];
-}
 
 interface TempSegment {
   controlPoints: L.LatLng[];
@@ -134,7 +129,7 @@ export default function LeafletMap({
   }
 
   async function renderAllSegments(map: L.Map, abortSignal: AbortSignal) {
-    const segments = await loadSegments(abortSignal);
+    const segments = await fetchSegments(abortSignal);
     if (abortSignal.aborted) {
       // catches case where fetch completed just before abort
       return;
@@ -303,17 +298,8 @@ export default function LeafletMap({
       throw new Error('Selecteer ten minste 2 punten');
     }
 
-    const res = await fetch('/api/segments', {
-      method: 'POST',
-      body: JSON.stringify({ rating, coordinates: allCoords }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      console.error(data.error);
-      throw new Error('Kan het segment niet opslaan');
-    }
+    const data = await createSegment({ rating, coordinates: allCoords });
 
-    const data = await res.json();
     const newSegment: Segment = {
       id: data.id,
       rating,
@@ -329,19 +315,9 @@ export default function LeafletMap({
     const idx = segmentsRef.current.findIndex((s) => s.id === id);
     if (idx === -1) return;
 
-    const res = await fetch('/api/segments', {
-      method: 'PATCH',
-      body: JSON.stringify({
-        id,
-        rating,
-      }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      console.error(data.error);
-      throw new Error('Kan het segment niet aanpassen');
-    }
+    await updateSegment(id, rating);
 
+    //-- start what will be handled by prop update later
     const updatedSegment = { ...segmentsRef.current[idx], rating };
     segmentsRef.current = [
       ...segmentsRef.current.slice(0, idx),
@@ -354,20 +330,13 @@ export default function LeafletMap({
       const color = mapColors.rating[String(rating) as keyof typeof mapColors.rating];
       polyline.setStyle({ color });
     }
+    //-- end what will be handled by prop update later
 
     clearSelectionVisuals();
   }
 
   async function deleteSegment(id: string) {
-    const res = await fetch('/api/segments', {
-      method: 'DELETE',
-      body: JSON.stringify({ id }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      console.error(data.error);
-      throw new Error('Kan het segment niet verwijderen');
-    }
+    await removeSegment(id);
 
     const polyline = segmentLayersRef.current.get(id);
     if (polyline) {
@@ -376,33 +345,19 @@ export default function LeafletMap({
     }
 
     segmentsRef.current = segmentsRef.current.filter((s) => s.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
-
-    clearSelectionVisuals();
-  }
-
-  function deleteSegment_bak(id: string) {
-    const polyline = segmentLayersRef.current.get(id);
-    if (polyline) {
-      polyline.remove();
-      segmentLayersRef.current.delete(id);
-    }
-
-    segmentsRef.current = segmentsRef.current.filter((s) => s.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(segmentsRef.current));
 
     clearSelectionVisuals();
   }
 }
 
-async function loadSegments(abortSignal: AbortSignal): Promise<Segment[]> {
-  try {
-    const res = await fetch('/api/segments', { signal: abortSignal });
-    return res.json();
-  } catch {
-    return [];
-  }
-}
+// async function loadSegments(abortSignal: AbortSignal): Promise<Segment[]> {
+//   try {
+//     const res = await fetch('/api/segments', { signal: abortSignal });
+//     return res.json();
+//   } catch {
+//     return [];
+//   }
+// }
 
 async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number][]> {
   const url = `${tilesProvider.routingUrl}${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;
