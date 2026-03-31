@@ -2,7 +2,7 @@ import Panel from './Panel';
 import PanelHeader from './PanelHeader';
 import PanelInstruction from './PanelInstruction';
 import RatingButtons from './RatingButtons';
-import styles from './SegmentEditPanel.module.css';
+import styles from './SegmentDetailsPanel.module.css';
 
 type Mode = 'view' | 'edit' | 'delete';
 
@@ -18,7 +18,7 @@ interface Props {
   onRatingSelect: (rating: number) => void;
 }
 
-export default function SegmentEditPanel({
+export default function SegmentDetailsPanel({
   lengthLabel,
   currentRating,
   mode,

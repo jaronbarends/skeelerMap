@@ -20,10 +20,8 @@ interface TempSegment {
 
 export interface MapHandle {
   cancelDrawing: () => void;
-  saveSegment: () => [number, number][];
+  getSegmentCoords: () => [number, number][];
   onSegmentSaved: () => void;
-  updateSegmentRating: (id: string, rating: number) => Promise<void>;
-  deleteSegment: (id: string) => Promise<void>;
   centerOnLocation: () => void;
 }
 
@@ -65,10 +63,8 @@ export default function LeafletMap({
     ref,
     () => ({
       cancelDrawing: clearTempSegment,
-      saveSegment,
+      getSegmentCoords,
       onSegmentSaved: clearTempSegment,
-      updateSegmentRating,
-      deleteSegment,
       centerOnLocation,
     }),
     []
@@ -294,7 +290,7 @@ export default function LeafletMap({
     };
   }
 
-  function saveSegment(): [number, number][] {
+  function getSegmentCoords(): [number, number][] {
     const tempSegment = tempSegmentRef.current;
 
     const allCoords = tempSegment.routeCoordinates
@@ -307,40 +303,7 @@ export default function LeafletMap({
 
     return allCoords;
   }
-
-  async function updateSegmentRating(id: string, rating: number) {
-    await updateSegment(id, rating);
-
-    const polyline = segmentLayersRef.current.get(id);
-    if (polyline) {
-      const color = mapColors.rating[String(rating) as keyof typeof mapColors.rating];
-      polyline.setStyle({ color });
-    }
-
-    clearSelectionVisuals();
-  }
-
-  async function deleteSegment(id: string) {
-    await removeSegment(id);
-
-    const polyline = segmentLayersRef.current.get(id);
-    if (polyline) {
-      polyline.remove();
-      segmentLayersRef.current.delete(id);
-    }
-
-    clearSelectionVisuals();
-  }
 }
-
-// async function loadSegments(abortSignal: AbortSignal): Promise<Segment[]> {
-//   try {
-//     const res = await fetch('/api/segments', { signal: abortSignal });
-//     return res.json();
-//   } catch {
-//     return [];
-//   }
-// }
 
 async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number][]> {
   const url = `${tilesProvider.routingUrl}${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`;

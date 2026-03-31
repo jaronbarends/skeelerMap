@@ -5,11 +5,11 @@ import { useRef, useState } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
-import SegmentEditPanel from '@/components/panel/SegmentEditPanel';
+import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import styles from './MapUIContainer.module.css';
 import type { MapHandle } from './LeafletMap';
 import type { Segment } from '@/types/segment';
-import { createSegment, fetchSegments } from '@/lib/segmentService';
+import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
 
 const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
 
@@ -54,12 +54,12 @@ export default function MapUIContainer() {
         <SegmentAddPanel
           controlPointCount={controlPointCount}
           onCancel={handleCancel}
-          onRatingSelect={handleRatingSelect}
+          onRatingSelect={handleCreateSegment}
         />
       )}
 
       {selectedSegment && (
-        <SegmentEditPanel
+        <SegmentDetailsPanel
           lengthLabel={formatLength(calculateLength(selectedSegment.coordinates))}
           currentRating={selectedSegment.rating}
           mode={selectionMode}
@@ -86,10 +86,10 @@ export default function MapUIContainer() {
     setControlPointCount(0);
   }
 
-  async function handleRatingSelect(rating: number) {
+  async function handleCreateSegment(rating: number) {
     if (!mapRef.current) return;
     try {
-      const coords = mapRef.current.saveSegment();
+      const coords = mapRef.current.getSegmentCoords();
       const data = await createSegment({ rating, coordinates: coords });
       const newSegment: Segment = { id: data.id, rating, coordinates: coords };
       mapRef.current.onSegmentSaved();
@@ -118,7 +118,8 @@ export default function MapUIContainer() {
   async function handleRatingUpdate(rating: number) {
     if (!selectedSegment) return;
     try {
-      await mapRef.current?.updateSegmentRating(selectedSegment.id, rating);
+      await updateSegment(selectedSegment.id, rating);
+      setSegments((prev) => prev.map((s) => (s.id === selectedSegment.id ? { ...s, rating } : s)));
       setSelectedSegment(null);
     } catch (error) {
       console.error(error);
@@ -137,7 +138,8 @@ export default function MapUIContainer() {
   async function handleDeleteConfirm() {
     if (!selectedSegment) return;
     try {
-      await mapRef.current?.deleteSegment(selectedSegment.id);
+      await removeSegment(selectedSegment.id);
+      setSegments((prev) => segments.filter((s) => s.id !== selectedSegment.id));
       setSelectedSegment(null);
     } catch (error) {
       console.error(error);
