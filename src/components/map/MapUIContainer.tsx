@@ -9,7 +9,7 @@ import SegmentEditPanel from '@/components/panel/SegmentEditPanel';
 import styles from './MapUIContainer.module.css';
 import type { MapHandle } from './LeafletMap';
 import type { Segment } from '@/types/segment';
-import { fetchSegments } from '@/lib/segmentService';
+import { createSegment, fetchSegments } from '@/lib/segmentService';
 
 const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
 
@@ -85,8 +85,13 @@ export default function MapUIContainer() {
   }
 
   async function handleRatingSelect(rating: number) {
+    if (!mapRef.current) return;
     try {
-      await mapRef.current?.saveSegment(rating);
+      const coords = mapRef.current.saveSegment();
+      const data = await createSegment({ rating, coordinates: coords });
+      const newSegment: Segment = { id: data.id, rating, coordinates: coords };
+      mapRef.current.onSegmentSaved();
+      setSegments((prev) => [...prev, newSegment]);
       setDrawingModeActive(false);
       setControlPointCount(0);
     } catch (error) {

@@ -5,7 +5,7 @@ import L from 'leaflet';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
 import { Segment } from '@/types/segment';
-import { createSegment, removeSegment, updateSegment } from '@/lib/segmentService';
+import { removeSegment, updateSegment } from '@/lib/segmentService';
 import styles from './LeafletMap.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;
@@ -20,7 +20,8 @@ interface TempSegment {
 
 export interface MapHandle {
   cancelDrawing: () => void;
-  saveSegment: (rating: number) => Promise<void>;
+  saveSegment: () => [number, number][];
+  onSegmentSaved: () => void;
   deselectSegment: () => void;
   updateSegmentRating: (id: string, rating: number) => Promise<void>;
   deleteSegment: (id: string) => Promise<void>;
@@ -41,6 +42,7 @@ export default function LeafletMap({
   ref,
   drawingModeActive,
   fetchSegments,
+  segments,
   onControlPointCountChange,
   onSegmentSelect,
 }: MapProps) {
@@ -53,7 +55,6 @@ export default function LeafletMap({
     routePolylines: [],
     routeCoordinates: [],
   });
-  const segmentsRef = useRef<Segment[]>([]);
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
   const selectedSegmentIdRef = useRef<string | null>(null);
   const selectionMarkersRef = useRef<{ start: L.CircleMarker; end: L.CircleMarker } | null>(null);
@@ -65,6 +66,7 @@ export default function LeafletMap({
     () => ({
       cancelDrawing: clearTempSegment,
       saveSegment,
+      onSegmentSaved: clearTempSegment,
       deselectSegment: clearSelectionVisuals,
       updateSegmentRating,
       deleteSegment,
@@ -95,6 +97,30 @@ export default function LeafletMap({
   useEffect(() => {
     drawingActiveRef.current = drawingModeActive;
   }, [drawingModeActive]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    for (const segment of segments) {
+      const polyline = segmentLayersRef.current.get(segment.id);
+      if (!polyline) {
+        renderSegment(segment, map);
+      } else {
+        const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+        if (polyline.options.color !== color) {
+          polyline.setStyle({ color });
+        }
+      }
+    }
+
+    for (const [id, polyline] of segmentLayersRef.current) {
+      if (!segments.find((s) => s.id === id)) {
+        polyline.remove();
+        segmentLayersRef.current.delete(id);
+      }
+    }
+  }, [segments]);
 
   // return the component's DOM element
   return <div ref={containerRef} className={styles.container} />;
@@ -137,7 +163,6 @@ export default function LeafletMap({
       // catches case where fetch completed just before abort
       return;
     }
-    segmentsRef.current = segments;
     segments.forEach((segment) => renderSegment(segment, map));
   }
 
@@ -168,16 +193,14 @@ export default function LeafletMap({
     const map = mapRef.current;
     if (!map) return;
 
-    const current = segmentsRef.current.find((s) => s.id === segment.id) ?? segment;
-
     clearSelectionVisuals();
 
-    selectedSegmentIdRef.current = current.id;
+    selectedSegmentIdRef.current = segment.id;
     polyline.setStyle({ weight: 8 });
 
-    const color = mapColors.rating[String(current.rating) as keyof typeof mapColors.rating];
-    const startCoord = current.coordinates[0];
-    const endCoord = current.coordinates[current.coordinates.length - 1];
+    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+    const startCoord = segment.coordinates[0];
+    const endCoord = segment.coordinates[segment.coordinates.length - 1];
     const markerOptions: L.CircleMarkerOptions = {
       radius: 6,
       color,
@@ -189,7 +212,7 @@ export default function LeafletMap({
     const endMarker = L.circleMarker(endCoord, markerOptions).addTo(map);
     selectionMarkersRef.current = { start: startMarker, end: endMarker };
 
-    onSegmentSelect(current);
+    onSegmentSelect(segment);
   }
 
   function clearSelectionVisuals() {
@@ -288,10 +311,8 @@ export default function LeafletMap({
     };
   }
 
-  async function saveSegment(rating: number) {
+  function saveSegment(): [number, number][] {
     const tempSegment = tempSegmentRef.current;
-    const map = mapRef.current;
-    if (!map) return;
 
     const allCoords = tempSegment.routeCoordinates
       .filter((c): c is [number, number][] => c !== null)
@@ -301,39 +322,17 @@ export default function LeafletMap({
       throw new Error('Selecteer ten minste 2 punten');
     }
 
-    const data = await createSegment({ rating, coordinates: allCoords });
-
-    const newSegment: Segment = {
-      id: data.id,
-      rating,
-      coordinates: allCoords,
-    };
-    renderSegment(newSegment, map);
-    segmentsRef.current = [...segmentsRef.current, newSegment];
-
-    clearTempSegment();
+    return allCoords;
   }
 
   async function updateSegmentRating(id: string, rating: number) {
-    const idx = segmentsRef.current.findIndex((s) => s.id === id);
-    if (idx === -1) return;
-
     await updateSegment(id, rating);
-
-    //-- start what will be handled by prop update later
-    const updatedSegment = { ...segmentsRef.current[idx], rating };
-    segmentsRef.current = [
-      ...segmentsRef.current.slice(0, idx),
-      updatedSegment,
-      ...segmentsRef.current.slice(idx + 1),
-    ];
 
     const polyline = segmentLayersRef.current.get(id);
     if (polyline) {
       const color = mapColors.rating[String(rating) as keyof typeof mapColors.rating];
       polyline.setStyle({ color });
     }
-    //-- end what will be handled by prop update later
 
     clearSelectionVisuals();
   }
@@ -346,8 +345,6 @@ export default function LeafletMap({
       polyline.remove();
       segmentLayersRef.current.delete(id);
     }
-
-    segmentsRef.current = segmentsRef.current.filter((s) => s.id !== id);
 
     clearSelectionVisuals();
   }
