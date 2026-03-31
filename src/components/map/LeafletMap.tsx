@@ -74,12 +74,26 @@ export default function LeafletMap({
     []
   );
 
+  useEffect(initializeMap, []);
+  useEffect(updateRenderedSegments, [segments]);
+  useEffect(updateSelectedSegment, [selectedSegment]);
   useEffect(() => {
+    // we need a ref here, because Leaflet's event callbacks will close over it. So we can't just use drawingModeActive directly.
+    drawingActiveRef.current = drawingModeActive;
+  }, [drawingModeActive]);
+
+  // return the component's DOM element
+  return <div ref={containerRef} className={styles.container} />;
+
+  // internal functions
+
+  function initializeMap() {
     const container = containerRef.current;
     if (!container) {
       return;
     }
 
+    // in React's strict mode, this function will be called twice. The map we create here will be passed to async renderAllSegments, and it may be destroyed before that function's await is done. So we need to abort the abortController when the component unmounts.
     const abortController = new AbortController();
     const { map, userLocationWatchId } = initMap(container, abortController.signal);
 
@@ -91,13 +105,28 @@ export default function LeafletMap({
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }
 
-  useEffect(() => {
-    drawingActiveRef.current = drawingModeActive;
-  }, [drawingModeActive]);
+  function initMap(
+    container: HTMLDivElement,
+    abortSignal: AbortSignal
+  ): { map: L.Map; userLocationWatchId: number | null } {
+    const map = L.map(container, { zoomControl: false }).setView(
+      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
+      DEFAULT_ZOOM
+    );
+    mapRef.current = map;
 
-  useEffect(() => {
+    createTileLayer(map);
+    renderAllSegments(map, abortSignal);
+    addMapListeners(map);
+
+    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
+
+    return { map, userLocationWatchId };
+  }
+
+  function updateRenderedSegments() {
     const map = mapRef.current;
     if (!map) return;
 
@@ -119,9 +148,9 @@ export default function LeafletMap({
         segmentLayersRef.current.delete(id);
       }
     }
-  }, [segments]);
+  }
 
-  useEffect(() => {
+  function updateSelectedSegment() {
     const map = mapRef.current;
     if (!map) return;
     if (!selectedSegment) return;
@@ -151,30 +180,6 @@ export default function LeafletMap({
       selectionMarkersRef.current?.end.remove();
       selectionMarkersRef.current = null;
     };
-  }, [selectedSegment]);
-
-  // return the component's DOM element
-  return <div ref={containerRef} className={styles.container} />;
-
-  // internal functions
-
-  function initMap(
-    container: HTMLDivElement,
-    abortSignal: AbortSignal
-  ): { map: L.Map; userLocationWatchId: number | null } {
-    const map = L.map(container, { zoomControl: false }).setView(
-      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-      DEFAULT_ZOOM
-    );
-    mapRef.current = map;
-
-    createTileLayer(map);
-    renderAllSegments(map, abortSignal);
-    addMapListeners(map);
-
-    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
-
-    return { map, userLocationWatchId };
   }
 
   function centerOnLocation() {
