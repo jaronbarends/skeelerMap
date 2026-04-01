@@ -21,11 +21,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const { rating, coordinates } = await request.json();
-  const geojson = {
-    type: 'LineString',
-    // swap leaflet's lat/lng to lng/lat for supabase's GeoJSON format
-    coordinates: coordinates.map(([lat, lng]: [number, number]) => [lng, lat]),
-  };
+  const geojson = coordsToGeojson(coordinates);
 
   const { data, error } = await supabase
     .from('segments')
@@ -43,9 +39,15 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const { id, rating } = await request.json();
+  const { id, rating, coordinates } = await request.json();
 
-  const { error } = await supabase.from('segments').update({ rating }).eq('id', id);
+  const updateData: { rating: number; geometry?: string } = { rating };
+  if (coordinates) {
+    const geojson = coordsToGeojson(coordinates);
+    updateData.geometry = JSON.stringify(geojson);
+  }
+
+  const { error } = await supabase.from('segments').update(updateData).eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -60,4 +62,12 @@ export async function DELETE(request: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return new NextResponse(null, { status: 204 });
+}
+
+function coordsToGeojson(coordinates: [number, number][]) {
+  return {
+    type: 'LineString',
+    // swap leaflet's lat/lng to lng/lat for supabase's GeoJSON format
+    coordinates: coordinates.map(([lat, lng]: [number, number]) => [lng, lat]),
+  };
 }

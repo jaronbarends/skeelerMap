@@ -28,10 +28,14 @@ export async function createSegment({
   return res.json();
 }
 
-export async function updateSegment(id: string, rating: number): Promise<void> {
+export async function updateSegment(
+  id: string,
+  rating: number,
+  coordinates?: [number, number][]
+): Promise<void> {
   const res = await fetch('/api/segments', {
     method: 'PATCH',
-    body: JSON.stringify({ id, rating }),
+    body: JSON.stringify({ id, rating, coordinates }),
   });
   if (!res.ok) {
     const data = await res.json();

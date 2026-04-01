@@ -32,6 +32,8 @@ interface MapProps {
   selectedSegment: Segment | null;
   onControlPointCountChange: (count: number) => void;
   onSegmentSelect: (segment: Segment) => void;
+  onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
+  onSegmentDragEnd: (segmentId: string, newCoordinates: [number, number][]) => void;
 }
 
 // we can't name this component Map, because that might conflict with javascript's Map object
@@ -43,6 +45,8 @@ export default function MapView({
   selectedSegment,
   onControlPointCountChange,
   onSegmentSelect,
+  onSegmentDragUpdate,
+  onSegmentDragEnd,
 }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -54,7 +58,11 @@ export default function MapView({
     routeCoordinates: [],
   });
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
-  const selectionMarkersRef = useRef<{ start: L.CircleMarker; end: L.CircleMarker } | null>(null);
+  const selectionMarkersRef = useRef<{
+    start: L.Marker;
+    end: L.Marker;
+    debounceTimer: ReturnType<typeof setTimeout> | null;
+  } | null>(null);
   const lastPositionRef = useRef<L.LatLngExpression | null>(null);
 
   // expose methods to the ref in parent component
@@ -69,9 +77,10 @@ export default function MapView({
     []
   );
 
-  useEffect(initializeMap, []);
-  useEffect(updateRenderedSegments, [segments]);
-  useEffect(updateSelectedSegment, [selectedSegment]);
+  useEffect(initializeMapEffect, []);
+  useEffect(updateRenderedSegmentsEffect, [segments]);
+  // depend on id only — coordinate updates during drag must not recreate markers
+  useEffect(updateSelectedSegmentEffect, [selectedSegment?.id]);
   useEffect(() => {
     // we need a ref here, because Leaflet's event callbacks will close over it. So we can't just use drawingModeActive directly.
     drawingActiveRef.current = drawingModeActive;
@@ -82,7 +91,7 @@ export default function MapView({
 
   // internal functions
 
-  function initializeMap() {
+  function initializeMapEffect() {
     const container = containerRef.current;
     if (!container) {
       return;
@@ -102,6 +111,7 @@ export default function MapView({
     const abortController = new AbortController();
     fetchSegments(abortController.signal);
 
+    // cleanup function, runs every time this effect function runs again
     return () => {
       abortController.abort();
       if (userLocationWatchId !== null) {
@@ -112,7 +122,7 @@ export default function MapView({
     };
   }
 
-  function updateRenderedSegments() {
+  function updateRenderedSegmentsEffect() {
     const map = mapRef.current;
     if (!map) return;
 
@@ -125,6 +135,8 @@ export default function MapView({
         if (polyline.options.color !== color) {
           polyline.setStyle({ color });
         }
+        // update coordinates (e.g. after drag)
+        polyline.setLatLngs(segment.coordinates);
       }
     }
 
@@ -136,7 +148,7 @@ export default function MapView({
     }
   }
 
-  function updateSelectedSegment() {
+  function updateSelectedSegmentEffect() {
     const map = mapRef.current;
     if (!map) return;
     if (!selectedSegment) return;
@@ -146,26 +158,65 @@ export default function MapView({
 
     polyline.setStyle({ weight: 8 });
 
-    const color = mapColors.rating[String(selectedSegment.rating) as keyof typeof mapColors.rating];
-    const startCoord = selectedSegment.coordinates[0];
-    const endCoord = selectedSegment.coordinates[selectedSegment.coordinates.length - 1];
-    const markerOptions: L.CircleMarkerOptions = {
-      radius: 6,
-      color,
-      weight: 3,
-      fillColor: '#000000',
-      fillOpacity: 1,
-    };
-    const startMarker = L.circleMarker(startCoord, markerOptions).addTo(map);
-    const endMarker = L.circleMarker(endCoord, markerOptions).addTo(map);
-    selectionMarkersRef.current = { start: startMarker, end: endMarker };
+    const segment = selectedSegment;
+    const dragEnabled = window.matchMedia('(pointer: fine)').matches;
+    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+    const startCoord = segment.coordinates[0];
+    const endCoord = segment.coordinates[segment.coordinates.length - 1];
 
+    const startMarker = L.marker(startCoord, {
+      icon: createEndpointIcon(color),
+      draggable: dragEnabled,
+    }).addTo(map);
+
+    const endMarker = L.marker(endCoord, {
+      icon: createEndpointIcon(color),
+      draggable: dragEnabled,
+    }).addTo(map);
+
+    selectionMarkersRef.current = { start: startMarker, end: endMarker, debounceTimer: null };
+
+    if (dragEnabled) {
+      startMarker.on('drag', handleDrag);
+      startMarker.on('dragend', handleDragEnd);
+      endMarker.on('drag', handleDrag);
+      endMarker.on('dragend', handleDragEnd);
+    }
+
+    // cleanup function, runs every time this effect function runs again
     return () => {
       polyline.setStyle({ weight: 5 });
-      selectionMarkersRef.current?.start.remove();
-      selectionMarkersRef.current?.end.remove();
+      const markers = selectionMarkersRef.current;
+      if (markers?.debounceTimer) {
+        clearTimeout(markers.debounceTimer);
+      }
+      markers?.start.remove();
+      markers?.end.remove();
       selectionMarkersRef.current = null;
     };
+
+    function handleDrag() {
+      const markers = selectionMarkersRef.current;
+      if (!markers) return;
+      if (markers.debounceTimer) {
+        clearTimeout(markers.debounceTimer);
+      }
+      markers.debounceTimer = setTimeout(async () => {
+        const coords = await fetchRoute(startMarker.getLatLng(), endMarker.getLatLng());
+        onSegmentDragUpdate(segment.id, coords);
+      }, 200);
+    }
+
+    async function handleDragEnd() {
+      const markers = selectionMarkersRef.current;
+      if (!markers) return;
+      if (markers.debounceTimer) {
+        clearTimeout(markers.debounceTimer);
+        markers.debounceTimer = null;
+      }
+      const coords = await fetchRoute(startMarker.getLatLng(), endMarker.getLatLng());
+      onSegmentDragEnd(segment.id, coords);
+    }
   }
 
   function centerOnLocation() {
@@ -198,12 +249,6 @@ export default function MapView({
     });
 
     segmentLayersRef.current.set(segment.id, polyline);
-  }
-
-  function clearSelectionVisuals() {
-    selectionMarkersRef.current?.start.remove();
-    selectionMarkersRef.current?.end.remove();
-    selectionMarkersRef.current = null;
   }
 
   function addControlMarkerListeners(map: L.Map) {
@@ -302,6 +347,15 @@ export default function MapView({
 
     return allCoords;
   }
+}
+
+function createEndpointIcon(borderColor: string): L.DivIcon {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:12px;height:12px;border-radius:50%;background-color:#000000;border:3px solid ${borderColor};cursor:grab;box-sizing:border-box;"></div>`,
+    iconSize: [12, 12],
+    iconAnchor: [6, 6],
+  });
 }
 
 async function fetchRoute(from: L.LatLng, to: L.LatLng): Promise<[number, number][]> {

@@ -34,6 +34,8 @@ export default function MapUIContainer() {
         selectedSegment={selectedSegment}
         onControlPointCountChange={setControlPointCount}
         onSegmentSelect={handleSegmentSelect}
+        onSegmentDragUpdate={handleSegmentDragUpdate}
+        onSegmentDragEnd={handleSegmentDragEnd}
       />
       <FabContainer>
         <FabButton
@@ -123,6 +125,40 @@ export default function MapUIContainer() {
       setSelectedSegment(null);
     } catch (error) {
       console.error(error);
+      alert('Kan het segment niet aanpassen');
+    }
+  }
+
+  function handleSegmentDragUpdate(segmentId: string, newCoordinates: [number, number][]) {
+    setSegments((prev) =>
+      prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
+    );
+    setSelectedSegment((prev) =>
+      prev?.id === segmentId ? { ...prev, coordinates: newCoordinates } : prev
+    );
+  }
+
+  async function handleSegmentDragEnd(segmentId: string, newCoordinates: [number, number][]) {
+    const prevSegment = segments.find((s) => s.id === segmentId);
+    if (!prevSegment) return;
+
+    setSegments((prev) =>
+      prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
+    );
+    setSelectedSegment((prev) =>
+      prev?.id === segmentId ? { ...prev, coordinates: newCoordinates } : prev
+    );
+
+    try {
+      await updateSegment(segmentId, prevSegment.rating, newCoordinates);
+    } catch (error) {
+      console.error(error);
+      setSegments((prev) =>
+        prev.map((s) => (s.id === segmentId ? { ...s, coordinates: prevSegment.coordinates } : s))
+      );
+      setSelectedSegment((prev) =>
+        prev?.id === segmentId ? { ...prev, coordinates: prevSegment.coordinates } : prev
+      );
       alert('Kan het segment niet aanpassen');
     }
   }
