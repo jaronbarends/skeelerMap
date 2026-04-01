@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-03-31
-**Current phase:** Supabase storage implemented.
+**Last updated:** 2026-04-01
+**Current phase:** Keyboard shortcuts and segment dragging implemented.
 
 ---
 
@@ -18,6 +18,8 @@
 - Panel component system: `Panel`, `PanelHeader`, `PanelInstruction`, `PanelIconButton`, `RatingButtons`, `SegmentCreation`, `SegmentEditPanel` — all in `src/components/panel/`
 - Segment selection and editing flow: tap segment → panel with length + edit/delete/close; edit rating with current rating indicated; delete with confirmation
 - Location button (FAB, below add-segment button): centers map on user's last known position
+- Keyboard shortcuts: `Esc` cancels drawing mode; `Delete` deletes selected segment (with confirmation)
+- Drag-to-edit segment endpoints: drag start/end point of a saved segment to reposition it; reroutes via OSRM and saves to Supabase
 
 ## What's decided
 
@@ -38,4 +40,4 @@
 
 ## Next step
 
-- TBD — review open items above or pick next feature from requirements.md
+- Pick next feature from backlog.md

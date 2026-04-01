@@ -121,6 +121,7 @@ export default function MapView({
       }
       map.remove();
       mapRef.current = null;
+      segmentLayersRef.current.clear();
     };
   }
 

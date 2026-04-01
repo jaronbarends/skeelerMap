@@ -109,9 +109,8 @@
 **Decision:** Tapping × closes the panel and deselects the segment. No changes are made.
 
 ### Drag-to-edit endpoints
-**Date:** 2025-06
-**Decision:** Deferred to v1.1. Not in MVP.
-**Rationale:** Adds meaningful interaction complexity. The core "fix a mistake" use case is covered by edit rating + delete.
+**Original decision:** Deferred to v1.1. Not in MVP.
+**Status:** Implemented 2026-04-01 — see "Drag-to-edit segment endpoints" section above.
 
 ---
 
@@ -139,6 +138,23 @@
 - Auto-follow mode: map stays centered on user while moving.
 - Interaction (pan/zoom) pauses auto-follow.
 - Tapping location button resumes auto-follow.
+
+---
+
+## Keyboard shortcuts
+
+**Date:** 2026-04-01
+**Decision:** `Esc` cancels drawing mode; `Delete` triggers deletion of the currently selected segment (same confirmation flow as the delete button).
+**Rationale:** Low-effort UX improvement for desktop users. Maps naturally to existing cancel/delete actions already in the panel.
+
+---
+
+## Drag-to-edit segment endpoints
+
+**Date:** 2026-04-01
+**Decision:** Users can drag the start or end endpoint of a saved segment. On drag end, the new endpoint is routed via OSRM and the updated geometry is saved to Supabase.
+**Rationale:** Covers the primary "fix a mistake" use case without storing intermediate control points. Operates on routed geometry endpoints only, consistent with the data model decision.
+**Scope:** Endpoints only — intermediate points are not draggable (stored data is routed geometry, not original control points).
 
 ---
 

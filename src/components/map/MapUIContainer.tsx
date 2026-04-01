@@ -109,7 +109,7 @@ export default function MapUIContainer() {
   function handleCreationCancel() {
     mapRef.current?.cancelCreation();
     setCreationModeActive(false);
-    setControlPointCount(0);
+    setControlPointCount(0); //
   }
 
   async function handleCreateSegment(rating: number) {
