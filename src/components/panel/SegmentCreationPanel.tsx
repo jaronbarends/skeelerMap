@@ -9,7 +9,7 @@ interface Props {
   onRatingSelect: (rating: number) => void;
 }
 
-export default function SegmentAddPanel({ controlPointCount, onCancel, onRatingSelect }: Props) {
+export default function SegmentCreation({ controlPointCount, onCancel, onRatingSelect }: Props) {
   const readyToRate = controlPointCount >= 2;
   return (
     <Panel>

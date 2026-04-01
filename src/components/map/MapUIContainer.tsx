@@ -1,10 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
-import SegmentAddPanel from '@/components/panel/SegmentAddPanel';
+import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import styles from './MapUIContainer.module.css';
 import type { MapHandle } from './MapView';
@@ -17,31 +17,39 @@ type SelectionMode = 'view' | 'edit' | 'delete';
 
 export default function MapUIContainer() {
   const mapRef = useRef<MapHandle>(null);
-  const [drawingModeActive, setDrawingModeActive] = useState(false);
+  const [creationModeActive, setCreationModeActive] = useState(false);
   const [controlPointCount, setControlPointCount] = useState(0);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('view');
   // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
   const [segments, setSegments] = useState<Segment[]>([]);
 
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className={styles.component}>
       <MapView
         ref={mapRef}
-        drawingModeActive={drawingModeActive}
+        creationModeActive={creationModeActive}
         fetchSegments={fetchSegmentsForMap}
         segments={segments}
         selectedSegment={selectedSegment}
         onControlPointCountChange={setControlPointCount}
         onSegmentSelect={handleSegmentSelect}
+        onSegmentDeselect={handleSegmentDeselect}
         onSegmentDragUpdate={handleSegmentDragUpdate}
         onSegmentDragEnd={handleSegmentDragEnd}
       />
       <FabContainer>
         <FabButton
-          onClick={() => setDrawingModeActive(true)}
+          onClick={() => setCreationModeActive(true)}
           ariaLabel="Segment toevoegen"
-          disabled={drawingModeActive || selectedSegment !== null}
+          disabled={creationModeActive || selectedSegment !== null}
           iconName="plus"
         />
         <FabButton
@@ -52,10 +60,10 @@ export default function MapUIContainer() {
         />
       </FabContainer>
 
-      {drawingModeActive && (
-        <SegmentAddPanel
+      {creationModeActive && (
+        <SegmentCreationPanel
           controlPointCount={controlPointCount}
-          onCancel={handleCancel}
+          onCancel={handleCreationCancel}
           onRatingSelect={handleCreateSegment}
         />
       )}
@@ -65,7 +73,7 @@ export default function MapUIContainer() {
           lengthLabel={formatLength(calculateLength(selectedSegment.coordinates))}
           currentRating={selectedSegment.rating}
           mode={selectionMode}
-          onClose={handleSegmentClose}
+          onClose={handleDetailsClose}
           onEditStart={handleEditStart}
           onDeleteStart={handleDeleteStart}
           onDeleteCancel={handleDeleteCancel}
@@ -82,9 +90,15 @@ export default function MapUIContainer() {
     return result;
   }
 
-  function handleCancel() {
-    mapRef.current?.cancelDrawing();
-    setDrawingModeActive(false);
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      handleCancelCurrentAction();
+    }
+  }
+
+  function handleCreationCancel() {
+    mapRef.current?.cancelCreation();
+    setCreationModeActive(false);
     setControlPointCount(0);
   }
 
@@ -96,7 +110,7 @@ export default function MapUIContainer() {
       const newSegment: Segment = { id: data.id, rating, coordinates: coords };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
-      setDrawingModeActive(false);
+      setCreationModeActive(false);
       setControlPointCount(0);
     } catch (error) {
       console.error(error);
@@ -109,7 +123,11 @@ export default function MapUIContainer() {
     setSelectionMode('view');
   }
 
-  function handleSegmentClose() {
+  function handleSegmentDeselect() {
+    setSelectedSegment(null);
+  }
+
+  function handleDetailsClose() {
     setSelectedSegment(null);
   }
 
@@ -181,6 +199,13 @@ export default function MapUIContainer() {
       console.error(error);
       alert('Kan het segment niet verwijderen');
     }
+  }
+
+  function handleCancelCurrentAction() {
+    handleCreationCancel();
+    handleSegmentDeselect();
+    handleDetailsClose();
+    handleDeleteCancel();
   }
 }
 

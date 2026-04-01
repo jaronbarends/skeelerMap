@@ -15,7 +15,7 @@
 - Open Sans via `next/font/google`
 - `react-icons` (fa6) for FAB and panel close button
 - Segment creation flow: FAB → drawing mode → control points → OSRM routing → rating → Supabase
-- Panel component system: `Panel`, `PanelHeader`, `PanelInstruction`, `PanelIconButton`, `RatingButtons`, `SegmentAddPanel`, `SegmentEditPanel` — all in `src/components/panel/`
+- Panel component system: `Panel`, `PanelHeader`, `PanelInstruction`, `PanelIconButton`, `RatingButtons`, `SegmentCreation`, `SegmentEditPanel` — all in `src/components/panel/`
 - Segment selection and editing flow: tap segment → panel with length + edit/delete/close; edit rating with current rating indicated; delete with confirmation
 - Location button (FAB, below add-segment button): centers map on user's last known position
 

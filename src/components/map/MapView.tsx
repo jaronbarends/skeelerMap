@@ -18,7 +18,7 @@ interface TempSegment {
 }
 
 export interface MapHandle {
-  cancelDrawing: () => void;
+  cancelCreation: () => void;
   getSegmentCoords: () => [number, number][];
   onSegmentSaved: () => void;
   centerOnLocation: () => void;
@@ -26,12 +26,13 @@ export interface MapHandle {
 
 interface MapProps {
   ref?: React.Ref<MapHandle>;
-  drawingModeActive: boolean;
+  creationModeActive: boolean;
   fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
   segments: Segment[];
   selectedSegment: Segment | null;
   onControlPointCountChange: (count: number) => void;
   onSegmentSelect: (segment: Segment) => void;
+  onSegmentDeselect: () => void;
   onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
   onSegmentDragEnd: (segmentId: string, newCoordinates: [number, number][]) => void;
 }
@@ -39,18 +40,19 @@ interface MapProps {
 // we can't name this component Map, because that might conflict with javascript's Map object
 export default function MapView({
   ref,
-  drawingModeActive,
+  creationModeActive,
   fetchSegments,
   segments,
   selectedSegment,
   onControlPointCountChange,
   onSegmentSelect,
+  onSegmentDeselect,
   onSegmentDragUpdate,
   onSegmentDragEnd,
 }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const drawingActiveRef = useRef(false);
+  const creationActiveRef = useRef(false);
   const tempSegmentRef = useRef<TempSegment>({
     controlPoints: [],
     controlMarkers: [],
@@ -69,7 +71,7 @@ export default function MapView({
   useImperativeHandle(
     ref,
     () => ({
-      cancelDrawing: clearTempSegment,
+      cancelCreation: clearTempSegment,
       getSegmentCoords,
       onSegmentSaved: clearTempSegment,
       centerOnLocation,
@@ -82,9 +84,9 @@ export default function MapView({
   // depend on id only — coordinate updates during drag must not recreate markers
   useEffect(updateSelectedSegmentEffect, [selectedSegment?.id]);
   useEffect(() => {
-    // we need a ref here, because Leaflet's event callbacks will close over it. So we can't just use drawingModeActive directly.
-    drawingActiveRef.current = drawingModeActive;
-  }, [drawingModeActive]);
+    // we need a ref here, because Leaflet's event callbacks will close over it. So we can't just use creationModeActive directly.
+    creationActiveRef.current = creationModeActive;
+  }, [creationModeActive]);
 
   // return the component's DOM element
   return <div ref={containerRef} className={styles.container} />;
@@ -104,7 +106,7 @@ export default function MapView({
     mapRef.current = map;
 
     createTileLayer(map);
-    addControlMarkerListeners(map);
+    addMapListeners(map);
     const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
 
     // in React's strict mode, this function will be called twice. In that case we want to abort the fetch request. Otherwise, we would end up with two parallel fetch requests.
@@ -243,7 +245,7 @@ export default function MapView({
 
     polyline.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
-      if (!drawingActiveRef.current) {
+      if (!creationActiveRef.current) {
         onSegmentSelect(segment);
       }
     });
@@ -251,17 +253,18 @@ export default function MapView({
     segmentLayersRef.current.set(segment.id, polyline);
   }
 
-  function addControlMarkerListeners(map: L.Map) {
+  function addMapListeners(map: L.Map) {
     map.on('click', (e) => {
-      if (!drawingActiveRef.current) {
+      if (!creationActiveRef.current) {
+        onSegmentDeselect();
         return;
       }
 
-      addControlMarker({ latlng: e.latlng, tempSegment: tempSegmentRef.current, map });
+      addNewSegmentControlMarker({ latlng: e.latlng, tempSegment: tempSegmentRef.current, map });
     });
   }
 
-  function addControlMarker({
+  function addNewSegmentControlMarker({
     latlng,
     tempSegment,
     map,
@@ -308,7 +311,7 @@ export default function MapView({
     tempSegment.routeCoordinates[legIndex] = null;
 
     fetchRoute(from, to).then((coords) => {
-      if (!drawingActiveRef.current) return;
+      if (!creationActiveRef.current) return;
       tempSegment.routeCoordinates[legIndex] = coords;
       const polyline = L.polyline(coords, {
         color: mapColors.rating.neutral,
