@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import styles from './Panel.module.css';
 
 interface Props {
@@ -5,5 +6,15 @@ interface Props {
 }
 
 export default function Panel({ children }: Props) {
-  return <div className={styles.panel}>{children}</div>;
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    panelRef.current?.focus();
+  }, []);
+
+  return (
+    <div className={styles.panel} ref={panelRef} tabIndex={-1}>
+      {children}
+    </div>
+  );
 }

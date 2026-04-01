@@ -13,14 +13,15 @@ import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/li
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false });
 
-type SelectionMode = 'view' | 'edit' | 'delete';
+export type MapUIMode = 'view' | 'details' | 'edit' | 'delete';
 
 export default function MapUIContainer() {
   const mapRef = useRef<MapHandle>(null);
   const [creationModeActive, setCreationModeActive] = useState(false);
   const [controlPointCount, setControlPointCount] = useState(0);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
-  const [selectionMode, setSelectionMode] = useState<SelectionMode>('view');
+  const selectedSegmentRef = useRef<Segment | null>(null);
+  const [MapUIMode, setMapUIMode] = useState<MapUIMode>('view');
   // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
   const [segments, setSegments] = useState<Segment[]>([]);
 
@@ -30,6 +31,10 @@ export default function MapUIContainer() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    selectedSegmentRef.current = selectedSegment;
+  }, [selectedSegment]);
 
   return (
     <div className={styles.component}>
@@ -72,7 +77,7 @@ export default function MapUIContainer() {
         <SegmentDetailsPanel
           lengthLabel={formatLength(calculateLength(selectedSegment.coordinates))}
           currentRating={selectedSegment.rating}
-          mode={selectionMode}
+          mode={MapUIMode}
           onClose={handleDetailsClose}
           onEditStart={handleEditStart}
           onDeleteStart={handleDeleteStart}
@@ -93,6 +98,11 @@ export default function MapUIContainer() {
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       handleCancelCurrentAction();
+    }
+    if (event.key === 'Delete') {
+      if (selectedSegmentRef.current) {
+        handleDeleteStart();
+      }
     }
   }
 
@@ -120,7 +130,7 @@ export default function MapUIContainer() {
 
   function handleSegmentSelect(segment: Segment) {
     setSelectedSegment(segment);
-    setSelectionMode('view');
+    setMapUIMode('details');
   }
 
   function handleSegmentDeselect() {
@@ -129,10 +139,11 @@ export default function MapUIContainer() {
 
   function handleDetailsClose() {
     setSelectedSegment(null);
+    setMapUIMode('view');
   }
 
   function handleEditStart() {
-    setSelectionMode('edit');
+    setMapUIMode('edit');
   }
 
   async function handleRatingUpdate(rating: number) {
@@ -182,11 +193,12 @@ export default function MapUIContainer() {
   }
 
   function handleDeleteStart() {
-    setSelectionMode('delete');
+    (document.activeElement as HTMLElement)?.blur();
+    setMapUIMode('delete');
   }
 
   function handleDeleteCancel() {
-    setSelectionMode('view');
+    setMapUIMode('details');
   }
 
   async function handleDeleteConfirm() {
@@ -207,7 +219,7 @@ export default function MapUIContainer() {
     handleDetailsClose();
     handleDeleteCancel();
   }
-}
+} //
 
 function calculateLength(coordinates: [number, number][]): number {
   let total = 0;

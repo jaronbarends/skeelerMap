@@ -22,5 +22,10 @@
 
 .confirmButton {
   background: var(--color-rating-1);
-  color: #ffffff;
+  color: var(--color-text-primary);
+
+  &:focus {
+    outline: 1px solid var(--color-white);
+    outline-offset: 2px;
+  }
 }

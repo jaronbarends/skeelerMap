@@ -1,5 +1,8 @@
 // tokens.ts
 
+// some colors are shared between map-color-tokens.ts and colors.css
+// if you change a color here, you must also change it in colors.css
+
 // Palette
 const blue = '#4285f4';
 const white = '#ffffff';

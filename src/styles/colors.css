@@ -1,9 +1,16 @@
 :root {
   /* NOTE: map-related colors are defined in  map-color-tokens.ts and injected into :root in layout.tsx */
 
+  /* overlap with map-color-tokens.ts */
+  /* if you change a color here, you must also change it in map-color-tokens.ts */
+  --color-blue: #4285f4;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-red: #ff3b3b;
+
   --color-surface-1: #1a1a1a;
   --color-surface-2: #2a2a2a;
-  --color-text-primary: #ffffff;
+  --color-text-primary: var(--color-white);
   --color-text-secondary: #aaaaaa;
   --color-shadow: rgba(0, 0, 0, 0.4);
 }
