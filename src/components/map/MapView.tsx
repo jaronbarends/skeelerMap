@@ -4,7 +4,7 @@ import { useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
-import { Segment } from '@/types/segment';
+import { Segment } from '@/lib/segments';
 import styles from './MapView.module.css';
 
 const DEFAULT_CENTER = { lat: 52.1326, lng: 5.2913 } as const;

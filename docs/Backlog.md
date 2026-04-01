@@ -11,12 +11,9 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 Allow users to drag the start or end point of a saved segment to adjust it. Operates on routed geometry endpoints only — not intermediate control points (those are not stored).
 _Implemented 2026-04-01._
 
-### Location permission flow
+### Indicate saving
 
-Decide and implement what happens before/during the browser location prompt:
-
-- Show explanation before triggering the prompt?
-- Show default map location while waiting, or hold?
+Saving a segment may take some time. Give the user feedback that something's happening.
 
 ---
 
@@ -26,12 +23,19 @@ Decide and implement what happens before/during the browser location prompt:
 
 - `Esc` — cancel drawing mode
 - `Delete` — delete selected segment in edit mode
-_Implemented 2026-04-01._
+  _Implemented 2026-04-01._
 
 ### Auto-follow location mode
 
 Map stays centered on user while moving. Panning/zooming pauses auto-follow. Tapping the location button resumes it.
 _Post-MVP behavior noted in decisions.md._
+
+### Location permission flow
+
+Decide and implement what happens before/during the browser location prompt:
+
+- Show explanation before triggering the prompt?
+- Show default map location while waiting, or hold?
 
 ### Zoom-based visual scaling
 

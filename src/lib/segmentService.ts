@@ -1,4 +1,4 @@
-import { Segment } from '@/types/segment';
+import { Segment } from '@/lib/segments';
 
 export async function fetchSegments(abortSignal: AbortSignal): Promise<Segment[]> {
   try {

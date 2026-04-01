@@ -2,14 +2,16 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
+
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
+import type { MapHandle } from '@/components/map/MapView';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
-import styles from './MapUIContainer.module.css';
-import type { MapHandle } from './MapView';
-import type { Segment } from '@/types/segment';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
+import type { Segment } from '@/lib/segments';
+
+import styles from './MapUIContainer.module.css';
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false });
 

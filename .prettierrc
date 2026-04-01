@@ -6,5 +6,9 @@
   "printWidth": 100,
   "bracketSpacing": true,
   "arrowParens": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": ["^@/", "^[./](?!.*\\.css$)", "\\.css$"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiersWithinImportDeclarations": true
 }

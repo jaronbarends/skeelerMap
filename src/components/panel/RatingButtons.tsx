@@ -1,14 +1,8 @@
-import PanelInstruction from './PanelInstruction';
-import styles from './RatingButtons.module.css';
+import { RATINGS, type Rating } from '@/lib/segments';
 
-const RATINGS = [
-  { value: 1, label: 'Kansloos', emoji: '💀', stars: '★' },
-  { value: 2, label: 'Slecht', emoji: '😬', stars: '★★' },
-  { value: 3, label: 'Redelijk', emoji: '🙂', stars: '★★★' },
-  { value: 4, label: 'Goed', emoji: '😎', stars: '★★★★' },
-  { value: 5, label: 'Geweldig', emoji: '🔥', stars: '★★★★★' },
-] as const;
-type Rating = (typeof RATINGS)[number];
+import PanelInstruction from './PanelInstruction';
+
+import styles from './RatingButtons.module.css';
 
 interface Props {
   onRatingSelect: (rating: number) => void;
