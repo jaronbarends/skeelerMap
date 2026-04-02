@@ -125,6 +125,7 @@ export default function MapUIContainer() {
       setCreationModeActive(false);
       setControlPointCount(0);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
       alert('Kan het segment niet opslaan');
     }
@@ -155,6 +156,7 @@ export default function MapUIContainer() {
       setSegments((prev) => prev.map((s) => (s.id === selectedSegment.id ? { ...s, rating } : s)));
       setSelectedSegment(null);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
       alert('Kan het segment niet aanpassen');
     }
@@ -183,6 +185,7 @@ export default function MapUIContainer() {
     try {
       await updateSegment(segmentId, prevSegment.rating, newCoordinates);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
       setSegments((prev) =>
         prev.map((s) => (s.id === segmentId ? { ...s, coordinates: prevSegment.coordinates } : s))
@@ -210,6 +213,7 @@ export default function MapUIContainer() {
       setSegments((prev) => segments.filter((s) => s.id !== selectedSegment.id));
       setSelectedSegment(null);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
       alert('Kan het segment niet verwijderen');
     }
