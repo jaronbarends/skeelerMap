@@ -1,7 +1,7 @@
 'use client';
 
 import L from 'leaflet';
-import { useEffect, useImperativeHandle, useRef } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
 import { Segment } from '@/lib/segments';
 import { tilesProvider } from '@/lib/tilesProvider';
@@ -54,6 +54,21 @@ export default function MapView({
 }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+
+  // Refs mirror props so Leaflet event callbacks always call the latest version
+  // without needing to be listed as effect dependencies.
+  const selectedSegmentRef = useRef<Segment | null>(null);
+  selectedSegmentRef.current = selectedSegment;
+
+  const onSegmentDragUpdateRef = useRef(onSegmentDragUpdate);
+  onSegmentDragUpdateRef.current = onSegmentDragUpdate;
+
+  const onSegmentDragEndRef = useRef(onSegmentDragEnd);
+  onSegmentDragEndRef.current = onSegmentDragEnd;
+
+  const onSegmentSelectRef = useRef(onSegmentSelect);
+  onSegmentSelectRef.current = onSegmentSelect;
+
   const creationActiveRef = useRef(false);
   const tempSegmentRef = useRef<TempSegment>({
     controlPoints: [],
@@ -69,6 +84,28 @@ export default function MapView({
   } | null>(null);
   const lastPositionRef = useRef<L.LatLngExpression | null>(null);
 
+  const renderSegment = useCallback(function renderSegment(segment: Segment, map: L.Map) {
+    if (!map) {
+      // eslint-disable-next-line no-console
+      console.error('Map not found');
+    }
+    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+    const polyline = L.polyline(segment.coordinates, {
+      color,
+      weight: 5,
+      opacity: 0.85,
+    }).addTo(map);
+
+    polyline.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      if (!creationActiveRef.current) {
+        onSegmentSelectRef.current(segment);
+      }
+    });
+
+    segmentLayersRef.current.set(segment.id, polyline);
+  }, []);
+
   // expose methods to the ref in parent component
   useImperativeHandle(
     ref,
@@ -82,7 +119,7 @@ export default function MapView({
   );
 
   useEffect(initializeMapEffect, []);
-  useEffect(updateRenderedSegmentsEffect, [segments]);
+  useEffect(updateRenderedSegmentsEffect, [segments, renderSegment]);
   // depend on id only — coordinate updates during drag must not recreate markers
   useEffect(updateSelectedSegmentEffect, [selectedSegment?.id]);
   useEffect(() => {
@@ -101,6 +138,7 @@ export default function MapView({
       return;
     }
 
+    const segmentLayer = segmentLayersRef.current;
     const map = L.map(container, { zoomControl: false }).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
       DEFAULT_ZOOM
@@ -123,7 +161,7 @@ export default function MapView({
       }
       map.remove();
       mapRef.current = null;
-      segmentLayersRef.current.clear();
+      segmentLayer.clear();
     };
   }
 
@@ -156,6 +194,7 @@ export default function MapView({
   function updateSelectedSegmentEffect() {
     const map = mapRef.current;
     if (!map) return;
+    const selectedSegment = selectedSegmentRef.current;
     if (!selectedSegment) return;
 
     const polyline = segmentLayersRef.current.get(selectedSegment.id);
@@ -208,7 +247,7 @@ export default function MapView({
       }
       markers.debounceTimer = setTimeout(async () => {
         const coords = await fetchRoute(startMarker.getLatLng(), endMarker.getLatLng());
-        onSegmentDragUpdate(segment.id, coords);
+        onSegmentDragUpdateRef.current(segment.id, coords);
       }, 200);
     }
 
@@ -220,7 +259,7 @@ export default function MapView({
         markers.debounceTimer = null;
       }
       const coords = await fetchRoute(startMarker.getLatLng(), endMarker.getLatLng());
-      onSegmentDragEnd(segment.id, coords);
+      onSegmentDragEndRef.current(segment.id, coords);
     }
   }
 
@@ -233,27 +272,6 @@ export default function MapView({
 
   function onPositionUpdate(latlng: L.LatLngExpression) {
     lastPositionRef.current = latlng;
-  }
-
-  function renderSegment(segment: Segment, map: L.Map) {
-    if (!map) {
-      console.error('Map not found');
-    }
-    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
-    const polyline = L.polyline(segment.coordinates, {
-      color,
-      weight: 5,
-      opacity: 0.85,
-    }).addTo(map);
-
-    polyline.on('click', (e) => {
-      L.DomEvent.stopPropagation(e);
-      if (!creationActiveRef.current) {
-        onSegmentSelect(segment);
-      }
-    });
-
-    segmentLayersRef.current.set(segment.id, polyline);
   }
 
   function addMapListeners(map: L.Map) {
