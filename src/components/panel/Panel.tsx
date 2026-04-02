@@ -1,8 +1,9 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, type ReactNode } from 'react';
+
 import styles from './Panel.module.css';
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function Panel({ children }: Props) {
