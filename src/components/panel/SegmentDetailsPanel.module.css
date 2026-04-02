@@ -1,13 +1,13 @@
 .deleteActions {
   display: flex;
-  gap: var(--space-8);
-  margin-top: var(--space-8);
+  gap: var(--size-8);
+  margin-top: var(--size-8);
 }
 
 .cancelButton,
 .confirmButton {
   flex: 1;
-  padding: var(--space-8) var(--space-16);
+  padding: var(--size-8) var(--size-16);
   border: none;
   border-radius: var(--radius-8);
   font-size: var(--font-size-14);

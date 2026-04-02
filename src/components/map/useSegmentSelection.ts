@@ -9,12 +9,14 @@ import { mapColors } from '@/styles/mapColorTokens';
 
 import { fetchRoute } from './mapUtils';
 
+import styles from './MapView.module.css';
+
 export function useSegmentSelection(
   mapRef: RefObject<L.Map | null>,
   segmentLayersRef: RefObject<Map<string, L.Polyline>>,
   selectedSegment: Segment | null,
   onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void,
-  onSegmentDragEnd: (segmentId: string, newCoordinates: [number, number][]) => void,
+  onSegmentDragEnd: (segmentId: string, newCoordinates: [number, number][]) => void
 ): void {
   const selectionMarkersRef = useRef<{
     start: L.Marker;
@@ -54,12 +56,12 @@ export function useSegmentSelection(
     const endCoord = segment.coordinates[segment.coordinates.length - 1];
 
     const startMarker = L.marker(startCoord, {
-      icon: createEndpointIcon(color),
+      icon: createEndpointIcon(segment.rating),
       draggable: dragEnabled,
     }).addTo(map);
 
     const endMarker = L.marker(endCoord, {
-      icon: createEndpointIcon(color),
+      icon: createEndpointIcon(segment.rating),
       draggable: dragEnabled,
     }).addTo(map);
 
@@ -109,11 +111,14 @@ export function useSegmentSelection(
   }
 }
 
-function createEndpointIcon(borderColor: string): L.DivIcon {
+// function createEndpointIcon(borderColor: string): L.DivIcon {
+function createEndpointIcon(rating: number): L.DivIcon {
+  const size = 16;
+  const anchor = size / 2;
   return L.divIcon({
     className: '',
-    html: `<div style="width:12px;height:12px;border-radius:50%;background-color:#000000;border:3px solid ${borderColor};cursor:grab;box-sizing:border-box;"></div>`,
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
+    html: `<div class="${styles.controlMarker}" style="--size:  ${size}px;" data-rating="${rating}"></div>`,
+    iconSize: [size, size],
+    iconAnchor: [anchor, anchor],
   });
 }

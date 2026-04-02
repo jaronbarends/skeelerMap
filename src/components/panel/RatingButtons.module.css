@@ -1,6 +1,6 @@
 .ratings {
   display: flex;
-  gap: var(--space-8);
+  gap: var(--size-8);
 }
 
 .ratingButton {
@@ -8,31 +8,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-8) var(--space-4);
+  gap: var(--size-2);
+  padding: var(--size-8) var(--size-4);
   background: var(--color-surface-2);
-  border: 1px solid var(--rating-color);
+  border: 1px solid var(--rating-color); /* mapped to correct color based on [data-rating] in colors.css*/
   border-radius: var(--radius-10);
   cursor: pointer;
   transition:
     opacity 0.2s,
     background 0.15s;
-
-  &[data-rating='1'] {
-    --rating-color: var(--color-rating-1);
-  }
-  &[data-rating='2'] {
-    --rating-color: var(--color-rating-2);
-  }
-  &[data-rating='3'] {
-    --rating-color: var(--color-rating-3);
-  }
-  &[data-rating='4'] {
-    --rating-color: var(--color-rating-4);
-  }
-  &[data-rating='5'] {
-    --rating-color: var(--color-rating-5);
-  }
 }
 
 .ratingButton:hover,

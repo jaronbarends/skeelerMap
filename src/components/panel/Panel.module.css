@@ -1,7 +1,7 @@
 .panel {
   --panel-max-width: 25rem;
-  --panel-margin: var(--space-16);
-  --panel-margin-min: var(--space-8);
+  --panel-margin: var(--size-16);
+  --panel-margin-min: var(--size-8);
 
   position: absolute;
   top: calc(var(--panel-margin) + env(safe-area-inset-top));
@@ -10,10 +10,10 @@
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--size-8);
   width: min(calc(100% - 2 * var(--panel-margin-min)), var(--panel-max-width));
   border-radius: var(--radius-8);
-  padding: var(--space-16);
+  padding: var(--size-16);
   background: var(--color-surface-1);
   box-shadow: 0 2px 20px var(--color-shadow);
 }
