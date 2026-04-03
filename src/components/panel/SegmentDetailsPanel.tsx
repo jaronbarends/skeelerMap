@@ -1,9 +1,12 @@
 import { useRef, useEffect } from 'react';
+
+import type { MapUIMode } from '@/components/map/MapUIContainer';
+
 import Panel from './Panel';
 import PanelHeader from './PanelHeader';
 import PanelInstruction from './PanelInstruction';
-import RatingButtons from './RatingButtons';
-import type { MapUIMode } from '@/components/map/MapUIContainer';
+import RatingSection from './RatingSection';
+
 import styles from './SegmentDetailsPanel.module.css';
 
 interface Props {
@@ -16,6 +19,7 @@ interface Props {
   onDeleteCancel: () => void;
   onDeleteConfirm: () => void;
   onRatingSelect: (rating: number) => void;
+  isPending: boolean;
 }
 
 export default function SegmentDetailsPanel({
@@ -28,6 +32,7 @@ export default function SegmentDetailsPanel({
   onDeleteCancel,
   onDeleteConfirm,
   onRatingSelect,
+  isPending,
 }: Props) {
   return (
     <Panel>
@@ -44,14 +49,25 @@ export default function SegmentDetailsPanel({
       {mode === 'edit' && (
         <>
           <PanelHeader title="Bewerk kwaliteit" onClose={onClose} />
-          <RatingButtons onRatingSelect={onRatingSelect} currentRating={currentRating} />
+          <RatingSection
+            onRatingSelect={onRatingSelect}
+            currentRating={currentRating}
+            isPending={isPending}
+            isReadyToRate={true}
+          />
         </>
       )}
       {mode === 'delete' && (
         <>
           <PanelHeader title="Segment verwijderen?" onClose={onDeleteCancel} />
-          <PanelInstruction>Weet je zeker dat je dit segment wil verwijderen?</PanelInstruction>
-          <DeleteActions onDeleteCancel={onDeleteCancel} onDeleteConfirm={onDeleteConfirm} />
+          {isPending ? (
+            <PanelInstruction>Segment aan het verwijderen...</PanelInstruction>
+          ) : (
+            <>
+              <PanelInstruction>Weet je zeker dat je dit segment wil verwijderen?</PanelInstruction>
+              <DeleteActions onDeleteCancel={onDeleteCancel} onDeleteConfirm={onDeleteConfirm} />
+            </>
+          )}
         </>
       )}
     </Panel>

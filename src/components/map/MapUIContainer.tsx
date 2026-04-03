@@ -22,6 +22,7 @@ export default function MapUIContainer() {
   const [creationModeActive, setCreationModeActive] = useState(false);
   const [controlPointCount, setControlPointCount] = useState(0);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const selectedSegmentRef = useRef<Segment | null>(null);
   const [MapUIMode, setMapUIMode] = useState<MapUIMode>('view');
   // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
@@ -49,7 +50,7 @@ export default function MapUIContainer() {
         onControlPointCountChange={setControlPointCount}
         onSegmentSelect={handleSegmentSelect}
         onSegmentDeselect={handleSegmentDeselect}
-        onSegmentDragUpdate={handleSegmentDragUpdate}
+        onSegmentDragUpdate={updateSegmentCoordinates}
         onSegmentDragEnd={handleSegmentDragEnd}
       />
       <FabContainer>
@@ -69,7 +70,8 @@ export default function MapUIContainer() {
 
       {creationModeActive && (
         <SegmentCreationPanel
-          controlPointCount={controlPointCount}
+          isReadyToRate={controlPointCount >= 2}
+          isPending={isPending}
           onCancel={handleCreationCancel}
           onRatingSelect={handleCreateSegment}
         />
@@ -86,6 +88,7 @@ export default function MapUIContainer() {
           onDeleteCancel={handleDeleteCancel}
           onDeleteConfirm={handleDeleteConfirm}
           onRatingSelect={handleRatingUpdate}
+          isPending={isPending}
         />
       )}
     </div>
@@ -118,15 +121,18 @@ export default function MapUIContainer() {
     if (!mapRef.current) return;
     try {
       const coords = mapRef.current.getSegmentCoords();
+      setIsPending(true);
       const data = await createSegment({ rating, coordinates: coords });
       const newSegment: Segment = { id: data.id, rating, coordinates: coords };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
       setCreationModeActive(false);
       setControlPointCount(0);
+      setIsPending(false);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
+      setIsPending(false);
       alert('Kan het segment niet opslaan');
     }
   }
@@ -152,17 +158,20 @@ export default function MapUIContainer() {
   async function handleRatingUpdate(rating: number) {
     if (!selectedSegment) return;
     try {
+      setIsPending(true);
       await updateSegment(selectedSegment.id, rating);
       setSegments((prev) => prev.map((s) => (s.id === selectedSegment.id ? { ...s, rating } : s)));
       setSelectedSegment(null);
+      setIsPending(false);
     } catch (error) {
+      setIsPending(false);
       // eslint-disable-next-line no-console
       console.error(error);
       alert('Kan het segment niet aanpassen');
     }
   }
 
-  function handleSegmentDragUpdate(segmentId: string, newCoordinates: [number, number][]) {
+  function updateSegmentCoordinates(segmentId: string, newCoordinates: [number, number][]) {
     setSegments((prev) =>
       prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
     );
@@ -175,24 +184,17 @@ export default function MapUIContainer() {
     const prevSegment = segments.find((s) => s.id === segmentId);
     if (!prevSegment) return;
 
-    setSegments((prev) =>
-      prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
-    );
-    setSelectedSegment((prev) =>
-      prev?.id === segmentId ? { ...prev, coordinates: newCoordinates } : prev
-    );
+    updateSegmentCoordinates(segmentId, newCoordinates);
 
     try {
+      setIsPending(true);
       await updateSegment(segmentId, prevSegment.rating, newCoordinates);
+      setIsPending(false);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
-      setSegments((prev) =>
-        prev.map((s) => (s.id === segmentId ? { ...s, coordinates: prevSegment.coordinates } : s))
-      );
-      setSelectedSegment((prev) =>
-        prev?.id === segmentId ? { ...prev, coordinates: prevSegment.coordinates } : prev
-      );
+      updateSegmentCoordinates(segmentId, prevSegment.coordinates);
+      setIsPending(false);
       alert('Kan het segment niet aanpassen');
     }
   }
@@ -209,10 +211,13 @@ export default function MapUIContainer() {
   async function handleDeleteConfirm() {
     if (!selectedSegment) return;
     try {
+      setIsPending(true);
       await removeSegment(selectedSegment.id);
       setSegments((prev) => segments.filter((s) => s.id !== selectedSegment.id));
       setSelectedSegment(null);
+      setIsPending(false);
     } catch (error) {
+      setIsPending(false);
       // eslint-disable-next-line no-console
       console.error(error);
       alert('Kan het segment niet verwijderen');
