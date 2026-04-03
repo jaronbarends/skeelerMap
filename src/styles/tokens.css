@@ -20,7 +20,4 @@
   --radius-8: 0.5rem;
   --radius-10: 0.625rem;
   --radius-16: 1rem;
-
-  /* layout */
-  --fab-margin: var(--size-16);
 }

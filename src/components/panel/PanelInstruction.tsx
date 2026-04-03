@@ -1,7 +1,9 @@
+import { type ReactNode } from 'react';
+
 import styles from './PanelInstruction.module.css';
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function PanelInstruction({ children }: Props) {

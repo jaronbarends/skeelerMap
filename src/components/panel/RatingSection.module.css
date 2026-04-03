@@ -4,13 +4,14 @@
 }
 
 .ratingButton {
+  --color-background: var(--color-surface-200);
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--size-2);
   padding: var(--size-8) var(--size-4);
-  background: var(--color-surface-2);
+  background: var(--color-background);
   border: 1px solid var(--rating-color); /* mapped to correct color based on [data-rating] in colors.css*/
   border-radius: var(--radius-10);
   cursor: pointer;
@@ -21,7 +22,7 @@
 
 .ratingButton:hover,
 .ratingButton.current {
-  background: color-mix(in srgb, var(--rating-color) 20%, var(--color-surface-2));
+  background: color-mix(in srgb, var(--rating-color) 20%, var(--color-background));
 }
 
 .ratingButton.current {

@@ -2,14 +2,14 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #1a1a1a;
+  background: var(--color-surface-100);
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 12px var(--color-shadow);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--color-text-primary);
   font-size: 22px;
 
   &[disabled] {

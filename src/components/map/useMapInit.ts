@@ -57,7 +57,7 @@ export function useMapInit(
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [containerRef]);
 
   return { mapRef, centerOnLocation };
 

@@ -14,6 +14,8 @@ const ICONS = {
   userLocation: FaLocationCrosshairs,
 } as const;
 
+export type IconName = keyof typeof ICONS;
+
 export function getIconByName(iconName: string) {
   const Icon = ICONS[iconName as keyof typeof ICONS];
   if (!Icon) {

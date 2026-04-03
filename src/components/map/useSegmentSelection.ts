@@ -36,6 +36,7 @@ export function useSegmentSelection(
   onSegmentDragEndRef.current = onSegmentDragEnd;
 
   // depend on id only — coordinate updates during drag must not recreate markers
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(updateSelectedSegmentEffect, [selectedSegment?.id]);
 
   function updateSelectedSegmentEffect() {

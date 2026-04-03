@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
@@ -24,16 +24,30 @@ export default function MapUIContainer() {
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
   const selectedSegmentRef = useRef<Segment | null>(null);
-  const [MapUIMode, setMapUIMode] = useState<MapUIMode>('view');
+  const [mapUIMode, setMapUIMode] = useState<MapUIMode>('view');
   // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
   const [segments, setSegments] = useState<Segment[]>([]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleCancelCurrentAction();
+      }
+      if (event.key === 'Delete') {
+        if (selectedSegmentRef.current) {
+          handleDeleteStart();
+        }
+      }
+    },
+    [handleCancelCurrentAction, handleDeleteStart]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
 
   useEffect(() => {
     selectedSegmentRef.current = selectedSegment;
@@ -81,7 +95,7 @@ export default function MapUIContainer() {
         <SegmentDetailsPanel
           lengthLabel={formatLength(calculateLength(selectedSegment.coordinates))}
           currentRating={selectedSegment.rating}
-          mode={MapUIMode}
+          mode={mapUIMode}
           onClose={handleDetailsClose}
           onEditStart={handleEditStart}
           onDeleteStart={handleDeleteStart}
@@ -98,17 +112,6 @@ export default function MapUIContainer() {
     const result = await fetchSegments(abortSignal);
     setSegments(result);
     return result;
-  }
-
-  function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      handleCancelCurrentAction();
-    }
-    if (event.key === 'Delete') {
-      if (selectedSegmentRef.current) {
-        handleDeleteStart();
-      }
-    }
   }
 
   function handleCreationCancel() {
@@ -213,7 +216,7 @@ export default function MapUIContainer() {
     try {
       setIsPending(true);
       await removeSegment(selectedSegment.id);
-      setSegments((prev) => segments.filter((s) => s.id !== selectedSegment.id));
+      setSegments((prev) => prev.filter((s) => s.id !== selectedSegment.id));
       setSelectedSegment(null);
       setIsPending(false);
     } catch (error) {
@@ -225,12 +228,12 @@ export default function MapUIContainer() {
   }
 
   function handleCancelCurrentAction() {
+    handleDeleteCancel();
     handleCreationCancel();
     handleSegmentDeselect();
     handleDetailsClose();
-    handleDeleteCancel();
   }
-} //
+}
 
 function calculateLength(coordinates: [number, number][]): number {
   let total = 0;

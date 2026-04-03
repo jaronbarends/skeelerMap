@@ -1,8 +1,11 @@
+import type { IconName } from '@/lib/getIconByName';
+
 import PanelIconButton from './PanelIconButton';
+
 import styles from './PanelHeader.module.css';
 
 interface ActionButton {
-  iconName: string;
+  iconName: IconName;
   onClick: () => void;
   ariaLabel: string;
 }

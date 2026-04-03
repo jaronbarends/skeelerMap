@@ -9,7 +9,7 @@ interface Props {
   onRatingSelect: (rating: number) => void;
 }
 
-export default function SegmentCreation({
+export default function SegmentCreationPanel({
   isReadyToRate,
   isPending,
   onCancel,

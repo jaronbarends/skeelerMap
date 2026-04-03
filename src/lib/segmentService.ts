@@ -19,9 +19,13 @@ export async function createSegment({
   const res = await fetch('/api/segments', {
     method: 'POST',
     body: JSON.stringify({ rating, coordinates }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   if (!res.ok) {
     const data = await res.json();
+    // eslint-disable-next-line no-console
     console.error(data.error);
     throw new Error('Kan het segment niet opslaan');
   }
@@ -36,9 +40,13 @@ export async function updateSegment(
   const res = await fetch('/api/segments', {
     method: 'PATCH',
     body: JSON.stringify({ id, rating, coordinates }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   if (!res.ok) {
     const data = await res.json();
+    // eslint-disable-next-line no-console
     console.error(data.error);
     throw new Error('Kan het segment niet aanpassen');
   }
@@ -48,9 +56,13 @@ export async function removeSegment(id: string): Promise<void> {
   const res = await fetch('/api/segments', {
     method: 'DELETE',
     body: JSON.stringify({ id }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   if (!res.ok) {
     const data = await res.json();
+    // eslint-disable-next-line no-console
     console.error(data.error);
     throw new Error('Kan het segment niet verwijderen');
   }

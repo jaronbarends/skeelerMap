@@ -5,7 +5,6 @@ import PanelInstruction from './PanelInstruction';
 import styles from './RatingSection.module.css';
 
 interface Props {
-  initialInstruction?: string;
   isPending?: boolean;
   isReadyToRate?: boolean;
   onRatingSelect: (rating: number) => void;
