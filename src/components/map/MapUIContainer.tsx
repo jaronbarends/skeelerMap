@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
@@ -17,16 +17,81 @@ const MapView = dynamic(() => import('./MapView'), { ssr: false });
 
 export type MapUIMode = 'view' | 'details' | 'edit' | 'delete';
 
+type UIState = {
+  mapUIMode: MapUIMode;
+  selectedSegment: Segment | null;
+  controlPointCount: number;
+  creationModeActive: boolean;
+};
+
+type UIAction =
+  | { type: 'SELECT_SEGMENT'; payload: Segment }
+  | { type: 'UPDATE_SELECTED_SEGMENT_COORDINATES'; payload: { newCoordinates: [number, number][] } }
+  | { type: 'DESELECT_SEGMENT' }
+  | { type: 'START_CREATION' }
+  | { type: 'UPDATE_CONTROL_POINT_COUNT'; payload: number }
+  | { type: 'SEGMENT_CREATED' }
+  | { type: 'CANCEL_CREATION' }
+  | { type: 'START_DELETE'; payload: Segment }
+  | { type: 'CANCEL_DELETE' }
+  | { type: 'CONFIRM_DELETE' }
+  | { type: 'EDIT_START' };
+
+function uiReducer(state: UIState, action: UIAction): UIState {
+  switch (action.type) {
+    case 'SEGMENT_CREATED':
+      return {
+        ...state,
+        creationModeActive: false,
+        controlPointCount: 0,
+        mapUIMode: 'view',
+        selectedSegment: null,
+      };
+    case 'SELECT_SEGMENT':
+      return { ...state, selectedSegment: action.payload, mapUIMode: 'details' };
+    case 'DESELECT_SEGMENT':
+      return { ...state, selectedSegment: null, mapUIMode: 'view' };
+    case 'START_CREATION':
+      return { ...state, creationModeActive: true, mapUIMode: 'edit' };
+    case 'UPDATE_CONTROL_POINT_COUNT':
+      return { ...state, controlPointCount: action.payload };
+    case 'CANCEL_CREATION':
+      return {
+        ...state,
+        creationModeActive: false,
+        controlPointCount: 0,
+        mapUIMode: 'view',
+        selectedSegment: null,
+      };
+    case 'EDIT_START':
+      return { ...state, mapUIMode: 'edit' };
+    case 'START_DELETE':
+      return { ...state, mapUIMode: 'delete' };
+    case 'CANCEL_DELETE':
+      return { ...state, mapUIMode: 'details' };
+    case 'CONFIRM_DELETE':
+      return { ...state, mapUIMode: 'view', selectedSegment: null };
+  }
+}
+
 export default function MapUIContainer() {
   const mapRef = useRef<MapHandle>(null);
-  const [creationModeActive, setCreationModeActive] = useState(false);
-  const [controlPointCount, setControlPointCount] = useState(0);
-  const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
+  // const [creationModeActive, setCreationModeActive] = useState(false);
+  // const [controlPointCount, setControlPointCount] = useState(0);
+  // const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
+  // const [mapUIMode, setMapUIMode] = useState<MapUIMode>('view');
   const [isPending, setIsPending] = useState<boolean>(false);
   const selectedSegmentRef = useRef<Segment | null>(null);
-  const [mapUIMode, setMapUIMode] = useState<MapUIMode>('view');
   // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
   const [segments, setSegments] = useState<Segment[]>([]);
+
+  const initialUiState: UIState = {
+    mapUIMode: 'view',
+    selectedSegment: null,
+    controlPointCount: 0,
+    creationModeActive: false,
+  };
+  const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -50,18 +115,18 @@ export default function MapUIContainer() {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    selectedSegmentRef.current = selectedSegment;
-  }, [selectedSegment]);
+    selectedSegmentRef.current = uiState.selectedSegment;
+  }, [uiState.selectedSegment]);
 
   return (
     <div className={styles.component}>
       <MapView
         ref={mapRef}
-        creationModeActive={creationModeActive}
+        creationModeActive={uiState.creationModeActive}
         fetchSegments={fetchSegmentsForMap}
         segments={segments}
-        selectedSegment={selectedSegment}
-        onControlPointCountChange={setControlPointCount}
+        selectedSegment={uiState.selectedSegment}
+        onControlPointCountChange={handleControlPointCountChange}
         onSegmentSelect={handleSegmentSelect}
         onSegmentDeselect={handleSegmentDeselect}
         onSegmentDragUpdate={updateSegmentCoordinates}
@@ -69,9 +134,9 @@ export default function MapUIContainer() {
       />
       <FabContainer>
         <FabButton
-          onClick={() => setCreationModeActive(true)}
+          onClick={() => uiDispatch({ type: 'START_CREATION' })}
           ariaLabel="Segment toevoegen"
-          disabled={creationModeActive || selectedSegment !== null}
+          disabled={uiState.creationModeActive || uiState.selectedSegment !== null}
           iconName="plus"
         />
         <FabButton
@@ -82,20 +147,20 @@ export default function MapUIContainer() {
         />
       </FabContainer>
 
-      {creationModeActive && (
+      {uiState.creationModeActive && (
         <SegmentCreationPanel
-          isReadyToRate={controlPointCount >= 2}
+          isReadyToRate={uiState.controlPointCount >= 2}
           isPending={isPending}
           onCancel={handleCreationCancel}
           onRatingSelect={handleCreateSegment}
         />
       )}
 
-      {selectedSegment && (
+      {uiState.selectedSegment && (
         <SegmentDetailsPanel
-          lengthLabel={formatLength(calculateLength(selectedSegment.coordinates))}
-          currentRating={selectedSegment.rating}
-          mode={mapUIMode}
+          lengthLabel={formatLength(calculateLength(uiState.selectedSegment.coordinates))}
+          currentRating={uiState.selectedSegment.rating}
+          mode={uiState.mapUIMode}
           onClose={handleDetailsClose}
           onEditStart={handleEditStart}
           onDeleteStart={handleDeleteStart}
@@ -114,10 +179,15 @@ export default function MapUIContainer() {
     return result;
   }
 
+  function handleControlPointCountChange(count: number) {
+    uiDispatch({ type: 'UPDATE_CONTROL_POINT_COUNT', payload: count });
+  }
+
   function handleCreationCancel() {
     mapRef.current?.cancelCreation();
-    setCreationModeActive(false);
-    setControlPointCount(0); //
+    uiDispatch({ type: 'CANCEL_CREATION' });
+    // setCreationModeActive(false);
+    // setControlPointCount(0); //
   }
 
   async function handleCreateSegment(rating: number) {
@@ -129,8 +199,10 @@ export default function MapUIContainer() {
       const newSegment: Segment = { id: data.id, rating, coordinates: coords };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
-      setCreationModeActive(false);
-      setControlPointCount(0);
+      uiDispatch({ type: 'SEGMENT_CREATED' });
+      // setCreationModeActive(false);
+      // setControlPointCount(0);
+
       setIsPending(false);
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -141,30 +213,34 @@ export default function MapUIContainer() {
   }
 
   function handleSegmentSelect(segment: Segment) {
-    setSelectedSegment(segment);
-    setMapUIMode('details');
+    uiDispatch({ type: 'SELECT_SEGMENT', payload: segment });
+    // setSelectedSegment(segment);
+    // setMapUIMode('details');
   }
 
   function handleSegmentDeselect() {
-    setSelectedSegment(null);
+    uiDispatch({ type: 'DESELECT_SEGMENT' });
+    // setSelectedSegment(null);
   }
 
   function handleDetailsClose() {
-    setSelectedSegment(null);
-    setMapUIMode('view');
+    uiDispatch({ type: 'DESELECT_SEGMENT' });
+    // setSelectedSegment(null);
+    // setMapUIMode('view');
   }
 
   function handleEditStart() {
-    setMapUIMode('edit');
+    uiDispatch({ type: 'EDIT_START' });
   }
 
   async function handleRatingUpdate(rating: number) {
-    if (!selectedSegment) return;
+    const segment = uiState.selectedSegment;
+    if (!segment) return;
     try {
       setIsPending(true);
-      await updateSegment(selectedSegment.id, rating);
-      setSegments((prev) => prev.map((s) => (s.id === selectedSegment.id ? { ...s, rating } : s)));
-      setSelectedSegment(null);
+      await updateSegment(segment.id, rating);
+      setSegments((prev) => prev.map((s) => (s.id === segment.id ? { ...s, rating } : s)));
+      uiDispatch({ type: 'DESELECT_SEGMENT' });
       setIsPending(false);
     } catch (error) {
       setIsPending(false);
@@ -178,9 +254,10 @@ export default function MapUIContainer() {
     setSegments((prev) =>
       prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
     );
-    setSelectedSegment((prev) =>
-      prev?.id === segmentId ? { ...prev, coordinates: newCoordinates } : prev
-    );
+    uiDispatch({ type: 'UPDATE_SELECTED_SEGMENT_COORDINATES', payload: { newCoordinates } });
+    // setSelectedSegment((prev) =>
+    //   prev?.id === segmentId ? { ...prev, coordinates: newCoordinates } : prev
+    // );
   }
 
   async function handleSegmentDragEnd(segmentId: string, newCoordinates: [number, number][]) {
@@ -204,20 +281,22 @@ export default function MapUIContainer() {
 
   function handleDeleteStart() {
     (document.activeElement as HTMLElement)?.blur();
-    setMapUIMode('delete');
+    uiDispatch({ type: 'START_DELETE' });
   }
 
   function handleDeleteCancel() {
-    setMapUIMode('details');
+    uiDispatch({ type: 'CANCEL_DELETE' });
+    // setMapUIMode('details');
   }
 
   async function handleDeleteConfirm() {
-    if (!selectedSegment) return;
+    const segment = uiState.selectedSegment;
+    if (!segment) return;
     try {
       setIsPending(true);
-      await removeSegment(selectedSegment.id);
-      setSegments((prev) => prev.filter((s) => s.id !== selectedSegment.id));
-      setSelectedSegment(null);
+      await removeSegment(segment.id);
+      setSegments((prev) => prev.filter((s) => s.id !== segment.id));
+      uiDispatch({ type: 'CONFIRM_DELETE' });
       setIsPending(false);
     } catch (error) {
       setIsPending(false);
