@@ -63,6 +63,14 @@ function uiReducer(state: UIState, action: UIAction): UIState {
         mapUIMode: 'view',
         selectedSegment: null,
       };
+    case 'UPDATE_SELECTED_SEGMENT_COORDINATES':
+      if (!state.selectedSegment) {
+        return state;
+      }
+      return {
+        ...state,
+        selectedSegment: { ...state.selectedSegment, coordinates: action.payload.newCoordinates },
+      };
     case 'EDIT_START':
       return { ...state, mapUIMode: 'edit' };
     case 'START_DELETE':
@@ -71,6 +79,10 @@ function uiReducer(state: UIState, action: UIAction): UIState {
       return { ...state, mapUIMode: 'details' };
     case 'CONFIRM_DELETE':
       return { ...state, mapUIMode: 'view', selectedSegment: null };
+    default:
+      // eslint-disable-next-line no-console
+      console.error(`Unknown action type: ${(action as { type: unknown }).type}`);
+      return state;
   }
 }
 
