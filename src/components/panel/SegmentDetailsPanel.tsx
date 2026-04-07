@@ -10,7 +10,7 @@ import RatingSection from './RatingSection';
 import styles from './SegmentDetailsPanel.module.css';
 
 interface Props {
-  lengthLabel: string;
+  segmentLength: number;
   currentRating: number;
   mode: MapUIMode;
   onClose: () => void;
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export default function SegmentDetailsPanel({
-  lengthLabel,
+  segmentLength,
   currentRating,
   mode,
   onClose,
@@ -38,7 +38,7 @@ export default function SegmentDetailsPanel({
     <Panel>
       {mode === 'details' && (
         <PanelHeader
-          title={lengthLabel}
+          title={`Lengte: ${formatLength(segmentLength)}`}
           onClose={onClose}
           actionButtons={[
             { iconName: 'edit', onClick: onEditStart, ariaLabel: 'Segment aanpassen' },
@@ -99,4 +99,11 @@ function DeleteActions({ onDeleteCancel, onDeleteConfirm }: DeleteActionsProps) 
       </button>
     </div>
   );
+}
+
+function formatLength(meters: number): string {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1)} km`;
+  }
+  return `${Math.round(meters)} m`;
 }
