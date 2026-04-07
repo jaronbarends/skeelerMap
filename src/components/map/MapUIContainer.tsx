@@ -124,6 +124,12 @@ export default function MapUIContainer() {
     }
   }, []);
 
+  const fetchSegmentsForMap = useCallback(async (abortSignal: AbortSignal): Promise<Segment[]> => {
+    const result = await fetchSegments(abortSignal);
+    setSegments(result);
+    return result;
+  }, []);
+
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -189,12 +195,6 @@ export default function MapUIContainer() {
       )}
     </div>
   );
-
-  async function fetchSegmentsForMap(abortSignal: AbortSignal): Promise<Segment[]> {
-    const result = await fetchSegments(abortSignal);
-    setSegments(result);
-    return result;
-  }
 
   function handleControlPointCountChange(count: number) {
     uiDispatch({ type: 'UPDATE_CONTROL_POINT_COUNT', payload: count });
