@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
 import { Segment } from '@/lib/segments';
-import { mapColors } from '@/styles/mapColorTokens';
 
 import { fetchRoute } from './mapUtils';
 
@@ -52,7 +51,6 @@ export function useSegmentSelection(
 
     const segment = selectedSegment;
     const dragEnabled = window.matchMedia('(pointer: fine)').matches;
-    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
     const startCoord = segment.coordinates[0];
     const endCoord = segment.coordinates[segment.coordinates.length - 1];
 

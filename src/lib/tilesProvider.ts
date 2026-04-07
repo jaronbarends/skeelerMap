@@ -13,6 +13,7 @@ const OSM: TilesProvider = {
   routingUrl: ROUTING_URL,
 };
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 const CARTO: TilesProvider = {
   url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
   attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
