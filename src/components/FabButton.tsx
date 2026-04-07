@@ -1,4 +1,5 @@
 import { getIconByName } from '@/lib/getIconByName';
+
 import styles from './FabButton.module.css';
 
 export default function FabButton({
@@ -16,7 +17,8 @@ export default function FabButton({
 
   return (
     <button className={styles.component} aria-label={ariaLabel} {...{ onClick, disabled }}>
-      <Icon />
+      {/* Next.js's built-in compiler throws an error ("Cannot create components during render") if you use <Icon /> here, so we use {Icon({})} instead. */}
+      {Icon({})}
     </button>
   );
 }

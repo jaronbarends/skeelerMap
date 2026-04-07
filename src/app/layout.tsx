@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
-import { mapColorCSSVars } from '@/styles/mapColorTokens';
-import MenuBar from '@/components/MenuBar';
+import { type CSSProperties, ReactNode } from 'react';
 
-import 'leaflet/dist/leaflet.css';
+import MenuBar from '@/components/MenuBar';
+import { mapColorCSSVars } from '@/styles/mapColorTokens';
+
 import './main.css';
+import 'leaflet/dist/leaflet.css';
 
 export const metadata: Metadata = {
   title: 'SkateMap',
@@ -16,8 +18,8 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const mapColorStyles = mapColorCSSVars as React.CSSProperties;
+export default function RootLayout({ children }: { children: ReactNode }) {
+  const mapColorStyles = mapColorCSSVars as CSSProperties;
 
   return (
     <html lang="nl">
