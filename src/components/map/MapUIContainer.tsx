@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import type { MapHandle } from '@/components/map/MapView';
+import { calculateSegmentLength } from '@/components/map/mapUtils';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
@@ -35,7 +36,8 @@ type UIAction =
   | { type: 'START_DELETE'; payload: Segment }
   | { type: 'CANCEL_DELETE' }
   | { type: 'CONFIRM_DELETE' }
-  | { type: 'EDIT_START' };
+  | { type: 'EDIT_START' }
+  | { type: 'CANCEL_CURRENT_ACTION' };
 
 function uiReducer(state: UIState, action: UIAction): UIState {
   switch (action.type) {
@@ -79,6 +81,14 @@ function uiReducer(state: UIState, action: UIAction): UIState {
       return { ...state, mapUIMode: 'details' };
     case 'CONFIRM_DELETE':
       return { ...state, mapUIMode: 'view', selectedSegment: null };
+    case 'CANCEL_CURRENT_ACTION':
+      return {
+        ...state,
+        mapUIMode: 'view',
+        selectedSegment: null,
+        controlPointCount: 0,
+        creationModeActive: false,
+      };
     default:
       // eslint-disable-next-line no-console
       console.error(`Unknown action type: ${(action as { type: unknown }).type}`);
@@ -88,10 +98,6 @@ function uiReducer(state: UIState, action: UIAction): UIState {
 
 export default function MapUIContainer() {
   const mapRef = useRef<MapHandle>(null);
-  // const [creationModeActive, setCreationModeActive] = useState(false);
-  // const [controlPointCount, setControlPointCount] = useState(0);
-  // const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
-  // const [mapUIMode, setMapUIMode] = useState<MapUIMode>('view');
   const [isPending, setIsPending] = useState<boolean>(false);
   const selectedSegmentRef = useRef<Segment | null>(null);
   // segments is empty array initially, because we don't want to fetch segments until the map is mounted (to accomodate for possibility to only load segments within the viewport later)
@@ -105,19 +111,18 @@ export default function MapUIContainer() {
   };
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleCancelCurrentAction();
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      // eslint-disable-next-line no-console
+      console.log('Escape key pressed');
+      uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
+    }
+    if (event.key === 'Delete') {
+      if (selectedSegmentRef.current) {
+        uiDispatch({ type: 'START_DELETE', payload: selectedSegmentRef.current });
       }
-      if (event.key === 'Delete') {
-        if (selectedSegmentRef.current) {
-          handleDeleteStart();
-        }
-      }
-    },
-    [handleCancelCurrentAction, handleDeleteStart]
-  );
+    }
+  }, []);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -170,7 +175,7 @@ export default function MapUIContainer() {
 
       {uiState.selectedSegment && (
         <SegmentDetailsPanel
-          lengthLabel={formatLength(calculateLength(uiState.selectedSegment.coordinates))}
+          segmentLength={calculateSegmentLength(uiState.selectedSegment.coordinates)}
           currentRating={uiState.selectedSegment.rating}
           mode={uiState.mapUIMode}
           onClose={handleDetailsClose}
@@ -198,8 +203,6 @@ export default function MapUIContainer() {
   function handleCreationCancel() {
     mapRef.current?.cancelCreation();
     uiDispatch({ type: 'CANCEL_CREATION' });
-    // setCreationModeActive(false);
-    // setControlPointCount(0); //
   }
 
   async function handleCreateSegment(rating: number) {
@@ -212,8 +215,6 @@ export default function MapUIContainer() {
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
       uiDispatch({ type: 'SEGMENT_CREATED' });
-      // setCreationModeActive(false);
-      // setControlPointCount(0);
 
       setIsPending(false);
     } catch (error) {
@@ -226,19 +227,14 @@ export default function MapUIContainer() {
 
   function handleSegmentSelect(segment: Segment) {
     uiDispatch({ type: 'SELECT_SEGMENT', payload: segment });
-    // setSelectedSegment(segment);
-    // setMapUIMode('details');
   }
 
   function handleSegmentDeselect() {
     uiDispatch({ type: 'DESELECT_SEGMENT' });
-    // setSelectedSegment(null);
   }
 
   function handleDetailsClose() {
     uiDispatch({ type: 'DESELECT_SEGMENT' });
-    // setSelectedSegment(null);
-    // setMapUIMode('view');
   }
 
   function handleEditStart() {
@@ -267,9 +263,6 @@ export default function MapUIContainer() {
       prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
     );
     uiDispatch({ type: 'UPDATE_SELECTED_SEGMENT_COORDINATES', payload: { newCoordinates } });
-    // setSelectedSegment((prev) =>
-    //   prev?.id === segmentId ? { ...prev, coordinates: newCoordinates } : prev
-    // );
   }
 
   async function handleSegmentDragEnd(segmentId: string, newCoordinates: [number, number][]) {
@@ -292,13 +285,15 @@ export default function MapUIContainer() {
   }
 
   function handleDeleteStart() {
+    if (!uiState.selectedSegment) {
+      return;
+    }
     (document.activeElement as HTMLElement)?.blur();
-    uiDispatch({ type: 'START_DELETE' });
+    uiDispatch({ type: 'START_DELETE', payload: uiState.selectedSegment });
   }
 
   function handleDeleteCancel() {
     uiDispatch({ type: 'CANCEL_DELETE' });
-    // setMapUIMode('details');
   }
 
   async function handleDeleteConfirm() {
@@ -317,36 +312,4 @@ export default function MapUIContainer() {
       alert('Kan het segment niet verwijderen');
     }
   }
-
-  function handleCancelCurrentAction() {
-    handleDeleteCancel();
-    handleCreationCancel();
-    handleSegmentDeselect();
-    handleDetailsClose();
-  }
-}
-
-function calculateLength(coordinates: [number, number][]): number {
-  let total = 0;
-  for (let i = 1; i < coordinates.length; i++) {
-    total += haversineDistance(coordinates[i - 1], coordinates[i]);
-  }
-  return total;
-}
-
-function haversineDistance([lat1, lon1]: [number, number], [lat2, lon2]: [number, number]): number {
-  const R = 6371000;
-  const φ1 = (lat1 * Math.PI) / 180;
-  const φ2 = (lat2 * Math.PI) / 180;
-  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function formatLength(meters: number): string {
-  if (meters >= 1000) {
-    return `${(meters / 1000).toFixed(1)} km`;
-  }
-  return `${Math.round(meters)} m`;
 }
