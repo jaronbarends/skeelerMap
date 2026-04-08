@@ -4,6 +4,7 @@ import type { MapUIMode } from '@/components/map/MapUIContainer';
 
 import Panel from './Panel';
 import PanelHeader from './PanelHeader';
+import type { ActionButton } from './PanelHeader';
 import PanelInstruction from './PanelInstruction';
 import RatingSection from './RatingSection';
 
@@ -40,10 +41,7 @@ export default function SegmentDetailsPanel({
         <PanelHeader
           title={`Lengte: ${formatLength(segmentLength)}`}
           onClose={onClose}
-          actionButtons={[
-            ...(onEditStart ? [{ iconName: 'edit' as const, onClick: onEditStart, ariaLabel: 'Segment aanpassen' }] : []),
-            ...(onDeleteStart ? [{ iconName: 'delete' as const, onClick: onDeleteStart, ariaLabel: 'Segment verwijderen' }] : []),
-          ]}
+          actionButtons={getActionButtons()}
         />
       )}
       {mode === 'edit' && (
@@ -72,6 +70,25 @@ export default function SegmentDetailsPanel({
       )}
     </Panel>
   );
+
+  function getActionButtons(): ActionButton[] {
+    const actionButtons = [];
+    if (onEditStart) {
+      actionButtons.push({
+        iconName: 'edit',
+        onClick: onEditStart,
+        ariaLabel: 'Segment aanpassen',
+      });
+    }
+    if (onDeleteStart) {
+      actionButtons.push({
+        iconName: 'delete',
+        onClick: onDeleteStart,
+        ariaLabel: 'Segment verwijderen',
+      });
+    }
+    return actionButtons;
+  }
 }
 
 interface DeleteActionsProps {
