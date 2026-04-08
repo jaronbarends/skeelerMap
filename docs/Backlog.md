@@ -50,6 +50,10 @@ After first login: manually assign existing segments to owner account via SQL up
 
 Supabase error messages are in English by default; for Dutch errors, add a translation layer on top of authError.message.
 
+### re-evaluate error messages on change
+
+`setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
+
 ### use DRY solution for buttons and forms
 
 TBD: do we want a button component, or do we use global button classes?
