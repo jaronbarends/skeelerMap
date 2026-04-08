@@ -16,35 +16,30 @@ _Implemented 2026-04-01._
 Saving a segment may take some time. Give the user feedback that something's happening.
 _Implemented 2026-04-07._
 
-### Menubar
+### ~~Menubar~~ ✓ Done
 
 Replace placeholder with real menubar: app name + tagline stacked left, auth controls right.
+_Implemented 2026-04-08._
 
-- App name: TBD (working title: SkateMap)
-- Tagline: "Vind en beoordeel skeelerpaden"
-- Logged-out: "Inloggen" button
-- Logged-in: "Uitloggen" button
-- MenuBar is a Server Component; interactive parts are Client Component children
-- See decisions.md for architecture details
-
-### Auth: login + signup
+### ~~Auth: login + signup~~ ✓ Done
 
 `/login` and `/signup` pages with Supabase email/password auth.
+_Implemented 2026-04-08._
 
-- Email verification required on signup
-- On success: redirect to `/` with `?toast=` query param for feedback
-- Segment write operations gated behind auth
-- See decisions.md for full details
-
-### Toast component
+### ~~Toast component~~ ✓ Done
 
 Map-level feedback component. Rendered in `page.tsx`, triggered by `?toast=` query param.
-Auto-dismisses after 3–4s. Positioned below menubar.
+_Implemented 2026-04-08._
 
-### Add `user_id` to segments table
+### ~~Add `user_id` to segments table~~ ✓ Done
 
 Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
 After first login: manually assign existing segments to owner account via SQL update.
+_Implemented 2026-04-08._
+
+### Add toast after logging out
+
+When the user logs out, they don't see any confirmation of that. Show a toast with the text "Je bent nu uitgelogd."
 
 ### Hide edit/delete controls for segments not owned by current user
 
@@ -65,10 +60,6 @@ Changes needed:
 Note: RLS already prevents unauthorized writes at the database level.
 This is a UX concern, not a security one.
 Note: when changing another user's segment, the UI updates because the PATCH handler returns a 204 either way so the client thinks it succeeded. The client-side state updates, the UI looks fine, but the database is unchanged. A page reload shows the original value again.
-
-### Adjust supabase's confirmation email text
-
-The text is now generic - make it custom Authentication > Notifications > Email
 
 ### use Dutch error messages
 
@@ -123,6 +114,26 @@ Scale polyline weight based on zoom level. Defer unless it becomes a visible pro
 Choose and configure a production tile provider. Current CartoDB usage may violate ToS under real traffic.
 Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
 _Open decision in decisions.md._
+
+### Supabase auth middleware
+
+Add `src/middleware.ts` to handle session token refresh on every request.
+
+Currently, token refresh is attempted in Server Components (e.g. MenuBar) where
+cookie writes are not allowed — the try/catch in `supabaseAuth.server.ts` suppresses
+the resulting error. This means a refreshed token is not persisted, and users may
+be logged out unexpectedly when their token expires.
+
+Middleware runs before any page renders and is allowed to write cookies, making it
+the correct place for token refresh. Supabase's SSR documentation has a standard
+template for this.
+
+**Risk without this:** low for now — tokens are valid for 1 hour and the user base
+is small. Revisit before launch.
+
+### Error and success styling
+
+The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
 
 ---
 

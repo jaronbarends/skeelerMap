@@ -8,7 +8,7 @@ import './main.css';
 import 'leaflet/dist/leaflet.css';
 
 export const metadata: Metadata = {
-  title: 'SkateMap',
+  title: 'SkeelerMap',
   description: 'Interactieve kaart met wegkwaliteit voor inline skating',
 };
 

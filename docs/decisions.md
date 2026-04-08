@@ -233,3 +233,10 @@
 
 **Date:** 2026-04-08
 **Decision:** Map-level feedback via a `<Toast>` component rendered in `page.tsx`. Triggered by `?toast=` query param on `/`. Page reads param on mount, shows toast, clears param from URL.
+
+### `supabaseAuth.server.ts` — `setAll` try/catch
+
+**Date:** 2026-04-08
+**Decision:** The `setAll` cookie handler in `supabaseAuth.server.ts` is wrapped in a try/catch that silently swallows errors.
+**Rationale:** When `getUser()` is called from a Server Component (e.g. `MenuBar`), Supabase may attempt to refresh the session token and write an updated cookie. Next.js forbids cookie writes outside of Server Actions and Route Handlers, so this throws. The try/catch suppresses the error — the session is still valid for the current request, and the proper place for token rotation is middleware (not yet implemented).
+**Risk:** Without middleware, a refreshed token won't be persisted until the next Route Handler or Server Action that writes cookies. Acceptable for now; revisit when middleware is added.

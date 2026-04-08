@@ -79,5 +79,6 @@ export default function LoginForm() {
 
     // no need to call setIsPending(false) here: the component unmounts via navigation, so resetting it would cause a state update on an unmounted component.
     router.push('/?toast=logged-in');
+    router.refresh();
   }
 }

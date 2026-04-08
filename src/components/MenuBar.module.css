@@ -10,6 +10,8 @@
 .logo {
   font-size: var(--font-size-16);
   font-weight: 600;
+  color: var(--color-text-primary);
+  text-decoration: none;
 }
 
 .tagline {

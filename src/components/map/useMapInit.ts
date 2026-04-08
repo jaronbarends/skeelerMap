@@ -99,6 +99,7 @@ function createWatchedLocationMarker(
           weight: 2,
           fillColor: mapColors.locationDot.fill,
           fillOpacity: 1,
+          pane: 'markerPane',
         }).addTo(map);
       } else {
         locationMarker.setLatLng(latlng);
