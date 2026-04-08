@@ -72,7 +72,7 @@ export default function SegmentDetailsPanel({
   );
 
   function getActionButtons(): ActionButton[] {
-    const actionButtons = [];
+    const actionButtons: ActionButton[] = [];
     if (onEditStart) {
       actionButtons.push({
         iconName: 'edit',
