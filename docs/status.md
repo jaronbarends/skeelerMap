@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-04-01
-**Current phase:** Keyboard shortcuts and segment dragging implemented.
+**Last updated:** 2026-04-07
+**Current phase:** Indicate saving implemented.
 
 ---
 
@@ -20,6 +20,7 @@
 - Location button (FAB, below add-segment button): centers map on user's last known position
 - Keyboard shortcuts: `Esc` cancels drawing mode; `Delete` deletes selected segment (with confirmation)
 - Drag-to-edit segment endpoints: drag start/end point of a saved segment to reposition it; reroutes via OSRM and saves to Supabase
+- Indicate saving: shows status text in the panel during save and delete operations
 
 ## What's decided
 

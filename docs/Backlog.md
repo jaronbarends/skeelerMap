@@ -11,9 +11,44 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 Allow users to drag the start or end point of a saved segment to adjust it. Operates on routed geometry endpoints only — not intermediate control points (those are not stored).
 _Implemented 2026-04-01._
 
-### Indicate saving
+### ~~Indicate saving~~ ✓ Done
 
 Saving a segment may take some time. Give the user feedback that something's happening.
+_Implemented 2026-04-07._
+
+### Menubar
+
+Replace placeholder with real menubar: app name + tagline stacked left, auth controls right.
+
+- App name: TBD (working title: SkateMap)
+- Tagline: "Vind en beoordeel skeelerpaden"
+- Logged-out: "Inloggen" button
+- Logged-in: "Uitloggen" button
+- MenuBar is a Server Component; interactive parts are Client Component children
+- See decisions.md for architecture details
+
+### Auth: login + signup
+
+`/login` and `/signup` pages with Supabase email/password auth.
+
+- Email verification required on signup
+- On success: redirect to `/` with `?toast=` query param for feedback
+- Segment write operations gated behind auth
+- See decisions.md for full details
+
+### Toast component
+
+Map-level feedback component. Rendered in `page.tsx`, triggered by `?toast=` query param.
+Auto-dismisses after 3–4s. Positioned below menubar.
+
+### Add `user_id` to segments table
+
+Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
+After first login: manually assign existing segments to owner account via SQL update.
+
+### use DRY solution for buttons
+
+TBD: do we want a button component, or do we use global button classes?
 
 ---
 
@@ -57,13 +92,17 @@ Explain the 5 rating levels to the user.
 
 ### Logo / branding
 
-### Auth (Supabase)
-
-Supabase is in place. Auth not yet implemented. Required before segments can be user-scoped.
-
 ### FAQ or other pages
 
 Deferred until core app is stable.
+
+### User profiles table
+
+Add a `profiles` table in Supabase (FK to `auth.uid()`, auto-populated on signup via trigger).
+Needed as a clean extension point for user metadata — in particular, a `role` column for
+admin vs. regular user permissions. Admin users would be able to edit/delete all segments;
+regular users can only edit/delete their own.
+Do not implement role-based RLS until the profiles table exists.
 
 ---
 
