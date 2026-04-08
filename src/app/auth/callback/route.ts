@@ -1,16 +1,14 @@
 import { createServerClient } from '@supabase/ssr';
-import type { EmailOtpType } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
-  const tokenHash = searchParams.get('token_hash');
-  const type = searchParams.get('type') as EmailOtpType | null;
+  const code = searchParams.get('code');
 
   const successUrl = `${origin}/?toast=account-confirmed`;
   const failureUrl = `${origin}/?toast=confirmation-failed`;
 
-  if (!tokenHash || !type) {
+  if (!code) {
     return NextResponse.redirect(failureUrl);
   }
 
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest) {
     },
   );
 
-  const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
     return NextResponse.redirect(failureUrl);

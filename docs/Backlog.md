@@ -46,6 +46,30 @@ Auto-dismisses after 3–4s. Positioned below menubar.
 Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
 After first login: manually assign existing segments to owner account via SQL update.
 
+### Hide edit/delete controls for segments not owned by current user
+
+Currently all segments show edit and delete buttons regardless of ownership.
+These should only be shown when the logged-in user owns the segment.
+
+Changes needed:
+
+- Pass the current user's ID into MapUIContainer (from a Server Component parent,
+  or via a client-side auth helper)
+- Add a `user_id` field to the Segment type
+- Return `user_id` from the GET /api/segments endpoint
+- Add a `segmentIsOwnedByCurrentUser` check where ownership matters:
+  - SegmentDetailsPanel: hide edit and delete buttons for unowned segments
+  - MapUIContainer: skip START_DELETE dispatch on Delete key if segment is not owned
+    by the current user
+
+Note: RLS already prevents unauthorized writes at the database level.
+This is a UX concern, not a security one.
+Note: when changing another user's segment, the UI updates because the PATCH handler returns a 204 either way so the client thinks it succeeded. The client-side state updates, the UI looks fine, but the database is unchanged. A page reload shows the original value again.
+
+### Adjust supabase's confirmation email text
+
+The text is now generic - make it custom Authentication > Notifications > Email
+
 ### use Dutch error messages
 
 Supabase error messages are in English by default; for Dutch errors, add a translation layer on top of authError.message.
@@ -121,6 +145,10 @@ Needed as a clean extension point for user metadata — in particular, a `role` 
 admin vs. regular user permissions. Admin users would be able to edit/delete all segments;
 regular users can only edit/delete their own.
 Do not implement role-based RLS until the profiles table exists.
+
+### Use Custom SMTP for supabase emails
+
+To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, SendGrid, or Postmark in your project settings to overcome free tier limitations.
 
 ---
 

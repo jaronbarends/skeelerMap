@@ -1,5 +1,28 @@
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+
 import { supabase } from '@/lib/supabase';
+
+async function getUserScopedClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        },
+      },
+    },
+  );
+}
 
 export async function GET() {
   const { data, error } = await supabase.rpc('get_segments');
@@ -20,13 +43,20 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const client = await getUserScopedClient();
+  const { data: { user } } = await client.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { rating, coordinates } = await request.json();
   const geojson = coordsToGeojson(coordinates);
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from('segments')
     .insert({
-      user_id: '00000000-0000-0000-0000-000000000000',
+      user_id: user.id,
       rating,
       geometry: JSON.stringify(geojson),
     })
@@ -39,6 +69,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const client = await getUserScopedClient();
+  const { data: { user } } = await client.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { id, rating, coordinates } = await request.json();
 
   const updateData: { rating: number; geometry?: string } = { rating };
@@ -47,7 +84,7 @@ export async function PATCH(request: NextRequest) {
     updateData.geometry = JSON.stringify(geojson);
   }
 
-  const { error } = await supabase.from('segments').update(updateData).eq('id', id);
+  const { error } = await client.from('segments').update(updateData).eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -55,9 +92,16 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const client = await getUserScopedClient();
+  const { data: { user } } = await client.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { id } = await request.json();
 
-  const { error } = await supabase.from('segments').delete().eq('id', id);
+  const { error } = await client.from('segments').delete().eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
