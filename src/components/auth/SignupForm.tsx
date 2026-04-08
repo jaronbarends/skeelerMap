@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { type SubmitEvent, useState } from 'react';
 
 import { signUp } from '@/lib/supabaseAuth';
 
@@ -19,9 +19,7 @@ export default function SignupForm() {
     return (
       <div className={styles.page}>
         <div className={styles.form}>
-          <p className={styles.successMessage}>
-            Controleer je e-mail om je account te bevestigen
-          </p>
+          <p className={styles.successMessage}>Controleer je e-mail om je account te bevestigen</p>
         </div>
       </div>
     );
@@ -90,7 +88,7 @@ export default function SignupForm() {
     </div>
   );
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setError(null);
 

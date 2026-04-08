@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { type SubmitEvent, useState } from 'react';
 
 import { signIn } from '@/lib/supabaseAuth';
 
@@ -64,7 +64,7 @@ export default function LoginForm() {
     </div>
   );
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setError(null);
     setIsPending(true);
