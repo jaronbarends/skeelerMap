@@ -46,7 +46,11 @@ Auto-dismisses after 3–4s. Positioned below menubar.
 Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
 After first login: manually assign existing segments to owner account via SQL update.
 
-### use DRY solution for buttons
+### use Dutch error messages
+
+Supabase error messages are in English by default; for Dutch errors, add a translation layer on top of authError.message.
+
+### use DRY solution for buttons and forms
 
 TBD: do we want a button component, or do we use global button classes?
 
