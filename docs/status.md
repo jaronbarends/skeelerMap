@@ -36,6 +36,8 @@
 - Supabase auth helpers split into `src/lib/supabaseAuth.ts` (browser) and
   `src/lib/supabaseAuth.server.ts` (server)
 - Segments have `user_id` (FK to auth.users); RLS policies enforce ownership on writes
+- Ownership-aware UI: edit/delete controls only shown for segments owned by the current user;
+  `get_segments` RPC returns `user_id`; `currentUserId` passed server-side from `page.tsx`
 
 ## What's decided
 
@@ -55,7 +57,6 @@
 
 - Location permission flow (deferred)
 - Tile provider for production (deferred)
-- Hide edit/delete controls for segments not owned by current user (see backlog)
 - Assign existing segments to owner account via SQL update (one-time task)
 
 ## Next step

@@ -41,25 +41,9 @@ _Implemented 2026-04-08._
 
 When the user logs out, they don't see any confirmation of that. Show a toast with the text "Je bent nu uitgelogd."
 
-### Hide edit/delete controls for segments not owned by current user
+### ~~Hide edit/delete controls for segments not owned by current user~~ ✓ Done
 
-Currently all segments show edit and delete buttons regardless of ownership.
-These should only be shown when the logged-in user owns the segment.
-
-Changes needed:
-
-- Pass the current user's ID into MapUIContainer (from a Server Component parent,
-  or via a client-side auth helper)
-- Add a `user_id` field to the Segment type
-- Return `user_id` from the GET /api/segments endpoint
-- Add a `segmentIsOwnedByCurrentUser` check where ownership matters:
-  - SegmentDetailsPanel: hide edit and delete buttons for unowned segments
-  - MapUIContainer: skip START_DELETE dispatch on Delete key if segment is not owned
-    by the current user
-
-Note: RLS already prevents unauthorized writes at the database level.
-This is a UX concern, not a security one.
-Note: when changing another user's segment, the UI updates because the PATCH handler returns a 204 either way so the client thinks it succeeded. The client-side state updates, the UI looks fine, but the database is unchanged. A page reload shows the original value again.
+_Implemented 2026-04-08._
 
 ### use Dutch error messages
 

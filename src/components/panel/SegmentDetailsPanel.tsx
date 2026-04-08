@@ -14,8 +14,8 @@ interface Props {
   currentRating: number;
   mode: MapUIMode;
   onClose: () => void;
-  onEditStart: () => void;
-  onDeleteStart: () => void;
+  onEditStart?: () => void;
+  onDeleteStart?: () => void;
   onDeleteCancel: () => void;
   onDeleteConfirm: () => void;
   onRatingSelect: (rating: number) => void;
@@ -41,8 +41,8 @@ export default function SegmentDetailsPanel({
           title={`Lengte: ${formatLength(segmentLength)}`}
           onClose={onClose}
           actionButtons={[
-            { iconName: 'edit', onClick: onEditStart, ariaLabel: 'Segment aanpassen' },
-            { iconName: 'delete', onClick: onDeleteStart, ariaLabel: 'Segment verwijderen' },
+            ...(onEditStart ? [{ iconName: 'edit' as const, onClick: onEditStart, ariaLabel: 'Segment aanpassen' }] : []),
+            ...(onDeleteStart ? [{ iconName: 'delete' as const, onClick: onDeleteStart, ariaLabel: 'Segment verwijderen' }] : []),
           ]}
         />
       )}
