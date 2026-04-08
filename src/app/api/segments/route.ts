@@ -32,6 +32,7 @@ export async function GET() {
   const segments = data.map((row: any) => ({
     id: row.id,
     rating: row.rating,
+    user_id: row.user_id ?? null,
     // parse to array, swap supabase's GeoJSON format lng/lat to lat/lng for leaflet
     coordinates: JSON.parse(row.geometry).coordinates.map(([lng, lat]: [number, number]) => [
       lat,

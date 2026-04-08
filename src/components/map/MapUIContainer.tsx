@@ -96,7 +96,7 @@ function uiReducer(state: UIState, action: UIAction): UIState {
   }
 }
 
-export default function MapUIContainer() {
+export default function MapUIContainer({ currentUserId }: { currentUserId: string | null }) {
   const mapRef = useRef<MapHandle>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
   const selectedSegmentRef = useRef<Segment | null>(null);
@@ -118,11 +118,11 @@ export default function MapUIContainer() {
       uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
     }
     if (event.key === 'Delete') {
-      if (selectedSegmentRef.current) {
+      if (selectedSegmentRef.current && segmentIsOwnedByCurrentUser(selectedSegmentRef.current)) {
         uiDispatch({ type: 'START_DELETE', payload: selectedSegmentRef.current });
       }
     }
-  }, []);
+  }, [currentUserId]);
 
   const fetchSegmentsForMap = useCallback(async (abortSignal: AbortSignal): Promise<Segment[]> => {
     const result = await fetchSegments(abortSignal);
@@ -185,8 +185,8 @@ export default function MapUIContainer() {
           currentRating={uiState.selectedSegment.rating}
           mode={uiState.mapUIMode}
           onClose={handleDetailsClose}
-          onEditStart={handleEditStart}
-          onDeleteStart={handleDeleteStart}
+          onEditStart={segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined}
+          onDeleteStart={segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleDeleteStart : undefined}
           onDeleteCancel={handleDeleteCancel}
           onDeleteConfirm={handleDeleteConfirm}
           onRatingSelect={handleRatingUpdate}
@@ -195,6 +195,10 @@ export default function MapUIContainer() {
       )}
     </div>
   );
+
+  function segmentIsOwnedByCurrentUser(segment: Segment): boolean {
+    return currentUserId !== null && segment.user_id === currentUserId;
+  }
 
   function handleControlPointCountChange(count: number) {
     uiDispatch({ type: 'UPDATE_CONTROL_POINT_COUNT', payload: count });
@@ -211,7 +215,7 @@ export default function MapUIContainer() {
       const coords = mapRef.current.getSegmentCoords();
       setIsPending(true);
       const data = await createSegment({ rating, coordinates: coords });
-      const newSegment: Segment = { id: data.id, rating, coordinates: coords };
+      const newSegment: Segment = { id: data.id, rating, coordinates: coords, user_id: currentUserId };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
       uiDispatch({ type: 'SEGMENT_CREATED' });
