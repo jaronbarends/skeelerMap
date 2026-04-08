@@ -9,7 +9,13 @@ function getBrowserClient() {
 
 export async function signUp(email: string, password: string) {
   const supabase = getBrowserClient();
-  return supabase.auth.signUp({ email, password });
+  return supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  });
 }
 
 export async function signIn(email: string, password: string) {

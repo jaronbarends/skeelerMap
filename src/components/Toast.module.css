@@ -1,0 +1,27 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding-top: 4rem;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--color-surface-200);
+  color: var(--color-text-primary);
+  padding: var(--size-12) var(--size-16);
+  border-radius: var(--radius-8);
+  box-shadow: 0 2px 12px var(--color-shadow);
+  font-size: var(--font-size-14);
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

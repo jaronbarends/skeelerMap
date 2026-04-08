@@ -58,6 +58,16 @@ Supabase error messages are in English by default; for Dutch errors, add a trans
 
 TBD: do we want a button component, or do we use global button classes?
 
+### Auth: confirmation failure page
+
+Currently, a failed email verification redirects to `/?toast=confirmation-failed`
+which is too brief for this error case. A failed confirmation needs a dedicated page
+that explains what went wrong and what the user can do next (e.g. request a new
+verification email, contact support, or try signing up again).
+
+- Create `/auth/confirmation-failed` page with a clear error message and next steps
+- Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
+
 ---
 
 ## Medium priority
