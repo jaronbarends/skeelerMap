@@ -13,6 +13,9 @@
   --color-gray-400: #666666;
   --color-gray-700: #aaaaaa;
 
+  --color-primary: var(--color-blue);
+  --color-danger: var(--color-red);
+
   --color-text-primary-on-dark: var(--color-white);
   --color-text-secondary-on-dark: var(--color-gray-700);
 
@@ -21,6 +24,7 @@
 
   --color-surface-100: var(--color-gray-100);
   --color-surface-200: var(--color-gray-200);
+
   --color-text-primary: var(--color-text-primary-on-dark);
   --color-text-secondary: var(--color-text-secondary-on-dark);
   --color-shadow: rgba(0, 0, 0, 0.4);

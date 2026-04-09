@@ -67,6 +67,10 @@ verification email, contact support, or try signing up again).
 - Create `/auth/confirmation-failed` page with a clear error message and next steps
 - Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
 
+### update github repo name
+
+Change SkateMap to SkeelerMap
+
 ---
 
 ## Medium priority

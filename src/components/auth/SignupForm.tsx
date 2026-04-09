@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { type SubmitEvent, useState } from 'react';
 
+import Button from '@/components/button/Button';
 import { signUp } from '@/lib/supabaseAuth';
 
 import styles from './SignupForm.module.css';
@@ -77,9 +78,12 @@ export default function SignupForm() {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button className={styles.submit} type="submit" disabled={isPending}>
-          {isPending ? 'Bezig…' : 'Aanmelden'}
-        </button>
+        <Button
+          label={isPending ? 'Bezig…' : 'Aanmelden'}
+          variant="primary"
+          type="submit"
+          disabled={isPending}
+        />
 
         <p className={styles.loginLink}>
           Al een account? <Link href="/login">Inloggen</Link>

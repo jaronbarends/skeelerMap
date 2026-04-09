@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState } from 'react';
 
+import Button from '@/components/button/Button';
 import { signIn } from '@/lib/supabaseAuth';
 
 import styles from './LoginForm.module.css';
@@ -53,9 +54,12 @@ export default function LoginForm() {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button className={styles.submit} type="submit" disabled={isPending}>
-          {isPending ? 'Bezig…' : 'Inloggen'}
-        </button>
+        <Button
+          label={isPending ? 'Bezig…' : 'Inloggen'}
+          variant="primary"
+          type="submit"
+          disabled={isPending}
+        />
 
         <p className={styles.signupLink}>
           Nog geen account? <Link href="/signup">Meld je aan</Link>

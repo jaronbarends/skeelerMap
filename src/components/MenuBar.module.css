@@ -9,7 +9,7 @@
 
 .logo {
   font-size: var(--font-size-16);
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   text-decoration: none;
 }

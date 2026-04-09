@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 
+import Button from '@/components/button/Button';
 import type { MapUIMode } from '@/components/map/MapUIContainer';
 
 import Panel from './Panel';
@@ -108,12 +109,13 @@ function DeleteActions({ onDeleteCancel, onDeleteConfirm }: DeleteActionsProps) 
 
   return (
     <div className={styles.deleteActions}>
-      <button className={styles.cancelButton} onClick={onDeleteCancel}>
-        Annuleren
-      </button>
-      <button className={styles.confirmButton} onClick={onDeleteConfirm} ref={deleteConfirmRef}>
-        Verwijderen
-      </button>
+      <Button label="Annuleren" variant="secondary" onClick={onDeleteCancel} />
+      <Button
+        label="Verwijderen"
+        variant="danger"
+        onClick={onDeleteConfirm}
+        ref={deleteConfirmRef}
+      />
     </div>
   );
 }

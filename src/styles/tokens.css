@@ -7,6 +7,9 @@
   --font-size-16: 1rem;
   --font-size-18: 1.125rem;
 
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
   /* spacing */
   --size-2: 0.125rem;
   --size-4: 0.25rem;
