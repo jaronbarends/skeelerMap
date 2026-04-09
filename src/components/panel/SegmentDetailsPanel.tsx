@@ -39,15 +39,15 @@ export default function SegmentDetailsPanel({
   return (
     <Panel>
       {mode === 'details' && (
-        <PanelHeader
-          title={`Lengte: ${formatLength(segmentLength)}`}
-          onClose={onClose}
-          actionButtons={getActionButtons()}
-        />
+        <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
+          <h1 className="hln-2">{`Lengte: ${formatLength(segmentLength)}`}</h1>
+        </PanelHeader>
       )}
       {mode === 'edit' && (
         <>
-          <PanelHeader title="Bewerk kwaliteit" onClose={onClose} />
+          <PanelHeader onClose={onClose}>
+            <h1 className="hln-2">Kwaliteit aanpassen</h1>
+          </PanelHeader>
           <RatingSection
             onRatingSelect={onRatingSelect}
             currentRating={currentRating}
@@ -58,7 +58,9 @@ export default function SegmentDetailsPanel({
       )}
       {mode === 'delete' && (
         <>
-          <PanelHeader title="Segment verwijderen?" onClose={onDeleteCancel} />
+          <PanelHeader onClose={onClose}>
+            <h1 className="hln-2">Segment verwijderen?</h1>
+          </PanelHeader>
           {isPending ? (
             <PanelInstruction>Segment aan het verwijderen...</PanelInstruction>
           ) : (

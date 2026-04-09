@@ -1,16 +1,26 @@
 .component {
-  width: 56px;
-  height: 56px;
+  width: var(--size-54);
+  height: var(--size-54);
   border-radius: 50%;
   background: var(--color-surface-100);
   border: none;
-  box-shadow: 0 2px 12px var(--color-shadow);
+  box-shadow: 0 0.125rem 0.75rem var(--color-shadow);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-primary);
-  font-size: 22px;
+  font-size: var(--font-size-22);
+
+  &:hover:not(:disabled) {
+    scale: 1.1;
+    transition: scale 0.1s ease-in-out;
+  }
+
+  &:focus-visible:not(:disabled) {
+    outline: 1px solid var(--color-white);
+    outline-offset: 2px;
+  }
 
   &[disabled] {
     opacity: 0.5;

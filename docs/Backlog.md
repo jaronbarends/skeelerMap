@@ -75,6 +75,10 @@ Change SkateMap to SkeelerMap
 
 ## Medium priority
 
+### Layout for content pages
+
+In LoginForm and SignUpForm we now have a div.formPage that defines the page's layout. Come up with a generic page layout.
+
 ### ~~Keyboard shortcuts~~ ✓ Done
 
 - `Esc` — cancel drawing mode

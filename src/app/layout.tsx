@@ -4,6 +4,7 @@ import { type CSSProperties, ReactNode } from 'react';
 import MenuBar from '@/components/MenuBar';
 import { mapColorCSSVars } from '@/styles/mapColorTokens';
 
+import styles from './layout.module.css';
 import './main.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="nl">
       <body style={mapColorStyles}>
         <MenuBar />
-        <main className="main">{children}</main>
+        <main className={styles.main}>{children}</main>
       </body>
     </html>
   );

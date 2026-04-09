@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type { IconName } from '@/lib/getIconByName';
 
 import PanelIconButton from './PanelIconButton';
@@ -11,15 +13,15 @@ export interface ActionButton {
 }
 
 interface Props {
-  title: string;
   onClose: () => void;
   actionButtons?: ActionButton[];
+  children?: ReactNode;
 }
 
-export default function PanelHeader({ title, onClose, actionButtons = [] }: Props) {
+export default function PanelHeader({ onClose, actionButtons = [], children }: Props) {
   return (
     <div className={styles.header}>
-      <h2 className={styles.title}>{title}</h2>
+      {children}
       <div className={styles.actions}>
         {actionButtons.map((btn) => (
           <PanelIconButton
