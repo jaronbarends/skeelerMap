@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-04-08
-**Current phase:** Auth implemented.
+**Last updated:** 2026-04-10
+**Current phase:** Auth implemented; DRY button and form styling in place.
 
 ---
 
@@ -38,6 +38,9 @@
 - Segments have `user_id` (FK to auth.users); RLS policies enforce ownership on writes
 - Ownership-aware UI: edit/delete controls only shown for segments owned by the current user;
   `get_segments` RPC returns `user_id`; `currentUserId` passed server-side from `page.tsx`
+- DRY button and form styling: `Button` component (`src/components/button/`); global stylesheets
+  `src/styles/elements.forms.css`, `src/styles/components.forms.css`, `src/styles/elements.type.css`;
+  auth forms (`LoginForm`, `SignupForm`) and panel buttons refactored to use these
 
 ## What's decided
 

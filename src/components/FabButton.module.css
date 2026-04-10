@@ -11,10 +11,10 @@
   justify-content: center;
   color: var(--color-text-primary);
   font-size: var(--font-size-22);
+  transition: scale 0.1s ease-in-out;
 
   &:hover:not(:disabled) {
     scale: 1.1;
-    transition: scale 0.1s ease-in-out;
   }
 
   &:focus-visible:not(:disabled) {

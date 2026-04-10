@@ -53,9 +53,10 @@ Supabase error messages are in English by default; for Dutch errors, add a trans
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
-### use DRY solution for buttons and forms
+### ~~use DRY solution for buttons and forms~~ ✓ Done
 
-TBD: do we want a button component, or do we use global button classes?
+`Button` component for interactive buttons; global element and component stylesheets for forms.
+_Implemented 2026-04-09._
 
 ### Auth: confirmation failure page
 
@@ -67,7 +68,7 @@ verification email, contact support, or try signing up again).
 - Create `/auth/confirmation-failed` page with a clear error message and next steps
 - Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
 
-### update github repo name
+### update GitHub repo name
 
 Change SkateMap to SkeelerMap
 
