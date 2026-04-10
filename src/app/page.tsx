@@ -8,11 +8,11 @@ export default async function Home() {
   const user = await getUser();
 
   return (
-    <>
+    <main>
       <MapUIContainer currentUserId={user?.id ?? null} />
       <Suspense>
         <Toast />
       </Suspense>
-    </>
+    </main>
   );
 }

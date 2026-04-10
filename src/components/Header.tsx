@@ -4,14 +4,14 @@ import { getUser } from '@/lib/supabaseAuth.server';
 
 import AuthControls from './auth/AuthControls';
 
-import styles from './MenuBar.module.css';
+import styles from './Header.module.css';
 
-export default async function MenuBar() {
+export default async function Header() {
   const user = await getUser();
   const isLoggedIn = user !== null;
 
   return (
-    <div className={styles.menuBar}>
+    <header className={styles.header}>
       <div className={styles.branding}>
         <Link className={styles.logo} href="/">
           SkeelerMap
@@ -19,6 +19,6 @@ export default async function MenuBar() {
         <div className={styles.tagline}>Vind en beoordeel skeelerpaden</div>
       </div>
       <AuthControls isLoggedIn={isLoggedIn} />
-    </div>
+    </header>
   );
 }

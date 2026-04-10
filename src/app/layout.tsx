@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { type CSSProperties, ReactNode } from 'react';
 
-import MenuBar from '@/components/MenuBar';
+import Header from '@/components/Header';
 import { mapColorCSSVars } from '@/styles/mapColorTokens';
 
-import styles from './layout.module.css';
 import './main.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -25,8 +24,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="nl">
       <body style={mapColorStyles}>
-        <MenuBar />
-        <main className={styles.main}>{children}</main>
+        <Header />
+        {children}
       </body>
     </html>
   );

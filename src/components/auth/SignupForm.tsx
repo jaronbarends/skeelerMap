@@ -14,76 +14,75 @@ export default function SignupForm() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const [successMessageVisible, setSuccessMessageVisible] = useState(false);
+  // const [successMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [successMessageVisible, setSuccessMessageVisible] = useState(true);
 
   if (successMessageVisible) {
     return (
-      <div className="formPage">
-        <div className="form">
-          <h1>Account aangemaakt</h1>
-          <p className={styles.successMessage}>
-            Je account is aangemaakt. Controleer je e-mail om je account te bevestigen.
-          </p>
-        </div>
-      </div>
+      <>
+        <h1>Account aangemaakt</h1>
+        <p className={styles.successMessage}>
+          Je account is aangemaakt. Controleer je e-mail om je account te bevestigen.
+        </p>
+      </>
     );
   }
 
   return (
-    <div className="formPage">
-      <form className="form" onSubmit={handleSubmit}>
-        <h1>Registreren</h1>
+    // <div className="formPage">
+    <form className="form" onSubmit={handleSubmit}>
+      <h1>Registreren</h1>
 
-        <div className="formGroup">
-          <div className="formItem">
-            <label htmlFor="email">E-mailadres</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-            />
-          </div>
-          <div className="formItem">
-            <label htmlFor="password">Wachtwoord</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              required
-            />
-          </div>
-          <div className="formItem">
-            <label htmlFor="passwordConfirm">Wachtwoord bevestigen</label>
-            <input
-              id="passwordConfirm"
-              type="password"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              autoComplete="new-password"
-              required
-            />
-          </div>
+      <div className="formGroup">
+        <div className="formItem">
+          <label htmlFor="email">E-mailadres</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
+          />
         </div>
+        <div className="formItem">
+          <label htmlFor="password">Wachtwoord</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            required
+          />
+        </div>
+        <div className="formItem">
+          <label htmlFor="passwordConfirm">Wachtwoord bevestigen</label>
+          <input
+            id="passwordConfirm"
+            type="password"
+            value={passwordConfirm}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
+            autoComplete="new-password"
+            required
+          />
+        </div>
+      </div>
 
-        {error && <div className="formError">{error}</div>}
+      {error && <div className="formError">{error}</div>}
 
-        <Button
-          label={isPending ? 'Bezig…' : 'Registreren'}
-          variant="primary"
-          type="submit"
-          disabled={isPending}
-        />
+      <Button
+        label={isPending ? 'Bezig…' : 'Registreren'}
+        variant="primary"
+        type="submit"
+        disabled={isPending}
+      />
 
-        <p className="formFooter">
-          Al een account? <Link href="/inloggen">Inloggen</Link>
-        </p>
-      </form>
-    </div>
+      <p className="formFooter">
+        Al een account? <Link href="/inloggen">Inloggen</Link>
+      </p>
+    </form>
+    // </div>
   );
 
   async function handleSubmit(e: SubmitEvent) {

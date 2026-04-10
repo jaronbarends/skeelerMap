@@ -16,49 +16,47 @@ export default function LoginForm() {
   const [isPending, setIsPending] = useState(false);
 
   return (
-    <div className="formPage">
-      <form className="form" onSubmit={handleSubmit}>
-        <h1>Inloggen</h1>
+    <form className="form" onSubmit={handleSubmit}>
+      <h1>Inloggen</h1>
 
-        <div className="formGroup">
-          <div className="formItem">
-            <label htmlFor="email">E-mailadres</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-            />
-          </div>
-          <div className="formItem">
-            <label htmlFor="password">Wachtwoord</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </div>
+      <div className="formGroup">
+        <div className="formItem">
+          <label htmlFor="email">E-mailadres</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
+          />
         </div>
+        <div className="formItem">
+          <label htmlFor="password">Wachtwoord</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+          />
+        </div>
+      </div>
 
-        {error && <div className="formError">{error}</div>}
+      {error && <div className="formError">{error}</div>}
 
-        <Button
-          label={isPending ? 'Bezig…' : 'Inloggen'}
-          variant="primary"
-          type="submit"
-          disabled={isPending}
-        />
+      <Button
+        label={isPending ? 'Bezig…' : 'Inloggen'}
+        variant="primary"
+        type="submit"
+        disabled={isPending}
+      />
 
-        <p className="formFooter">
-          Nog geen account? <Link href="/registreren">Maak een account aan</Link>
-        </p>
-      </form>
-    </div>
+      <p className="formFooter">
+        Nog geen account? <Link href="/registreren">Maak een account aan</Link>
+      </p>
+    </form>
   );
 
   async function handleSubmit(e: SubmitEvent) {
