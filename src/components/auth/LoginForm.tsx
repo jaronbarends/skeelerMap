@@ -55,7 +55,7 @@ export default function LoginForm() {
         />
 
         <p className="formFooter">
-          Nog geen account? <Link href="/signup">Meld je aan</Link>
+          Nog geen account? <Link href="/registreren">Maak een account aan</Link>
         </p>
       </form>
     </div>
