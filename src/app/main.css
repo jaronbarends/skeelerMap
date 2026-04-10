@@ -1,7 +1,10 @@
 @import '@/styles/tokens.css';
 @import '@/styles/reset.css';
 @import '@/styles/fonts.css';
-@import '@/styles/type.css';
 @import '@/styles/colors.css';
-@import '@/styles/globals.css';
+@import '@/styles/type.css';
+@import '@/styles/elements.css';
+@import '@/styles/elements.type.css';
+@import '@/styles/elements.forms.css';
+@import '@/styles/components.forms.css';
 @import '@/styles/leaflet-customize.css';

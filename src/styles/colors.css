@@ -1,3 +1,9 @@
+/*
+ * DESIGN TOKENS — DO NOT ADD NEW VALUES
+ * If a value you need isn't here, ask before creating one.
+ * Use the closest existing token or request a system-level addition.
+ */
+
 :root {
   /* NOTE: map-related colors are defined in  map-color-tokens.ts and injected into :root in layout.tsx */
 
@@ -8,19 +14,29 @@
   --color-black: #000000;
   --color-red: #ff3b3b;
 
+  --color-blue-70: color-mix(in oklab, var(--color-blue) 70%, white);
+  --color-red-60: color-mix(in oklab, var(--color-red) 60%, white);
+
   --color-gray-100: #1a1a1a;
   --color-gray-200: #2a2a2a;
   --color-gray-400: #666666;
   --color-gray-700: #aaaaaa;
 
+  --color-primary: var(--color-blue);
+  --color-danger: var(--color-red);
+
   --color-text-primary-on-dark: var(--color-white);
   --color-text-secondary-on-dark: var(--color-gray-700);
+  --color-text-link: var(--color-blue-70);
 
   --color-text-primary-on-light: var(--color-gray-200);
   --color-text-secondary-on-light: var(--color-gray-400);
 
   --color-surface-100: var(--color-gray-100);
   --color-surface-200: var(--color-gray-200);
+  --color-surface-error: var(--color-red-60);
+  --color-text-error: var(--color-gray-100);
+
   --color-text-primary: var(--color-text-primary-on-dark);
   --color-text-secondary: var(--color-text-secondary-on-dark);
   --color-shadow: rgba(0, 0, 0, 0.4);

@@ -4,30 +4,27 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState } from 'react';
 
+import Button from '@/components/button/Button';
 import { signIn } from '@/lib/supabaseAuth';
-
-import styles from './LoginForm.module.css';
 
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>('test error');
   const [isPending, setIsPending] = useState(false);
 
   return (
-    <div className={styles.page}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h1 className={styles.heading}>Inloggen</h1>
+    <div className="formPage">
+      <form className="form" onSubmit={handleSubmit}>
+        <h1>Inloggen</h1>
 
-        <div className={styles.fields}>
-          <div className={styles.formItem}>
-            <label className={styles.label} htmlFor="email">
-              E-mailadres
-            </label>
+        <div className="formGroup">
+          <div className="formItem">
+            <label htmlFor="email">E-mailadres</label>
             <input
               id="email"
-              className={styles.input}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -35,13 +32,10 @@ export default function LoginForm() {
               required
             />
           </div>
-          <div className={styles.formItem}>
-            <label className={styles.label} htmlFor="password">
-              Wachtwoord
-            </label>
+          <div className="formItem">
+            <label htmlFor="password">Wachtwoord</label>
             <input
               id="password"
-              className={styles.input}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -51,13 +45,16 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <div className="formError">{error}</div>}
 
-        <button className={styles.submit} type="submit" disabled={isPending}>
-          {isPending ? 'Bezig…' : 'Inloggen'}
-        </button>
+        <Button
+          label={isPending ? 'Bezig…' : 'Inloggen'}
+          variant="primary"
+          type="submit"
+          disabled={isPending}
+        />
 
-        <p className={styles.signupLink}>
+        <p className="formFooter">
           Nog geen account? <Link href="/signup">Meld je aan</Link>
         </p>
       </form>

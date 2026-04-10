@@ -1,0 +1,49 @@
+.component {
+  --color-background: var(--color-surface-200);
+  --color-text: var(--color-text-primary);
+  --color-border: transparent;
+  --font-weight: var(--font-weight-bold);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--size-8) var(--size-16);
+  border-radius: var(--radius-8);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight);
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover:not(:disabled),
+  &:focus:not(:disabled) {
+    outline: 1px solid var(--color-white);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.primary {
+  --color-background: var(--color-primary);
+}
+
+.danger {
+  --color-background: var(--color-danger);
+}
+
+.secondary {
+  --color-background: var(--color-surface-200);
+  --font-weight: var(--font-weight-normal);
+}
+
+.ghost {
+  --color-background: transparent;
+  --color-border: var(--color-gray-400);
+  --font-weight: var(--font-weight-normal);
+}

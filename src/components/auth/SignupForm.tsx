@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { type SubmitEvent, useState } from 'react';
 
+import Button from '@/components/button/Button';
 import { signUp } from '@/lib/supabaseAuth';
 
 import styles from './SignupForm.module.css';
@@ -17,27 +18,27 @@ export default function SignupForm() {
 
   if (successMessageVisible) {
     return (
-      <div className={styles.page}>
-        <div className={styles.form}>
-          <p className={styles.successMessage}>Controleer je e-mail om je account te bevestigen</p>
+      <div className="formPage">
+        <div className="form">
+          <h1>Account aangemaakt</h1>
+          <p className={styles.successMessage}>
+            Je account is aangemaakt. Controleer je e-mail om je account te bevestigen.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h1 className={styles.heading}>Aanmelden</h1>
+    <div className="formPage">
+      <form className="form" onSubmit={handleSubmit}>
+        <h1>Aanmelden</h1>
 
-        <div className={styles.fields}>
-          <div className={styles.formItem}>
-            <label className={styles.label} htmlFor="email">
-              E-mailadres
-            </label>
+        <div className="formGroup">
+          <div className="formItem">
+            <label htmlFor="email">E-mailadres</label>
             <input
               id="email"
-              className={styles.input}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -45,13 +46,10 @@ export default function SignupForm() {
               required
             />
           </div>
-          <div className={styles.formItem}>
-            <label className={styles.label} htmlFor="password">
-              Wachtwoord
-            </label>
+          <div className="formItem">
+            <label htmlFor="password">Wachtwoord</label>
             <input
               id="password"
-              className={styles.input}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -59,13 +57,10 @@ export default function SignupForm() {
               required
             />
           </div>
-          <div className={styles.formItem}>
-            <label className={styles.label} htmlFor="passwordConfirm">
-              Wachtwoord bevestigen
-            </label>
+          <div className="formItem">
+            <label htmlFor="passwordConfirm">Wachtwoord bevestigen</label>
             <input
               id="passwordConfirm"
-              className={styles.input}
               type="password"
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
@@ -75,13 +70,16 @@ export default function SignupForm() {
           </div>
         </div>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <div className="formError">{error}</div>}
 
-        <button className={styles.submit} type="submit" disabled={isPending}>
-          {isPending ? 'Bezig…' : 'Aanmelden'}
-        </button>
+        <Button
+          label={isPending ? 'Bezig…' : 'Aanmelden'}
+          variant="primary"
+          type="submit"
+          disabled={isPending}
+        />
 
-        <p className={styles.loginLink}>
+        <p className="formFooter">
           Al een account? <Link href="/login">Inloggen</Link>
         </p>
       </form>

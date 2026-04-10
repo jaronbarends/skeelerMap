@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 
+import Button from '@/components/button/Button';
 import type { MapUIMode } from '@/components/map/MapUIContainer';
 
 import Panel from './Panel';
@@ -38,15 +39,15 @@ export default function SegmentDetailsPanel({
   return (
     <Panel>
       {mode === 'details' && (
-        <PanelHeader
-          title={`Lengte: ${formatLength(segmentLength)}`}
-          onClose={onClose}
-          actionButtons={getActionButtons()}
-        />
+        <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
+          <h1 className="hln-2">{`Lengte: ${formatLength(segmentLength)}`}</h1>
+        </PanelHeader>
       )}
       {mode === 'edit' && (
         <>
-          <PanelHeader title="Bewerk kwaliteit" onClose={onClose} />
+          <PanelHeader onClose={onClose}>
+            <h1 className="hln-2">Kwaliteit aanpassen</h1>
+          </PanelHeader>
           <RatingSection
             onRatingSelect={onRatingSelect}
             currentRating={currentRating}
@@ -57,7 +58,9 @@ export default function SegmentDetailsPanel({
       )}
       {mode === 'delete' && (
         <>
-          <PanelHeader title="Segment verwijderen?" onClose={onDeleteCancel} />
+          <PanelHeader onClose={onClose}>
+            <h1 className="hln-2">Segment verwijderen?</h1>
+          </PanelHeader>
           {isPending ? (
             <PanelInstruction>Segment aan het verwijderen...</PanelInstruction>
           ) : (
@@ -108,12 +111,13 @@ function DeleteActions({ onDeleteCancel, onDeleteConfirm }: DeleteActionsProps) 
 
   return (
     <div className={styles.deleteActions}>
-      <button className={styles.cancelButton} onClick={onDeleteCancel}>
-        Annuleren
-      </button>
-      <button className={styles.confirmButton} onClick={onDeleteConfirm} ref={deleteConfirmRef}>
-        Verwijderen
-      </button>
+      <Button label="Annuleren" variant="secondary" onClick={onDeleteCancel} />
+      <Button
+        label="Verwijderen"
+        variant="danger"
+        onClick={onDeleteConfirm}
+        ref={deleteConfirmRef}
+      />
     </div>
   );
 }

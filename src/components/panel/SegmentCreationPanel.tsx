@@ -17,7 +17,9 @@ export default function SegmentCreationPanel({
 }: Props) {
   return (
     <Panel>
-      <PanelHeader title="Segment toevoegen" onClose={onCancel} />
+      <PanelHeader onClose={onCancel}>
+        <h1 className="hln-2">Segment toevoegen</h1>
+      </PanelHeader>
       <RatingSection
         isPending={isPending}
         isReadyToRate={isReadyToRate}

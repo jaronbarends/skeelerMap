@@ -7,8 +7,3 @@ body {
   background: var(--color-surface-100);
   color: var(--color-text-primary);
 }
-
-.main {
-  flex: 1 1 auto;
-  min-height: 0;
-}

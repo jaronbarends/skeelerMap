@@ -1,4 +1,4 @@
-# SkateMap
+# SkeelerMap
 
 ## Setup
 
