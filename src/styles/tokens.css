@@ -31,6 +31,15 @@
   --size-54: 3.375rem;
   --size-64: 4rem;
 
+  /* layout */
+  --header-height: 4rem;
+  --content-max-width: 50rem;
+  --content-padding-inline: var(--size-32);
+
+  @media (max-width: 30rem) {
+    --content-padding-inline: var(--size-16);
+  }
+
   /* radii */
   --radius-4: 0.25rem;
   --radius-8: 0.5rem;

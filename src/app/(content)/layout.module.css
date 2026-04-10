@@ -1,0 +1,6 @@
+.main {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--size-32) var(--content-padding-inline);
+}
