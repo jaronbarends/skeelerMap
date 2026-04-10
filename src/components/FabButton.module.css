@@ -27,3 +27,52 @@
     cursor: not-allowed;
   }
 }
+
+.tooltip {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s ease,
+    visibility 0.15s;
+}
+
+@supports (anchor-name: --x) {
+  @media (pointer: fine) {
+    .component {
+      anchor-name: --my-anchor;
+      /* anchor-name: var(--fab-anchor); */
+    }
+
+    .tooltip {
+      /* pointer-events: none; */
+      position: fixed;
+      position-anchor: --my-anchor;
+      /* position-anchor: var(--fab-anchor); */
+      position-area: left center;
+      margin-inline-end: var(--size-8);
+
+      background: var(--color-surface-200);
+      color: var(--color-text-primary);
+      padding: var(--size-4) var(--size-8);
+      border-radius: var(--radius-4);
+      font-size: var(--font-size-12);
+      white-space: nowrap;
+      box-shadow: 0 0.125rem 0.5rem var(--color-shadow);
+
+      opacity: 0;
+      transition:
+        opacity 0.15s ease,
+        display 0.15s allow-discrete;
+    }
+
+    .component:hover + .tooltip {
+      opacity: 1;
+      visibility: visible;
+
+      @starting-style {
+        opacity: 0;
+      }
+    }
+  }
+}
