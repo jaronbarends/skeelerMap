@@ -1,4 +1,5 @@
-.component {
+.button {
+  /* anchor-name set as style attribute on the elm */
   width: var(--size-54);
   height: var(--size-54);
   border-radius: 50%;
@@ -39,16 +40,9 @@
 
 @supports (anchor-name: --x) {
   @media (pointer: fine) {
-    .component {
-      anchor-name: --my-anchor;
-      /* anchor-name: var(--fab-anchor); */
-    }
-
     .tooltip {
-      /* pointer-events: none; */
+      /* position-anchor set as style attribute on the elm */
       position: fixed;
-      position-anchor: --my-anchor;
-      /* position-anchor: var(--fab-anchor); */
       position-area: left center;
       margin-inline-end: var(--size-8);
 
@@ -63,10 +57,11 @@
       opacity: 0;
       transition:
         opacity 0.15s ease,
-        display 0.15s allow-discrete;
+        visibility 0.15s;
     }
 
-    .component:hover + .tooltip {
+    .button:hover + .tooltip,
+    .button:focus-visible + .tooltip {
       opacity: 1;
       visibility: visible;
 

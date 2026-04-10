@@ -166,13 +166,13 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           iconName="plus"
           tooltip="Segment toevoegen"
         />
-        {/* <FabButton
+        <FabButton
           onClick={() => mapRef.current?.centerOnLocation()}
           ariaLabel="Centreer op locatie"
           disabled={false}
           iconName="userLocation"
           tooltip="Centreer op locatie"
-        /> */}
+        />
       </FabContainer>
 
       {uiState.creationModeActive && (
