@@ -100,6 +100,20 @@ Decide and implement what happens before/during the browser location prompt:
 - Show explanation before triggering the prompt?
 - Show default map location while waiting, or hold?
 
+### Center-on-location FAB: permission-aware visibility
+
+Currently the FAB is always shown (`disabled={false}`), and silently does nothing when geolocation is denied.
+
+Use the Permissions API (`navigator.permissions.query({ name: 'geolocation' })`) to track permission state and expose it from `useMapInit`. Then in `MapUIContainer`:
+
+- `granted` — show FAB normally
+- `prompt` — show FAB (the existing `watchPosition` call already triggers the browser prompt on map load)
+- `denied` — hide or disable the FAB; optionally show a tooltip like "Schakel locatietoegang in via je browserinstellingen"
+
+The `PermissionStatus` object supports a `change` event, so the FAB reacts live if the user changes the setting while the app is open.
+
+Note: a `denied` permission cannot be re-triggered via JS — the user must reset it manually in browser settings.
+
 ### Zoom-based visual scaling
 
 Scale polyline weight based on zoom level. Defer unless it becomes a visible problem.
@@ -129,6 +143,14 @@ is small. Revisit before launch.
 ### Error and success styling
 
 The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
+
+### Option to add warning sign
+
+Add option to add a traffic sign for warning, dangerous crossing, dangerous slope
+
+### Don't allow drawing segments when not logged in
+
+When user is not logged in, when clicking on add segment button, they should be shown a panel with a text that they need to login (or register) to create segments.
 
 ---
 
