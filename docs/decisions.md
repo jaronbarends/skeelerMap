@@ -222,17 +222,28 @@
 - UPDATE: authenticated users only; `user_id` must match `auth.uid()`
 - DELETE: authenticated users only; `user_id` must match `auth.uid()`
 
-### MenuBar architecture
+### Header architecture
 
-**Date:** 2026-04-08
-**Decision:** MenuBar is a Server Component. Auth state is read server-side and passed as props to child Client Components.
+**Date:** 2026-04-08 (originally MenuBar; renamed to Header 2026-04-10)
+**Decision:** Header is a Server Component. Auth state is read server-side and passed as props to child Client Components.
 **Rationale:** Avoids logged-out → logged-in flicker on load. Consistent with Next.js App Router model.
-**Pattern:** `<MenuBar>` (Server) renders `<AuthControls>` (Client) for interactive auth buttons. Future flyout menu follows the same pattern — a Client Component child of the Server Component shell.
+**Pattern:** `<Header>` (Server) renders `<AuthControls>` (Client) for interactive auth buttons. Future flyout menu follows the same pattern — a Client Component child of the Server Component shell.
 
 ### Toast component
 
 **Date:** 2026-04-08
 **Decision:** Map-level feedback via a `<Toast>` component rendered in `page.tsx`. Triggered by `?toast=` query param on `/`. Page reads param on mount, shows toast, clears param from URL.
+
+### Layout architecture: root vs content pages
+
+**Date:** 2026-04-10
+**Decision:** The root layout (`app/layout.tsx`) provides chrome only — `<Header>` and `{children}`, no `<main>`. Each layout level that needs it owns its own `<main>`:
+- Root page (`app/page.tsx`) wraps its map content in a full-width `<main>`.
+- Content pages live in the `app/(content)/` route group, whose layout renders a max-width centered `<main>`.
+**Rationale:** Different pages need structurally different `<main>` elements (full-width map vs constrained content). Putting `<main>` in the root layout forces all pages to share the same structure. Route groups let each section own the right structure without affecting URLs.
+**Color layering:** `body` → `--color-surface-200`; `main` → `--color-surface-150` (global); `<header>` → `--color-surface-100`. Header has `max-width: var(--content-max-width)` centered — on wide screens the body color shows on either side of it (intentional).
+
+---
 
 ### `supabaseAuth.server.ts` — `setAll` try/catch
 

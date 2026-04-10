@@ -68,17 +68,19 @@ verification email, contact support, or try signing up again).
 - Create `/auth/confirmation-failed` page with a clear error message and next steps
 - Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
 
-### update GitHub repo name
+### ~~update GitHub repo name~~ ✓ Done
 
 Change SkateMap to SkeelerMap
+_Implemented 2026-04-09._
 
 ---
 
 ## Medium priority
 
-### Layout for content pages
+### ~~Layout for content pages~~ ✓ Done
 
 In LoginForm and SignUpForm we now have a div.formPage that defines the page's layout. Come up with a generic page layout.
+_Implemented 2026-04-10._
 
 ### ~~Keyboard shortcuts~~ ✓ Done
 

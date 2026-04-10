@@ -1,7 +1,7 @@
 # Project status
 
 **Last updated:** 2026-04-10
-**Current phase:** Auth implemented; DRY button and form styling in place.
+**Current phase:** Auth implemented; DRY button and form styling in place; content page layout in place.
 
 ---
 
@@ -41,6 +41,11 @@
 - DRY button and form styling: `Button` component (`src/components/button/`); global stylesheets
   `src/styles/elements.forms.css`, `src/styles/components.forms.css`, `src/styles/elements.type.css`;
   auth forms (`LoginForm`, `SignupForm`) and panel buttons refactored to use these
+- Layout: root layout provides chrome only (`<Header>` + `{children}`, no `<main>`); root page
+  (`page.tsx`) wraps map in full-width `<main>`; content pages use `app/(content)/` route group
+  with its own layout that renders a max-width centered `<main>`. `MenuBar` renamed to `Header`.
+  Color tokens: `--color-surface-150` added; `body` uses `--color-surface-200`, `main` uses
+  `--color-surface-150`, header uses `--color-surface-100`.
 
 ## What's decided
 
@@ -54,7 +59,7 @@
 - Rating UI: Option A (greyed out until 2+ points placed)
 - Auth: email/password via Supabase, PKCE flow, email verification required
 - Segments are public (anyone can read); writes require auth and ownership (RLS)
-- MenuBar architecture: Server Component shell, Client Component islands
+- Header (formerly MenuBar) architecture: Server Component shell, Client Component islands
 
 ## What's open
 
