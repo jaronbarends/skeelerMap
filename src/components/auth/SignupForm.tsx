@@ -32,7 +32,7 @@ export default function SignupForm() {
   return (
     <div className="formPage">
       <form className="form" onSubmit={handleSubmit}>
-        <h1>Aanmelden</h1>
+        <h1>Registreren</h1>
 
         <div className="formGroup">
           <div className="formItem">
@@ -73,14 +73,14 @@ export default function SignupForm() {
         {error && <div className="formError">{error}</div>}
 
         <Button
-          label={isPending ? 'Bezig…' : 'Aanmelden'}
+          label={isPending ? 'Bezig…' : 'Registreren'}
           variant="primary"
           type="submit"
           disabled={isPending}
         />
 
         <p className="formFooter">
-          Al een account? <Link href="/login">Inloggen</Link>
+          Al een account? <Link href="/inloggen">Inloggen</Link>
         </p>
       </form>
     </div>
