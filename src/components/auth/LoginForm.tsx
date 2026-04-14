@@ -73,7 +73,8 @@ export default function LoginForm() {
     }
 
     // no need to call setIsPending(false) here: the component unmounts via navigation, so resetting it would cause a state update on an unmounted component.
-    router.push('/?toast=logged-in');
+    router.push(`/?toast=loggedIn`);
+    // push only re-renders client-side. We need to refresh server side AuthControls as well to show correct login state. router.refresh() does that.
     router.refresh();
   }
 }

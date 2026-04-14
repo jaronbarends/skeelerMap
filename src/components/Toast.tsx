@@ -3,13 +3,9 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import styles from './Toast.module.css';
+import { type ToastKey, isToastKey, getToastMessage } from '@/lib/toastMessages';
 
-const MESSAGES: Record<string, string> = {
-  'logged-in': 'Je bent nu ingelogd',
-  'account-confirmed': 'Je account is bevestigd. Je kunt nu zelf segmenten aanmaken.',
-  'confirmation-failed': 'Bevestiging mislukt. Probeer opnieuw aan te melden.',
-};
+import styles from './Toast.module.css';
 
 const AUTO_DISMISS_MS = 4000;
 
@@ -18,8 +14,9 @@ export default function Toast() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const toastKey = searchParams.get('toast');
-  const message = toastKey ? (MESSAGES[toastKey] ?? null) : null;
+  const rawToastKey = searchParams.get('toast');
+  const toastKey: ToastKey | null = isToastKey(rawToastKey) ? rawToastKey : null;
+  const message = toastKey ? getToastMessage(toastKey) : null;
 
   const [visible, setVisible] = useState(!!message);
 
@@ -30,6 +27,12 @@ export default function Toast() {
     const timer = setTimeout(dismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
   }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (message) {
+      setVisible(true);
+    }
+  }, [message]);
 
   if (!visible || !message) {
     return null;

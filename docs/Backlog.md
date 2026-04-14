@@ -37,9 +37,10 @@ Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS
 After first login: manually assign existing segments to owner account via SQL update.
 _Implemented 2026-04-08._
 
-### Add toast after logging out
+### ~~Add toast after logging out~~ ✓ Done
 
 When the user logs out, they don't see any confirmation of that. Show a toast with the text "Je bent nu uitgelogd."
+_Implemented 2026-04-14._
 
 ### ~~Hide edit/delete controls for segments not owned by current user~~ ✓ Done
 

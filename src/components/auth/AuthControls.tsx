@@ -22,6 +22,8 @@ export default function AuthControls({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   async function handleSignOut() {
     await signOut();
+    router.push(`/?toast=loggedOut`);
+    // push only re-renders client-side. We need to refresh server side AuthControls as well to show correct login state. router.refresh() does that.
     router.refresh();
   }
 }

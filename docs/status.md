@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-04-10
-**Current phase:** Auth implemented; DRY button and form styling in place; content page layout in place.
+**Last updated:** 2026-04-14
+**Current phase:** Auth implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
 
 ---
 
@@ -50,6 +50,8 @@
   anchor positioning support (`@supports (anchor-name: --x)`), a tooltip is rendered as a sibling
   of the button and positioned to the left via CSS anchor positioning (`position: fixed`,
   `position-area: left center`). Anchor name is generated per-instance via `useId()`.
+- Toast on logout: logging out triggers a toast "Je bent nu uitgelogd." via `?toast=loggedOut`
+  redirect, reusing the existing `?toast=` mechanism.
 
 ## What's decided
 
