@@ -134,6 +134,15 @@
 
 ---
 
+## FAB tooltips
+
+**Date:** 2026-04-10
+**Decision:** Tooltip is rendered as a sibling of the button (inside a fragment), not as a child. Positioned via CSS anchor positioning (`position: fixed`, `position-area: left center`). Anchor name generated per-instance via `useId()`, set as an inline style using camelCase (`anchorName`, `positionAnchor`) which React converts to kebab-case.
+**Key constraint:** CSS anchor positioning requires that if the positioned element is `position: fixed` (containing block = viewport), the anchor element must also have the viewport as its containing block. Since `FabContainer` is `position: fixed`, a tooltip rendered as a child of the button (inside `FabContainer`) violates this: the button's containing block is `FabContainer`, not the viewport. Making the tooltip a sibling of the button (both direct children of `FabContainer`) resolves this — the positioned element and the anchor share the same containing block.
+**Scope:** Only shown on `pointer: fine` devices, scoped inside `@supports (anchor-name: --x)`.
+
+---
+
 ## FAB container positioning: `position: fixed`
 
 **Date:** 2026-03-31

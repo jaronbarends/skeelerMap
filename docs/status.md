@@ -46,6 +46,10 @@
   with its own layout that renders a max-width centered `<main>`. `MenuBar` renamed to `Header`.
   Color tokens: `--color-surface-150` added; `body` uses `--color-surface-200`, `main` uses
   `--color-surface-150`, header uses `--color-surface-100`.
+- FAB tooltips: `FabButton` accepts an optional `tooltip` prop. On `pointer: fine` devices with
+  anchor positioning support (`@supports (anchor-name: --x)`), a tooltip is rendered as a sibling
+  of the button and positioned to the left via CSS anchor positioning (`position: fixed`,
+  `position-area: left center`). Anchor name is generated per-instance via `useId()`.
 
 ## What's decided
 

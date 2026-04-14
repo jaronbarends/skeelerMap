@@ -114,8 +114,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        // eslint-disable-next-line no-console
-        console.log('Escape key pressed');
         uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
       }
       if (event.key === 'Delete') {
