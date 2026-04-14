@@ -111,18 +111,19 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   };
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      // eslint-disable-next-line no-console
-      console.log('Escape key pressed');
-      uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
-    }
-    if (event.key === 'Delete') {
-      if (selectedSegmentRef.current && segmentIsOwnedByCurrentUser(selectedSegmentRef.current)) {
-        uiDispatch({ type: 'START_DELETE', payload: selectedSegmentRef.current });
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
       }
-    }
-  }, [currentUserId]);
+      if (event.key === 'Delete') {
+        if (selectedSegmentRef.current && segmentIsOwnedByCurrentUser(selectedSegmentRef.current)) {
+          uiDispatch({ type: 'START_DELETE', payload: selectedSegmentRef.current });
+        }
+      }
+    },
+    [currentUserId]
+  );
 
   const fetchSegmentsForMap = useCallback(async (abortSignal: AbortSignal): Promise<Segment[]> => {
     const result = await fetchSegments(abortSignal);
@@ -161,12 +162,14 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           ariaLabel="Segment toevoegen"
           disabled={uiState.creationModeActive || uiState.selectedSegment !== null}
           iconName="plus"
+          tooltip="Segment toevoegen"
         />
         <FabButton
           onClick={() => mapRef.current?.centerOnLocation()}
           ariaLabel="Centreer op locatie"
           disabled={false}
           iconName="userLocation"
+          tooltip="Centreer op locatie"
         />
       </FabContainer>
 
@@ -185,8 +188,12 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           currentRating={uiState.selectedSegment.rating}
           mode={uiState.mapUIMode}
           onClose={handleDetailsClose}
-          onEditStart={segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined}
-          onDeleteStart={segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleDeleteStart : undefined}
+          onEditStart={
+            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined
+          }
+          onDeleteStart={
+            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleDeleteStart : undefined
+          }
           onDeleteCancel={handleDeleteCancel}
           onDeleteConfirm={handleDeleteConfirm}
           onRatingSelect={handleRatingUpdate}
@@ -215,7 +222,12 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       const coords = mapRef.current.getSegmentCoords();
       setIsPending(true);
       const data = await createSegment({ rating, coordinates: coords });
-      const newSegment: Segment = { id: data.id, rating, coordinates: coords, user_id: currentUserId };
+      const newSegment: Segment = {
+        id: data.id,
+        rating,
+        coordinates: coords,
+        user_id: currentUserId,
+      };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
       uiDispatch({ type: 'SEGMENT_CREATED' });
