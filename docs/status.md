@@ -25,9 +25,10 @@
 - Drag-to-edit segment endpoints: drag start/end point of a saved segment to reposition it;
   reroutes via OSRM and saves to Supabase
 - Indicate saving: shows status text in the panel during save and delete operations
-- Auth: Supabase email/password — signup at `/signup`, login at `/login`, email verification
+- Auth: Supabase email/password — signup at `/registreren`, login at `/inloggen`, email verification
   via `/auth/callback`. Write operations (POST, PATCH, DELETE) require authentication;
   RLS enforced in Supabase.
+- Segment creation requires auth: logged-out users see a panel prompting login/registration when tapping “Segment toevoegen”
 - Menubar: app name "SkeelerMap" + tagline "Vind en beoordeel skeelerpaden" (stacked left);
   auth controls right ("Inloggen" / "Uitloggen"). MenuBar is a Server Component;
   `AuthControls` is a Client Component child.
@@ -71,7 +72,6 @@
 
 - Location permission flow (deferred)
 - Tile provider for production (deferred)
-- Assign existing segments to owner account via SQL update (one-time task)
 
 ## Next step
 

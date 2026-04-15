@@ -23,7 +23,7 @@ _Implemented 2026-04-08._
 
 ### ~~Auth: login + signup~~ ✓ Done
 
-`/login` and `/signup` pages with Supabase email/password auth.
+`/inloggen` and `/registreren` pages with Supabase email/password auth.
 _Implemented 2026-04-08._
 
 ### ~~Toast component~~ ✓ Done
@@ -34,7 +34,6 @@ _Implemented 2026-04-08._
 ### ~~Add `user_id` to segments table~~ ✓ Done
 
 Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
-After first login: manually assign existing segments to owner account via SQL update.
 _Implemented 2026-04-08._
 
 ### ~~Add toast after logging out~~ ✓ Done
@@ -152,6 +151,8 @@ Add option to add a traffic sign for warning, dangerous crossing, dangerous slop
 ### Don't allow drawing segments when not logged in
 
 When user is not logged in, when clicking on add segment button, they should be shown a panel with a text that they need to login (or register) to create segments.
+
+_Implemented 2026-04-15._
 
 ---
 

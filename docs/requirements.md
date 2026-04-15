@@ -12,6 +12,7 @@
   - [ ] 5-option rating picker
   - [ ] Segment saved in rating color on confirm
   - [ ] Cancel clears all drawn points/lines
+  - [ ] Creation requires login (when logged out, show login/register prompt)
 - [ ] Segment selection and editing
   - [ ] Tap segment to select (thicker stroke, endpoint dots, panel)
   - [ ] Panel shows length, edit, delete, close
@@ -29,7 +30,6 @@
 ### Not in MVP
 
 - Store segments in a BaaS
-- User accounts / auth
 - FAQ or other pages
 - Drag-to-edit segment endpoints (v1.1)
 - Auto-follow location mode
