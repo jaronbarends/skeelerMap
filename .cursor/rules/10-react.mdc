@@ -1,0 +1,19 @@
+---
+description: React component patterns and architecture
+globs: **/*.tsx, **/*.jsx
+alwaysApply: false
+---
+
+## React guidelines
+
+- The project uses React 19.
+
+### Generic React guidelines
+
+- Use Suspense for async operations
+- Optimize for performance and Web Vitals
+  
+### Component architecture
+
+- When writing React components, always place its return statement as early as possible in the component body, and define any internal functions after the return statement (hoisted function declarations), rather than before it.
+- Structure components logically: keep exports, subcomponents, helpers, and types well-organized. Extract subcomponents when JSX is complex, reused, or has its own behavior; keep simple, one-off JSX inline for readability. When a subcomponent is only used once, keep it in the same file.

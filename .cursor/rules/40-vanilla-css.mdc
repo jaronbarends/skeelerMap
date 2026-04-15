@@ -1,0 +1,8 @@
+## CSS guidelines
+
+- Do not use Tailwind css
+- Organize css in separate files
+- When using React, use CSS modules
+- Use class selectors over ID selectors for styling.
+- Use Flexbox and Grid for layout.
+- Use CSS variables for consistent theming.
