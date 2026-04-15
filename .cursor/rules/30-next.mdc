@@ -1,0 +1,18 @@
+---
+description: Next.js App Router patterns and state management
+globs: **/*.ts, **/*.tsx
+alwaysApply: false
+---
+
+## Next.js guidelines
+
+- The project uses Next 15 with App Router
+- Favor React Server Components (RSC) where possible
+- Minimize 'use client' directives
+
+### State Management
+
+- Use `useActionState` instead of deprecated `useFormState`
+- Leverage enhanced `useFormStatus` with new properties (data, method, action)
+- Implement URL state management with 'nuqs'
+- Minimize client-side state
