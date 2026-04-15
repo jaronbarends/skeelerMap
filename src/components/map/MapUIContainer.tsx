@@ -7,6 +7,7 @@ import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import type { MapHandle } from '@/components/map/MapView';
 import { calculateSegmentLength } from '@/components/map/mapUtils';
+import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
@@ -23,6 +24,7 @@ type UIState = {
   selectedSegment: Segment | null;
   controlPointCount: number;
   creationModeActive: boolean;
+  loginRequiredPanelOpen: boolean;
 };
 
 type UIAction =
@@ -33,6 +35,8 @@ type UIAction =
   | { type: 'UPDATE_CONTROL_POINT_COUNT'; payload: number }
   | { type: 'SEGMENT_CREATED' }
   | { type: 'CANCEL_CREATION' }
+  | { type: 'SHOW_LOGIN_REQUIRED' }
+  | { type: 'HIDE_LOGIN_REQUIRED' }
   | { type: 'START_DELETE'; payload: Segment }
   | { type: 'CANCEL_DELETE' }
   | { type: 'CONFIRM_DELETE' }
@@ -54,7 +58,7 @@ function uiReducer(state: UIState, action: UIAction): UIState {
     case 'DESELECT_SEGMENT':
       return { ...state, selectedSegment: null, mapUIMode: 'view' };
     case 'START_CREATION':
-      return { ...state, creationModeActive: true, mapUIMode: 'edit' };
+      return { ...state, creationModeActive: true, mapUIMode: 'edit', loginRequiredPanelOpen: false };
     case 'UPDATE_CONTROL_POINT_COUNT':
       return { ...state, controlPointCount: action.payload };
     case 'CANCEL_CREATION':
@@ -64,7 +68,19 @@ function uiReducer(state: UIState, action: UIAction): UIState {
         controlPointCount: 0,
         mapUIMode: 'view',
         selectedSegment: null,
+        loginRequiredPanelOpen: false,
       };
+    case 'SHOW_LOGIN_REQUIRED':
+      return {
+        ...state,
+        loginRequiredPanelOpen: true,
+        creationModeActive: false,
+        controlPointCount: 0,
+        mapUIMode: 'view',
+        selectedSegment: null,
+      };
+    case 'HIDE_LOGIN_REQUIRED':
+      return { ...state, loginRequiredPanelOpen: false };
     case 'UPDATE_SELECTED_SEGMENT_COORDINATES':
       if (!state.selectedSegment) {
         return state;
@@ -88,6 +104,7 @@ function uiReducer(state: UIState, action: UIAction): UIState {
         selectedSegment: null,
         controlPointCount: 0,
         creationModeActive: false,
+        loginRequiredPanelOpen: false,
       };
     default:
       // eslint-disable-next-line no-console
@@ -108,6 +125,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     selectedSegment: null,
     controlPointCount: 0,
     creationModeActive: false,
+    loginRequiredPanelOpen: false,
   };
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
@@ -158,9 +176,13 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       />
       <FabContainer>
         <FabButton
-          onClick={() => uiDispatch({ type: 'START_CREATION' })}
+          onClick={handleStartCreationClick}
           ariaLabel="Segment toevoegen"
-          disabled={uiState.creationModeActive || uiState.selectedSegment !== null}
+          disabled={
+            uiState.creationModeActive ||
+            uiState.selectedSegment !== null ||
+            uiState.loginRequiredPanelOpen
+          }
           iconName="plus"
           tooltip="Segment toevoegen"
         />
@@ -172,6 +194,10 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           tooltip="Centreer op locatie"
         />
       </FabContainer>
+
+      {uiState.loginRequiredPanelOpen && (
+        <LoginRequiredPanel onClose={handleLoginRequiredClose} />
+      )}
 
       {uiState.creationModeActive && (
         <SegmentCreationPanel
@@ -209,6 +235,18 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
   function handleControlPointCountChange(count: number) {
     uiDispatch({ type: 'UPDATE_CONTROL_POINT_COUNT', payload: count });
+  }
+
+  function handleStartCreationClick() {
+    if (currentUserId === null) {
+      uiDispatch({ type: 'SHOW_LOGIN_REQUIRED' });
+      return;
+    }
+    uiDispatch({ type: 'START_CREATION' });
+  }
+
+  function handleLoginRequiredClose() {
+    uiDispatch({ type: 'HIDE_LOGIN_REQUIRED' });
   }
 
   function handleCreationCancel() {

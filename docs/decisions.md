@@ -210,17 +210,23 @@
 **Decision:** Email + password auth via Supabase. No social login.
 **Details:**
 
-- Self-service signup at `/signup` with email verification
-- Login at `/login`
+- Self-service signup at `/registreren` with email verification
+- Login at `/inloggen`
 - On success, redirect to `/` with toast feedback via `?toast=` query param
 - Toast auto-dismisses after 3–4s, positioned below menubar
+
+### Segment creation requires auth
+
+**Date:** 2026-04-15
+**Decision:** When the user is logged out and taps “Segment toevoegen”, show a panel prompting login/registration instead of entering drawing mode.
+**Rationale:** Segment writes are authenticated + ownership-protected; blocking the creation flow in the UI prevents confusing “you can draw but can’t save” states.
 
 ### Segment ownership
 
 **Date:** 2026-04-08
 **Decision:** Every segment has a `user_id` (uuid, FK to auth.users). Only the owner can edit or delete their segments.
 **Enforcement:** Supabase RLS — not in the Next.js layer.
-**Existing segments:** `user_id` is nullable for now. After first login, assign existing segments to owner account manually via SQL.
+**Existing segments:** `user_id` is nullable for now. One-time SQL assignment of anonymous segments to an owner account has been completed.
 
 ### RLS policies (segments table)
 

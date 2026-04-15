@@ -1,0 +1,9 @@
+.actions {
+  display: flex;
+  gap: var(--size-8);
+
+  & > * {
+    flex: 1;
+  }
+}
+
