@@ -1,0 +1,13 @@
+---
+description: Project overrides for skeelerMap (highest priority)
+alwaysApply: true
+---
+
+These rules take precedence over all other rules in this project.
+
+## overrides for earlier instructions
+
+- about minimizing client-side state: don't let this instruction create friction when client-side state is genuinly the right choice (e.g. for map interactions)
+- Use `nuqs` for URL state only when the state is meaningful to persist or share via URL
+  (e.g. map center/zoom for shareable links). Do not use it for transient UI state
+  (e.g. drawing mode, selection state, panel visibility).
