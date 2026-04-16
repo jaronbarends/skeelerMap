@@ -2,7 +2,7 @@ export interface Segment {
   id: string;
   rating: number;
   coordinates: [number, number][];
-  user_id: string | null;
+  userId: string | null;
 }
 
 export const RATINGS = [

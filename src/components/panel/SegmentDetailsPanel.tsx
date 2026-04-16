@@ -47,7 +47,7 @@ export default function SegmentDetailsPanel({
           <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
             <h1 className="hln-2">Segment details</h1>
           </PanelHeader>
-          <SegmentDetails segment={segment} />
+          <SegmentDetails segment={segment} currentUserOwnsSegment={currentUserOwnsSegment} />
         </>
       )}
       {mode === 'edit' && (
@@ -101,7 +101,11 @@ export default function SegmentDetailsPanel({
   }
 }
 
-function SegmentDetails({ segment }: { segment: Segment }) {
+interface SegmentDetailsProps {
+  segment: Segment;
+  currentUserOwnsSegment: boolean;
+}
+function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps) {
   const length: number = calculateSegmentLength(segment.coordinates);
   const currentRatingValue: number = segment.rating;
   const currentRatingLabel: string = getRatingByValue(currentRatingValue)?.label || '';
@@ -111,6 +115,11 @@ function SegmentDetails({ segment }: { segment: Segment }) {
         Lengte: <span className={styles.length}>{formatLength(length)}</span>
       </p>
       <p>Kwaliteit: {currentRatingLabel}</p>
+      <p>
+        {currentUserOwnsSegment
+          ? 'Je bent de eigenaar van dit segment'
+          : 'Je bent niet de eigenaar van dit segment'}
+      </p>
     </div>
   );
 }

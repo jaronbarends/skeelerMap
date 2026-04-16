@@ -139,8 +139,13 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
       }
       if (event.key === 'Delete') {
-        if (selectedSegmentRef.current && segmentIsOwnedByCurrentUser(selectedSegmentRef.current)) {
-          uiDispatch({ type: 'START_DELETE', payload: selectedSegmentRef.current });
+        const selectedSegment = selectedSegmentRef.current;
+        if (
+          selectedSegment &&
+          currentUserId !== null &&
+          selectedSegment.userId === currentUserId
+        ) {
+          uiDispatch({ type: 'START_DELETE', payload: selectedSegment });
         }
       }
     },
@@ -232,7 +237,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   );
 
   function segmentIsOwnedByCurrentUser(segment: Segment): boolean {
-    return currentUserId !== null && segment.user_id === currentUserId;
+    return currentUserId !== null && segment.userId === currentUserId;
   }
 
   function handleControlPointCountChange(count: number) {
@@ -266,7 +271,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         id: data.id,
         rating,
         coordinates: coords,
-        user_id: currentUserId,
+        userId: currentUserId,
       };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
