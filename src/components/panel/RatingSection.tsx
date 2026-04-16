@@ -1,11 +1,11 @@
-import { RATINGS, type Rating } from '@/lib/segments';
+import { RATINGS, RatingValue, type Rating } from '@/lib/segments';
 
 import styles from './RatingSection.module.css';
 
 interface Props {
   isPending?: boolean;
   isReadyToRate?: boolean;
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
   currentRatingValue?: number;
 }
 
@@ -36,7 +36,7 @@ export default function RatingSection({
 }
 
 interface RatingButtonsProps {
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
   currentRatingValue?: number;
 }
 
@@ -57,7 +57,7 @@ function RatingButtons({ onRatingSelect, currentRatingValue }: RatingButtonsProp
 
 interface RatingButtonProps {
   rating: Rating;
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
   isCurrent: boolean;
 }
 

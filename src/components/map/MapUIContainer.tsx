@@ -10,7 +10,7 @@ import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
-import type { Segment } from '@/lib/segments';
+import type { RatingValue, Segment } from '@/lib/segments';
 
 import styles from './MapUIContainer.module.css';
 
@@ -140,11 +140,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       }
       if (event.key === 'Delete') {
         const selectedSegment = selectedSegmentRef.current;
-        if (
-          selectedSegment &&
-          currentUserId !== null &&
-          selectedSegment.userId === currentUserId
-        ) {
+        if (selectedSegment && currentUserId !== null && selectedSegment.userId === currentUserId) {
           uiDispatch({ type: 'START_DELETE', payload: selectedSegment });
         }
       }
@@ -261,7 +257,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'CANCEL_CREATION' });
   }
 
-  async function handleCreateSegment(ratingValue: number) {
+  async function handleCreateSegment(ratingValue: RatingValue) {
     if (!mapRef.current) return;
     try {
       const coords = mapRef.current.getSegmentCoords();
@@ -302,15 +298,13 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'EDIT_START' });
   }
 
-  async function handleRatingUpdate(ratingValue: number) {
+  async function handleRatingUpdate(ratingValue: RatingValue) {
     const segment = uiState.selectedSegment;
     if (!segment) return;
     try {
       setIsPending(true);
       await updateSegment(segment.id, ratingValue);
-      setSegments((prev) =>
-        prev.map((s) => (s.id === segment.id ? { ...s, ratingValue } : s))
-      );
+      setSegments((prev) => prev.map((s) => (s.id === segment.id ? { ...s, ratingValue } : s)));
       uiDispatch({ type: 'DESELECT_SEGMENT' });
       setIsPending(false);
     } catch (error) {

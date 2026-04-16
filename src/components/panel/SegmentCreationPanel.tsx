@@ -1,3 +1,5 @@
+import type { RatingValue } from '@/lib/segments';
+
 import Panel from './Panel';
 import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
@@ -7,7 +9,7 @@ interface Props {
   isReadyToRate: boolean;
   isPending: boolean;
   onCancel: () => void;
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
 }
 
 export default function SegmentCreationPanel({

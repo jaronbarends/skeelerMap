@@ -4,12 +4,14 @@ import {
   FaPlus,
   FaRegTrashCan,
   FaXmark,
+  FaCircleInfo,
 } from 'react-icons/fa6';
 
 const ICONS = {
   close: FaXmark,
   delete: FaRegTrashCan,
   edit: FaPenToSquare,
+  info: FaCircleInfo,
   plus: FaPlus,
   userLocation: FaLocationCrosshairs,
 } as const;

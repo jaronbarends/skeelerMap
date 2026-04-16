@@ -1,3 +1,33 @@
+.specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--size-8);
+}
+
+.specs dd {
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.infoButton {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+  transition: color 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-text-primary);
+  }
+}
+
+.stars {
+  color: var(--rating-color);
+}
+
 .deleteActions {
   display: flex;
   gap: var(--size-8);

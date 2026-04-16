@@ -1,9 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import Button from '@/components/button/Button';
 import type { MapUIMode } from '@/components/map/MapUIContainer';
 import { calculateSegmentLength } from '@/components/map/mapUtils';
-import type { Segment } from '@/lib/segments';
+import { getIconByName } from '@/lib/getIconByName';
+import type { RatingValue, Segment } from '@/lib/segments';
 import { getRatingByValue } from '@/lib/segments';
 
 import Panel from './Panel';
@@ -23,7 +24,7 @@ interface Props {
   onDeleteStart?: () => void;
   onDeleteCancel: () => void;
   onDeleteConfirm: () => void;
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
   isPending: boolean;
 }
 
@@ -112,22 +113,39 @@ interface SegmentDetailsProps {
   currentUserOwnsSegment: boolean;
 }
 function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps) {
+  const [infoIsOpen, setInfoIsOpen] = useState(false);
   const length: number = calculateSegmentLength(segment.coordinates);
-  const currentRatingValue: number = segment.ratingValue;
-  const currentRatingLabel: string = getRatingByValue(currentRatingValue)?.label || '';
+  const rating = getRatingByValue(segment.ratingValue);
+  const infoIcon = getIconByName('info');
   return (
-    <div>
-      <p>
-        Lengte: <span className={styles.length}>{formatLength(length)}</span>
-      </p>
-      <p>Kwaliteit: {currentRatingLabel}</p>
+    <>
+      <dl className={styles.specs} data-rating={segment.ratingValue}>
+        <dt>Lengte:</dt>
+        <dd> {formatLength(length)} </dd>
+        <dt>Kwaliteit:</dt>
+        <dd>
+          {rating.label} <span className={styles.stars}>{rating.stars}</span>{' '}
+          <button
+            className={styles.infoButton}
+            onClick={toggleInfo}
+            aria-label="Info over kwaliteit"
+          >
+            {infoIcon({})}
+          </button>
+        </dd>
+      </dl>
+      {infoIsOpen && <p>{rating.description}</p>}
       <p>
         {currentUserOwnsSegment
-          ? 'Je bent de eigenaar van dit segment'
-          : 'Je bent niet de eigenaar van dit segment'}
+          ? 'Segment aangemaakt door jou'
+          : 'Segment aangemaakt door andere gebruiker'}
       </p>
-    </div>
+    </>
   );
+
+  function toggleInfo() {
+    setInfoIsOpen(!infoIsOpen);
+  }
 }
 
 interface DeleteActionsProps {
