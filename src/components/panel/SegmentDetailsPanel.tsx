@@ -39,7 +39,7 @@ export default function SegmentDetailsPanel({
   onRatingSelect,
   isPending,
 }: Props) {
-  const currentRating: number = segment.rating;
+  const currentRatingValue: number = segment.ratingValue;
   return (
     <Panel>
       {mode === 'details' && (
@@ -57,7 +57,7 @@ export default function SegmentDetailsPanel({
           </PanelHeader>
           <RatingSection
             onRatingSelect={onRatingSelect}
-            currentRating={currentRating}
+            currentRatingValue={currentRatingValue}
             isPending={isPending}
             isReadyToRate={true}
           />
@@ -107,7 +107,7 @@ interface SegmentDetailsProps {
 }
 function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps) {
   const length: number = calculateSegmentLength(segment.coordinates);
-  const currentRatingValue: number = segment.rating;
+  const currentRatingValue: number = segment.ratingValue;
   const currentRatingLabel: string = getRatingByValue(currentRatingValue)?.label || '';
   return (
     <div>

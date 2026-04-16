@@ -8,14 +8,14 @@ interface Props {
   isPending?: boolean;
   isReadyToRate?: boolean;
   onRatingSelect: (rating: number) => void;
-  currentRating?: number;
+  currentRatingValue?: number;
 }
 
 export default function RatingSection({
   isPending,
   isReadyToRate,
   onRatingSelect,
-  currentRating,
+  currentRatingValue,
 }: Props) {
   let instruction: string;
   if (isPending) {
@@ -31,7 +31,7 @@ export default function RatingSection({
     <>
       <PanelInstruction>{instruction}</PanelInstruction>
       {showRatingButtons && (
-        <RatingButtons onRatingSelect={onRatingSelect} currentRating={currentRating} />
+        <RatingButtons onRatingSelect={onRatingSelect} currentRatingValue={currentRatingValue} />
       )}
     </>
   );
@@ -39,10 +39,10 @@ export default function RatingSection({
 
 interface RatingButtonsProps {
   onRatingSelect: (rating: number) => void;
-  currentRating?: number;
+  currentRatingValue?: number;
 }
 
-function RatingButtons({ onRatingSelect, currentRating }: RatingButtonsProps) {
+function RatingButtons({ onRatingSelect, currentRatingValue }: RatingButtonsProps) {
   return (
     <div className={styles.ratings}>
       {RATINGS.map((rating) => (
@@ -50,7 +50,7 @@ function RatingButtons({ onRatingSelect, currentRating }: RatingButtonsProps) {
           key={rating.value}
           rating={rating}
           onRatingSelect={onRatingSelect}
-          isCurrent={rating.value === currentRating}
+          isCurrent={rating.value === currentRatingValue}
         />
       ))}
     </div>

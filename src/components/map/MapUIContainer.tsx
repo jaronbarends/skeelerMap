@@ -261,15 +261,15 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'CANCEL_CREATION' });
   }
 
-  async function handleCreateSegment(rating: number) {
+  async function handleCreateSegment(ratingValue: number) {
     if (!mapRef.current) return;
     try {
       const coords = mapRef.current.getSegmentCoords();
       setIsPending(true);
-      const data = await createSegment({ rating, coordinates: coords });
+      const data = await createSegment({ ratingValue, coordinates: coords });
       const newSegment: Segment = {
         id: data.id,
-        rating,
+        ratingValue,
         coordinates: coords,
         userId: currentUserId,
       };
@@ -302,13 +302,15 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'EDIT_START' });
   }
 
-  async function handleRatingUpdate(rating: number) {
+  async function handleRatingUpdate(ratingValue: number) {
     const segment = uiState.selectedSegment;
     if (!segment) return;
     try {
       setIsPending(true);
-      await updateSegment(segment.id, rating);
-      setSegments((prev) => prev.map((s) => (s.id === segment.id ? { ...s, rating } : s)));
+      await updateSegment(segment.id, ratingValue);
+      setSegments((prev) =>
+        prev.map((s) => (s.id === segment.id ? { ...s, ratingValue } : s))
+      );
       uiDispatch({ type: 'DESELECT_SEGMENT' });
       setIsPending(false);
     } catch (error) {
@@ -334,7 +336,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
     try {
       setIsPending(true);
-      await updateSegment(segmentId, prevSegment.rating, newCoordinates);
+      await updateSegment(segmentId, prevSegment.ratingValue, newCoordinates);
       setIsPending(false);
     } catch (error) {
       // eslint-disable-next-line no-console

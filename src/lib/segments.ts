@@ -1,6 +1,6 @@
 export interface Segment {
   id: string;
-  rating: number;
+  ratingValue: number;
   coordinates: [number, number][];
   userId: string | null;
 }
