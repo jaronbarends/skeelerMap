@@ -10,15 +10,15 @@ export async function fetchSegments(abortSignal: AbortSignal): Promise<Segment[]
 }
 
 export async function createSegment({
-  rating,
+  ratingValue,
   coordinates,
 }: {
-  rating: number;
+  ratingValue: number;
   coordinates: [number, number][];
 }): Promise<{ id: string }> {
   const res = await fetch('/api/segments', {
     method: 'POST',
-    body: JSON.stringify({ rating, coordinates }),
+    body: JSON.stringify({ ratingValue, coordinates }),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -34,12 +34,12 @@ export async function createSegment({
 
 export async function updateSegment(
   id: string,
-  rating: number,
+  ratingValue: number,
   coordinates?: [number, number][]
 ): Promise<void> {
   const res = await fetch('/api/segments', {
     method: 'PATCH',
-    body: JSON.stringify({ id, rating, coordinates }),
+    body: JSON.stringify({ id, ratingValue, coordinates }),
     headers: {
       'Content-Type': 'application/json',
     },

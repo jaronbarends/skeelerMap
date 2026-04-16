@@ -1,21 +1,19 @@
-import { RATINGS, type Rating } from '@/lib/segments';
-
-import PanelInstruction from './PanelInstruction';
+import { RATINGS, RatingValue, type Rating } from '@/lib/segments';
 
 import styles from './RatingSection.module.css';
 
 interface Props {
   isPending?: boolean;
   isReadyToRate?: boolean;
-  onRatingSelect: (rating: number) => void;
-  currentRating?: number;
+  onRatingSelect: (ratingValue: RatingValue) => void;
+  currentRatingValue?: number;
 }
 
 export default function RatingSection({
   isPending,
   isReadyToRate,
   onRatingSelect,
-  currentRating,
+  currentRatingValue,
 }: Props) {
   let instruction: string;
   if (isPending) {
@@ -29,20 +27,20 @@ export default function RatingSection({
   const showRatingButtons = isReadyToRate && !isPending;
   return (
     <>
-      <PanelInstruction>{instruction}</PanelInstruction>
+      <p>{instruction}</p>
       {showRatingButtons && (
-        <RatingButtons onRatingSelect={onRatingSelect} currentRating={currentRating} />
+        <RatingButtons onRatingSelect={onRatingSelect} currentRatingValue={currentRatingValue} />
       )}
     </>
   );
 }
 
 interface RatingButtonsProps {
-  onRatingSelect: (rating: number) => void;
-  currentRating?: number;
+  onRatingSelect: (ratingValue: RatingValue) => void;
+  currentRatingValue?: number;
 }
 
-function RatingButtons({ onRatingSelect, currentRating }: RatingButtonsProps) {
+function RatingButtons({ onRatingSelect, currentRatingValue }: RatingButtonsProps) {
   return (
     <div className={styles.ratings}>
       {RATINGS.map((rating) => (
@@ -50,7 +48,7 @@ function RatingButtons({ onRatingSelect, currentRating }: RatingButtonsProps) {
           key={rating.value}
           rating={rating}
           onRatingSelect={onRatingSelect}
-          isCurrent={rating.value === currentRating}
+          isCurrent={rating.value === currentRatingValue}
         />
       ))}
     </div>
@@ -59,7 +57,7 @@ function RatingButtons({ onRatingSelect, currentRating }: RatingButtonsProps) {
 
 interface RatingButtonProps {
   rating: Rating;
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
   isCurrent: boolean;
 }
 

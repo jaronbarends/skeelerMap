@@ -28,7 +28,12 @@ export function useSegmentLayers(
       // eslint-disable-next-line no-console
       console.error('Map not found');
     }
-    const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+    const color = mapColors.rating[String(segment.ratingValue) as keyof typeof mapColors.rating];
+    // const polylineBackground = L.polyline(segment.coordinates, {
+    //   color: '#000000',
+    //   weight: 7,
+    //   opacity: 0.85,
+    // }).addTo(map);
     const polyline = L.polyline(segment.coordinates, {
       color,
       weight: 5,
@@ -63,7 +68,7 @@ export function useSegmentLayers(
       if (!polyline) {
         renderSegment(segment, map);
       } else {
-        const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+        const color = mapColors.rating[String(segment.ratingValue) as keyof typeof mapColors.rating];
         if (polyline.options.color !== color) {
           polyline.setStyle({ color });
         }

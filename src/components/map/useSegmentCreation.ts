@@ -17,7 +17,7 @@ interface TempSegment {
 
 export function useSegmentCreation(
   mapRef: RefObject<L.Map | null>,
-  onControlPointCountChange: (count: number) => void,
+  onControlPointCountChange: (count: number) => void
 ): {
   addControlPoint: (latlng: L.LatLng) => void;
   cancelCreation: () => void;

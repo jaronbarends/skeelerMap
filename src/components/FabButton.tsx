@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import type { CSSProperties } from 'react';
 
 import { getIconByName } from '@/lib/getIconByName';
 
@@ -28,7 +29,7 @@ export default function FabButton({
       <button
         className={styles.button}
         aria-label={ariaLabel}
-        style={{ anchorName: anchorId } as React.CSSProperties}
+        style={{ anchorName: anchorId } as CSSProperties}
         {...{ onClick, disabled }}
       >
         {/* Next.js's built-in compiler throws an error ("Cannot create components during render") if you use <Icon /> here, so we use {Icon({})} instead. */}
@@ -38,7 +39,7 @@ export default function FabButton({
         <span
           className={styles.tooltip}
           aria-hidden="true"
-          style={{ positionAnchor: anchorId } as React.CSSProperties}
+          style={{ positionAnchor: anchorId } as CSSProperties}
         >
           {tooltip}
         </span>

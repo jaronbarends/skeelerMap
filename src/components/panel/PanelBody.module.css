@@ -1,4 +1,7 @@
-.instruction {
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-12);
   font-size: var(--font-size-14);
   color: var(--color-text-secondary);
 }

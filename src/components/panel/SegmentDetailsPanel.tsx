@@ -1,33 +1,37 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import Button from '@/components/button/Button';
 import type { MapUIMode } from '@/components/map/MapUIContainer';
+import { calculateSegmentLength } from '@/components/map/mapUtils';
+import { getIconByName } from '@/lib/getIconByName';
+import type { RatingValue, Segment } from '@/lib/segments';
+import { getRatingByValue } from '@/lib/segments';
 
 import Panel from './Panel';
+import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
 import type { ActionButton } from './PanelHeader';
-import PanelInstruction from './PanelInstruction';
 import RatingSection from './RatingSection';
 
 import styles from './SegmentDetailsPanel.module.css';
 
 interface Props {
-  segmentLength: number;
-  currentRating: number;
+  segment: Segment;
   mode: MapUIMode;
+  currentUserOwnsSegment: boolean;
   onClose: () => void;
   onEditStart?: () => void;
   onDeleteStart?: () => void;
   onDeleteCancel: () => void;
   onDeleteConfirm: () => void;
-  onRatingSelect: (rating: number) => void;
+  onRatingSelect: (ratingValue: RatingValue) => void;
   isPending: boolean;
 }
 
 export default function SegmentDetailsPanel({
-  segmentLength,
-  currentRating,
+  segment,
   mode,
+  currentUserOwnsSegment,
   onClose,
   onEditStart,
   onDeleteStart,
@@ -36,24 +40,32 @@ export default function SegmentDetailsPanel({
   onRatingSelect,
   isPending,
 }: Props) {
+  const currentRatingValue: number = segment.ratingValue;
   return (
     <Panel>
       {mode === 'details' && (
-        <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
-          <h1 className="hln-2">{`Lengte: ${formatLength(segmentLength)}`}</h1>
-        </PanelHeader>
+        <>
+          <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
+            <h1 className="hln-2">Segment details</h1>
+          </PanelHeader>
+          <PanelBody>
+            <SegmentDetails segment={segment} currentUserOwnsSegment={currentUserOwnsSegment} />
+          </PanelBody>
+        </>
       )}
       {mode === 'edit' && (
         <>
           <PanelHeader onClose={onClose}>
             <h1 className="hln-2">Kwaliteit aanpassen</h1>
           </PanelHeader>
-          <RatingSection
-            onRatingSelect={onRatingSelect}
-            currentRating={currentRating}
-            isPending={isPending}
-            isReadyToRate={true}
-          />
+          <PanelBody>
+            <RatingSection
+              onRatingSelect={onRatingSelect}
+              currentRatingValue={currentRatingValue}
+              isPending={isPending}
+              isReadyToRate={true}
+            />
+          </PanelBody>
         </>
       )}
       {mode === 'delete' && (
@@ -61,14 +73,16 @@ export default function SegmentDetailsPanel({
           <PanelHeader onClose={onClose}>
             <h1 className="hln-2">Segment verwijderen?</h1>
           </PanelHeader>
-          {isPending ? (
-            <PanelInstruction>Segment aan het verwijderen...</PanelInstruction>
-          ) : (
-            <>
-              <PanelInstruction>Weet je zeker dat je dit segment wil verwijderen?</PanelInstruction>
-              <DeleteActions onDeleteCancel={onDeleteCancel} onDeleteConfirm={onDeleteConfirm} />
-            </>
-          )}
+          <PanelBody>
+            {isPending ? (
+              <p>Segment aan het verwijderen...</p>
+            ) : (
+              <>
+                <p>Weet je zeker dat je dit segment wil verwijderen?</p>
+                <DeleteActions onDeleteCancel={onDeleteCancel} onDeleteConfirm={onDeleteConfirm} />
+              </>
+            )}
+          </PanelBody>
         </>
       )}
     </Panel>
@@ -91,6 +105,46 @@ export default function SegmentDetailsPanel({
       });
     }
     return actionButtons;
+  }
+}
+
+interface SegmentDetailsProps {
+  segment: Segment;
+  currentUserOwnsSegment: boolean;
+}
+function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps) {
+  const [infoIsOpen, setInfoIsOpen] = useState(false);
+  const length: number = calculateSegmentLength(segment.coordinates);
+  const rating = getRatingByValue(segment.ratingValue);
+  const infoIcon = getIconByName('info');
+  return (
+    <>
+      <dl className={styles.specs} data-rating={segment.ratingValue}>
+        <dt>Lengte:</dt>
+        <dd> {formatLength(length)} </dd>
+        <dt>Kwaliteit:</dt>
+        <dd>
+          {rating.label} <span className={styles.stars}>{rating.stars}</span>{' '}
+          <button
+            className={styles.infoButton}
+            onClick={toggleInfo}
+            aria-label="Info over kwaliteit"
+          >
+            {infoIcon({})}
+          </button>
+        </dd>
+      </dl>
+      {infoIsOpen && <p>{rating.description}</p>}
+      <p>
+        {currentUserOwnsSegment
+          ? 'Segment aangemaakt door jou'
+          : 'Segment aangemaakt door andere gebruiker'}
+      </p>
+    </>
+  );
+
+  function toggleInfo() {
+    setInfoIsOpen(!infoIsOpen);
   }
 }
 

@@ -6,12 +6,11 @@ import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import type { MapHandle } from '@/components/map/MapView';
-import { calculateSegmentLength } from '@/components/map/mapUtils';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
-import type { Segment } from '@/lib/segments';
+import type { RatingValue, Segment } from '@/lib/segments';
 
 import styles from './MapUIContainer.module.css';
 
@@ -58,7 +57,12 @@ function uiReducer(state: UIState, action: UIAction): UIState {
     case 'DESELECT_SEGMENT':
       return { ...state, selectedSegment: null, mapUIMode: 'view' };
     case 'START_CREATION':
-      return { ...state, creationModeActive: true, mapUIMode: 'edit', loginRequiredPanelOpen: false };
+      return {
+        ...state,
+        creationModeActive: true,
+        mapUIMode: 'edit',
+        loginRequiredPanelOpen: false,
+      };
     case 'UPDATE_CONTROL_POINT_COUNT':
       return { ...state, controlPointCount: action.payload };
     case 'CANCEL_CREATION':
@@ -135,8 +139,9 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
       }
       if (event.key === 'Delete') {
-        if (selectedSegmentRef.current && segmentIsOwnedByCurrentUser(selectedSegmentRef.current)) {
-          uiDispatch({ type: 'START_DELETE', payload: selectedSegmentRef.current });
+        const selectedSegment = selectedSegmentRef.current;
+        if (selectedSegment && currentUserId !== null && selectedSegment.userId === currentUserId) {
+          uiDispatch({ type: 'START_DELETE', payload: selectedSegment });
         }
       }
     },
@@ -195,9 +200,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         />
       </FabContainer>
 
-      {uiState.loginRequiredPanelOpen && (
-        <LoginRequiredPanel onClose={handleLoginRequiredClose} />
-      )}
+      {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleLoginRequiredClose} />}
 
       {uiState.creationModeActive && (
         <SegmentCreationPanel
@@ -210,9 +213,9 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
       {uiState.selectedSegment && (
         <SegmentDetailsPanel
-          segmentLength={calculateSegmentLength(uiState.selectedSegment.coordinates)}
-          currentRating={uiState.selectedSegment.rating}
+          segment={uiState.selectedSegment}
           mode={uiState.mapUIMode}
+          currentUserOwnsSegment={segmentIsOwnedByCurrentUser(uiState.selectedSegment)}
           onClose={handleDetailsClose}
           onEditStart={
             segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined
@@ -230,7 +233,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   );
 
   function segmentIsOwnedByCurrentUser(segment: Segment): boolean {
-    return currentUserId !== null && segment.user_id === currentUserId;
+    return currentUserId !== null && segment.userId === currentUserId;
   }
 
   function handleControlPointCountChange(count: number) {
@@ -254,17 +257,17 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'CANCEL_CREATION' });
   }
 
-  async function handleCreateSegment(rating: number) {
+  async function handleCreateSegment(ratingValue: RatingValue) {
     if (!mapRef.current) return;
     try {
       const coords = mapRef.current.getSegmentCoords();
       setIsPending(true);
-      const data = await createSegment({ rating, coordinates: coords });
+      const data = await createSegment({ ratingValue, coordinates: coords });
       const newSegment: Segment = {
         id: data.id,
-        rating,
+        ratingValue,
         coordinates: coords,
-        user_id: currentUserId,
+        userId: currentUserId,
       };
       mapRef.current.onSegmentSaved();
       setSegments((prev) => [...prev, newSegment]);
@@ -295,13 +298,13 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'EDIT_START' });
   }
 
-  async function handleRatingUpdate(rating: number) {
+  async function handleRatingUpdate(ratingValue: RatingValue) {
     const segment = uiState.selectedSegment;
     if (!segment) return;
     try {
       setIsPending(true);
-      await updateSegment(segment.id, rating);
-      setSegments((prev) => prev.map((s) => (s.id === segment.id ? { ...s, rating } : s)));
+      await updateSegment(segment.id, ratingValue);
+      setSegments((prev) => prev.map((s) => (s.id === segment.id ? { ...s, ratingValue } : s)));
       uiDispatch({ type: 'DESELECT_SEGMENT' });
       setIsPending(false);
     } catch (error) {
@@ -327,7 +330,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
     try {
       setIsPending(true);
-      await updateSegment(segmentId, prevSegment.rating, newCoordinates);
+      await updateSegment(segmentId, prevSegment.ratingValue, newCoordinates);
       setIsPending(false);
     } catch (error) {
       // eslint-disable-next-line no-console

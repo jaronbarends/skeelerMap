@@ -31,8 +31,8 @@ export async function GET() {
 
   const segments = data.map((row: any) => ({
     id: row.id,
-    rating: row.rating,
-    user_id: row.user_id ?? null,
+    ratingValue: row.rating,
+    userId: row.user_id ?? null,
     // parse to array, swap supabase's GeoJSON format lng/lat to lat/lng for leaflet
     coordinates: JSON.parse(row.geometry).coordinates.map(([lng, lat]: [number, number]) => [
       lat,
@@ -51,14 +51,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { rating, coordinates } = await request.json();
+  const { ratingValue, coordinates } = await request.json();
   const geojson = coordsToGeojson(coordinates);
 
   const { data, error } = await client
     .from('segments')
     .insert({
       user_id: user.id,
-      rating,
+      rating: ratingValue,
       geometry: JSON.stringify(geojson),
     })
     .select('id')
@@ -77,9 +77,9 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id, rating, coordinates } = await request.json();
+  const { id, ratingValue, coordinates } = await request.json();
 
-  const updateData: { rating: number; geometry?: string } = { rating };
+  const updateData: { rating: number; geometry?: string } = { rating: ratingValue };
   if (coordinates) {
     const geojson = coordsToGeojson(coordinates);
     updateData.geometry = JSON.stringify(geojson);
