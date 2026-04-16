@@ -7,9 +7,9 @@ import type { Segment } from '@/lib/segments';
 import { getRatingByValue } from '@/lib/segments';
 
 import Panel from './Panel';
+import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
 import type { ActionButton } from './PanelHeader';
-import PanelInstruction from './PanelInstruction';
 import RatingSection from './RatingSection';
 
 import styles from './SegmentDetailsPanel.module.css';
@@ -47,7 +47,9 @@ export default function SegmentDetailsPanel({
           <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
             <h1 className="hln-2">Segment details</h1>
           </PanelHeader>
-          <SegmentDetails segment={segment} currentUserOwnsSegment={currentUserOwnsSegment} />
+          <PanelBody>
+            <SegmentDetails segment={segment} currentUserOwnsSegment={currentUserOwnsSegment} />
+          </PanelBody>
         </>
       )}
       {mode === 'edit' && (
@@ -55,12 +57,14 @@ export default function SegmentDetailsPanel({
           <PanelHeader onClose={onClose}>
             <h1 className="hln-2">Kwaliteit aanpassen</h1>
           </PanelHeader>
-          <RatingSection
-            onRatingSelect={onRatingSelect}
-            currentRatingValue={currentRatingValue}
-            isPending={isPending}
-            isReadyToRate={true}
-          />
+          <PanelBody>
+            <RatingSection
+              onRatingSelect={onRatingSelect}
+              currentRatingValue={currentRatingValue}
+              isPending={isPending}
+              isReadyToRate={true}
+            />
+          </PanelBody>
         </>
       )}
       {mode === 'delete' && (
@@ -68,14 +72,16 @@ export default function SegmentDetailsPanel({
           <PanelHeader onClose={onClose}>
             <h1 className="hln-2">Segment verwijderen?</h1>
           </PanelHeader>
-          {isPending ? (
-            <PanelInstruction>Segment aan het verwijderen...</PanelInstruction>
-          ) : (
-            <>
-              <PanelInstruction>Weet je zeker dat je dit segment wil verwijderen?</PanelInstruction>
-              <DeleteActions onDeleteCancel={onDeleteCancel} onDeleteConfirm={onDeleteConfirm} />
-            </>
-          )}
+          <PanelBody>
+            {isPending ? (
+              <p>Segment aan het verwijderen...</p>
+            ) : (
+              <>
+                <p>Weet je zeker dat je dit segment wil verwijderen?</p>
+                <DeleteActions onDeleteCancel={onDeleteCancel} onDeleteConfirm={onDeleteConfirm} />
+              </>
+            )}
+          </PanelBody>
         </>
       )}
     </Panel>

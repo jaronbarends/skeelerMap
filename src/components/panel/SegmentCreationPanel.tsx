@@ -1,4 +1,5 @@
 import Panel from './Panel';
+import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
 import RatingSection from './RatingSection';
 
@@ -20,11 +21,13 @@ export default function SegmentCreationPanel({
       <PanelHeader onClose={onCancel}>
         <h1 className="hln-2">Segment toevoegen</h1>
       </PanelHeader>
-      <RatingSection
-        isPending={isPending}
-        isReadyToRate={isReadyToRate}
-        onRatingSelect={onRatingSelect}
-      />
+      <PanelBody>
+        <RatingSection
+          isPending={isPending}
+          isReadyToRate={isReadyToRate}
+          onRatingSelect={onRatingSelect}
+        />
+      </PanelBody>
     </Panel>
   );
 }

@@ -1,7 +1,5 @@
 import { RATINGS, type Rating } from '@/lib/segments';
 
-import PanelInstruction from './PanelInstruction';
-
 import styles from './RatingSection.module.css';
 
 interface Props {
@@ -29,7 +27,7 @@ export default function RatingSection({
   const showRatingButtons = isReadyToRate && !isPending;
   return (
     <>
-      <PanelInstruction>{instruction}</PanelInstruction>
+      <p>{instruction}</p>
       {showRatingButtons && (
         <RatingButtons onRatingSelect={onRatingSelect} currentRatingValue={currentRatingValue} />
       )}

@@ -15,6 +15,7 @@ h2,
   font-size: var(--font-size);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-heading);
+  color: var(--color-headings-default);
 }
 
 h2,

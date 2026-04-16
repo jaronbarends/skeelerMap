@@ -26,21 +26,19 @@
   --color-primary: var(--color-blue);
   --color-danger: var(--color-red);
 
-  --color-text-primary-on-dark: var(--color-white);
-  --color-text-secondary-on-dark: var(--color-gray-700);
-  --color-text-link: var(--color-blue-70);
+  --color-text-primary: var(--color-white);
+  --color-text-secondary: var(--color-gray-700);
 
-  --color-text-primary-on-light: var(--color-gray-200);
-  --color-text-secondary-on-light: var(--color-gray-400);
+  --color-text-default: var(--color-text-secondary);
+  --color-headings-default: var(--color-text-primary);
+  --color-text-link: var(--color-blue-70);
+  --color-text-error: var(--color-gray-100);
 
   --color-surface-100: var(--color-gray-100);
   --color-surface-150: var(--color-gray-150);
   --color-surface-200: var(--color-gray-200);
   --color-surface-error: var(--color-red-60);
-  --color-text-error: var(--color-gray-100);
 
-  --color-text-primary: var(--color-text-primary-on-dark);
-  --color-text-secondary: var(--color-text-secondary-on-dark);
   --color-shadow: rgba(0, 0, 0, 0.4);
 
   [data-rating='1'] {
