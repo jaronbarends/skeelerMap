@@ -28,10 +28,4 @@ export type IconName = keyof typeof ICONS;
 
 export function getIconByName(iconName: IconName) {
   return ICONS[iconName];
-  // const Icon = ICONS[iconName as keyof typeof ICONS];
-  // if (!Icon) {
-  //   throw new Error(`Icon ${iconName} not found`);
-  // }
-
-  // return Icon;
 }
