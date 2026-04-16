@@ -134,7 +134,11 @@ function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps
           </button>
         </dd>
       </dl>
-      {infoIsOpen && <p>{rating.description}</p>}
+      {infoIsOpen && (
+        <p>
+          <em>{rating.label}</em> houdt in: {rating.description}
+        </p>
+      )}
       <p>
         {currentUserOwnsSegment
           ? 'Segment aangemaakt door jou'
