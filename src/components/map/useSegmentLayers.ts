@@ -29,6 +29,11 @@ export function useSegmentLayers(
       console.error('Map not found');
     }
     const color = mapColors.rating[String(segment.rating) as keyof typeof mapColors.rating];
+    // const polylineBackground = L.polyline(segment.coordinates, {
+    //   color: '#000000',
+    //   weight: 7,
+    //   opacity: 0.85,
+    // }).addTo(map);
     const polyline = L.polyline(segment.coordinates, {
       color,
       weight: 5,

@@ -2,6 +2,9 @@ import { useRef, useEffect } from 'react';
 
 import Button from '@/components/button/Button';
 import type { MapUIMode } from '@/components/map/MapUIContainer';
+import { calculateSegmentLength } from '@/components/map/mapUtils';
+import type { Segment } from '@/lib/segments';
+import { getRatingByValue } from '@/lib/segments';
 
 import Panel from './Panel';
 import PanelHeader from './PanelHeader';
@@ -12,9 +15,9 @@ import RatingSection from './RatingSection';
 import styles from './SegmentDetailsPanel.module.css';
 
 interface Props {
-  segmentLength: number;
-  currentRating: number;
+  segment: Segment;
   mode: MapUIMode;
+  currentUserOwnsSegment: boolean;
   onClose: () => void;
   onEditStart?: () => void;
   onDeleteStart?: () => void;
@@ -25,9 +28,9 @@ interface Props {
 }
 
 export default function SegmentDetailsPanel({
-  segmentLength,
-  currentRating,
+  segment,
   mode,
+  currentUserOwnsSegment,
   onClose,
   onEditStart,
   onDeleteStart,
@@ -36,12 +39,16 @@ export default function SegmentDetailsPanel({
   onRatingSelect,
   isPending,
 }: Props) {
+  const currentRating: number = segment.rating;
   return (
     <Panel>
       {mode === 'details' && (
-        <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
-          <h1 className="hln-2">{`Lengte: ${formatLength(segmentLength)}`}</h1>
-        </PanelHeader>
+        <>
+          <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
+            <h1 className="hln-2">Segment details</h1>
+          </PanelHeader>
+          <SegmentDetails segment={segment} />
+        </>
       )}
       {mode === 'edit' && (
         <>
@@ -92,6 +99,20 @@ export default function SegmentDetailsPanel({
     }
     return actionButtons;
   }
+}
+
+function SegmentDetails({ segment }: { segment: Segment }) {
+  const length: number = calculateSegmentLength(segment.coordinates);
+  const currentRatingValue: number = segment.rating;
+  const currentRatingLabel: string = getRatingByValue(currentRatingValue)?.label || '';
+  return (
+    <div>
+      <p>
+        Lengte: <span className={styles.length}>{formatLength(length)}</span>
+      </p>
+      <p>Kwaliteit: {currentRatingLabel}</p>
+    </div>
+  );
 }
 
 interface DeleteActionsProps {

@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import type { MapHandle } from '@/components/map/MapView';
-import { calculateSegmentLength } from '@/components/map/mapUtils';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
@@ -58,7 +57,12 @@ function uiReducer(state: UIState, action: UIAction): UIState {
     case 'DESELECT_SEGMENT':
       return { ...state, selectedSegment: null, mapUIMode: 'view' };
     case 'START_CREATION':
-      return { ...state, creationModeActive: true, mapUIMode: 'edit', loginRequiredPanelOpen: false };
+      return {
+        ...state,
+        creationModeActive: true,
+        mapUIMode: 'edit',
+        loginRequiredPanelOpen: false,
+      };
     case 'UPDATE_CONTROL_POINT_COUNT':
       return { ...state, controlPointCount: action.payload };
     case 'CANCEL_CREATION':
@@ -195,9 +199,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         />
       </FabContainer>
 
-      {uiState.loginRequiredPanelOpen && (
-        <LoginRequiredPanel onClose={handleLoginRequiredClose} />
-      )}
+      {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleLoginRequiredClose} />}
 
       {uiState.creationModeActive && (
         <SegmentCreationPanel
@@ -210,9 +212,9 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
       {uiState.selectedSegment && (
         <SegmentDetailsPanel
-          segmentLength={calculateSegmentLength(uiState.selectedSegment.coordinates)}
-          currentRating={uiState.selectedSegment.rating}
+          segment={uiState.selectedSegment}
           mode={uiState.mapUIMode}
+          currentUserOwnsSegment={segmentIsOwnedByCurrentUser(uiState.selectedSegment)}
           onClose={handleDetailsClose}
           onEditStart={
             segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined

@@ -11,7 +11,7 @@ export const RATINGS = [
     label: 'Kansloos',
     emoji: '💀',
     stars: '★',
-    description: 'Hier kun je echt niet overheen op skates. Denk aan een grindweg.',
+    description: 'Hier kun je echt niet overheen op skeelers. Bijvoorbeeld grindweg.',
   },
   {
     value: 2,
@@ -19,7 +19,7 @@ export const RATINGS = [
     emoji: '😬',
     stars: '★★',
     description:
-      'Erg onregelmatig wegdek. Te doen voor kort stukje, maar je moet voorzichtig rijden. Groffe klinkers, slecht asfalt.',
+      'Erg onregelmatig wegdek. Te doen voor kort stukje, maar je moet voorzichtig rijden i.v.m. kans op vallen. Bijvoorbeeld groffe klinkers, slecht asfalt.',
   },
   {
     value: 3,
@@ -45,5 +45,9 @@ export const RATINGS = [
     description: 'Zingende engelen begeleiden je op deze route. Violen zwellen aan.',
   },
 ] as const;
+
+export function getRatingByValue(value: number): Rating | null {
+  return RATINGS.find((rating) => rating.value === value) || null;
+}
 
 export type Rating = (typeof RATINGS)[number];
