@@ -1,5 +1,5 @@
-import type { SVGProps, FC } from 'react';
 import {
+  FaCircleInfo,
   FaLocationCrosshairs,
   FaPenToSquare,
   FaPlus,
@@ -11,17 +11,16 @@ import TrafficSignCrossing from '@/assets/icons/traffic-sign-crossing.svg';
 import TrafficSignDanger from '@/assets/icons/traffic-sign-danger.svg';
 import TrafficSignSlope from '@/assets/icons/traffic-sign-slope.svg';
 
-type IconComponent = FC<SVGProps<SVGSVGElement>>;
-
 const ICONS = {
   close: FaXmark,
   delete: FaRegTrashCan,
   edit: FaPenToSquare,
+  info: FaCircleInfo,
   plus: FaPlus,
   userLocation: FaLocationCrosshairs,
-  trafficSignSlope: TrafficSignSlope as IconComponent,
-  trafficSignDanger: TrafficSignDanger as IconComponent,
-  trafficSignCrossing: TrafficSignCrossing as IconComponent,
+  trafficSignSlope: TrafficSignSlope,
+  trafficSignDanger: TrafficSignDanger,
+  trafficSignCrossing: TrafficSignCrossing,
 } as const;
 
 export type IconName = keyof typeof ICONS;
