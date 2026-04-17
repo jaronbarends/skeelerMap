@@ -5,6 +5,7 @@ import { useCallback, useEffect, useImperativeHandle, useRef, type Ref } from 'r
 
 import { Segment } from '@/lib/segments';
 
+import type { MapUIMode } from './MapUIContainer';
 import { useMapInit } from './useMapInit';
 import { useSegmentCreation } from './useSegmentCreation';
 import { useSegmentLayers } from './useSegmentLayers';
@@ -22,10 +23,12 @@ export interface MapHandle {
 interface MapProps {
   ref?: Ref<MapHandle>;
   creationModeActive: boolean;
+  mode: MapUIMode;
   fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
   segments: Segment[];
   selectedSegment: Segment | null;
   onControlPointCountChange: (count: number) => void;
+  onMarkerLocationSelected: (lat: number, lng: number) => void;
   onSegmentSelect: (segment: Segment) => void;
   onSegmentDeselect: () => void;
   onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
@@ -36,10 +39,12 @@ interface MapProps {
 export default function MapView({
   ref,
   creationModeActive,
+  mode,
   fetchSegments,
   segments,
   selectedSegment,
   onControlPointCountChange,
+  onMarkerLocationSelected,
   onSegmentSelect,
   onSegmentDeselect,
   onSegmentDragUpdate,
@@ -53,13 +58,17 @@ export default function MapView({
 
   const handleMapClick = useCallback(
     (latlng: L.LatLng) => {
+      if (mode === 'placeMarker') {
+        onMarkerLocationSelected(latlng.lat, latlng.lng);
+        return;
+      }
       if (creationModeActive) {
         addControlPointRef.current(latlng);
       } else {
         onSegmentDeselect();
       }
     },
-    [creationModeActive, onSegmentDeselect]
+    [creationModeActive, mode, onMarkerLocationSelected, onSegmentDeselect]
   );
 
   const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchSegments, handleMapClick);
