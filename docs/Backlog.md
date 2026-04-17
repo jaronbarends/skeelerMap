@@ -154,6 +154,10 @@ When user is not logged in, when clicking on add segment button, they should be 
 
 _Implemented 2026-04-15._
 
+### Only show user-info when user is logged in
+
+In SegmentDetailsPanel (and if we already have it, MarkerDetailsPanel), only show the user information ('Segment aangemaakt door jou' or 'Segment aangemaakt door andere gebruiker') if the user is logged in.
+
 ---
 
 ## Low priority
