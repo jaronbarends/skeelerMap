@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
-import type { RatingValue } from '@/lib/segments';
-import { getIconByName } from '@/lib/getIconByName';
-import { MARKER_TYPES, type MarkerType } from '@/lib/markers';
-
 import Button from '@/components/button/Button';
-import type { MapUIMode } from '@/components/map/MapUIContainer';
+import { getIconByName } from '@/lib/getIconByName';
+import { isCreateMarkerMode, isCreateSegmentMode, type MapUIMode } from '@/lib/mapUIMode';
+import { MARKER_TYPES, type MarkerType } from '@/lib/markers';
+import type { RatingValue } from '@/lib/segments';
 
 import Panel from './Panel';
 import PanelBody from './PanelBody';
@@ -36,17 +35,11 @@ export default function SegmentCreationPanel({
   const [markerType, setMarkerType] = useState<MarkerType>('danger');
   const [description, setDescription] = useState<string>('');
 
-  if (
-    mode !== 'drawSegment' &&
-    mode !== 'rateSegment' &&
-    mode !== 'placeMarker' &&
-    mode !== 'markerForm'
-  ) {
+  if (!isCreateSegmentMode(mode) && !isCreateMarkerMode(mode)) {
     return null;
   }
 
-  const title =
-    mode === 'drawSegment' || mode === 'rateSegment' ? 'Segment toevoegen' : 'Waarschuwing toevoegen';
+  const title = isCreateSegmentMode(mode) ? 'Segment toevoegen' : 'Waarschuwing toevoegen';
 
   return (
     <Panel>
@@ -56,15 +49,23 @@ export default function SegmentCreationPanel({
       <PanelBody>
         {mode === 'drawSegment' && (
           <>
-            <p>Klik minstens 2 punten om een segment te maken</p>
-            <button className={styles.inlineLinkButton} type="button" onClick={onAddMarkerStart}>
-              voeg een waarschuwing toe
-            </button>
+            <p>
+              Klik minstens 2 punten om een segment te maken
+              <br />
+              of{' '}
+              <button className={styles.inlineLinkButton} type="button" onClick={onAddMarkerStart}>
+                voeg een waarschuwing toe
+              </button>
+            </p>
           </>
         )}
 
         {mode === 'rateSegment' && (
-          <RatingSection isPending={isPending} isReadyToRate={true} onRatingSelect={onRatingSelect} />
+          <RatingSection
+            isPending={isPending}
+            isReadyToRate={true}
+            onRatingSelect={onRatingSelect}
+          />
         )}
 
         {mode === 'placeMarker' && (
@@ -92,7 +93,9 @@ export default function SegmentCreationPanel({
                   role="radio"
                   aria-checked={type === markerType}
                 >
-                  <span className={styles.icon}>{getIconByName(MARKER_TYPES[type].iconName)({})}</span>
+                  <span className={styles.icon}>
+                    {getIconByName(MARKER_TYPES[type].iconName)({})}
+                  </span>
                   <span className={styles.iconTitle}>{MARKER_TYPES[type].title}</span>
                 </button>
               ))}

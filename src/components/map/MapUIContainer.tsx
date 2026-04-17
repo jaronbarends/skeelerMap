@@ -9,6 +9,7 @@ import type { MapHandle } from '@/components/map/MapView';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
+import type { MapUIMode } from '@/lib/mapUIMode';
 import type { MarkerType } from '@/lib/markers';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
 import type { RatingValue, Segment } from '@/lib/segments';
@@ -16,16 +17,6 @@ import type { RatingValue, Segment } from '@/lib/segments';
 import styles from './MapUIContainer.module.css';
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false });
-
-export type MapUIMode =
-  | 'idle'
-  | 'segmentDetails'
-  | 'editSegment'
-  | 'deleteSegment'
-  | 'drawSegment'
-  | 'rateSegment'
-  | 'placeMarker'
-  | 'markerForm';
 
 type UIState = {
   mapUIMode: MapUIMode;

@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 
 import Button from '@/components/button/Button';
-import type { MapUIMode } from '@/components/map/MapUIContainer';
 import { calculateSegmentLength } from '@/components/map/mapUtils';
 import { getIconByName } from '@/lib/getIconByName';
+import type { MapUIMode } from '@/lib/mapUIMode';
 import type { RatingValue, Segment } from '@/lib/segments';
 import { getRatingByValue } from '@/lib/segments';
 

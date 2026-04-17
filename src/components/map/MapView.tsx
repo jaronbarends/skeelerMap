@@ -5,7 +5,7 @@ import { useCallback, useEffect, useImperativeHandle, useRef, type Ref } from 'r
 
 import { Segment } from '@/lib/segments';
 
-import type { MapUIMode } from './MapUIContainer';
+import type { MapUIMode } from '@/lib/mapUIMode';
 import { useMapInit } from './useMapInit';
 import { useSegmentCreation } from './useSegmentCreation';
 import { useSegmentLayers } from './useSegmentLayers';
