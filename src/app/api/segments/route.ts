@@ -1,33 +1,14 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { supabase } from '@/lib/supabase';
-
-async function getUserScopedClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        },
-      },
-    },
-  );
-}
+import { getSupabaseServerClient } from '@/lib/supabaseAuth.server';
 
 export async function GET() {
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase.rpc('get_segments');
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   const segments = data.map((row: any) => ({
     id: row.id,
@@ -44,8 +25,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const client = await getUserScopedClient();
-  const { data: { user } } = await client.auth.getUser();
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -54,7 +37,7 @@ export async function POST(request: NextRequest) {
   const { ratingValue, coordinates } = await request.json();
   const geojson = coordsToGeojson(coordinates);
 
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from('segments')
     .insert({
       user_id: user.id,
@@ -64,14 +47,18 @@ export async function POST(request: NextRequest) {
     .select('id')
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return NextResponse.json({ id: data.id }, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {
-  const client = await getUserScopedClient();
-  const { data: { user } } = await client.auth.getUser();
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -85,16 +72,20 @@ export async function PATCH(request: NextRequest) {
     updateData.geometry = JSON.stringify(geojson);
   }
 
-  const { error } = await client.from('segments').update(updateData).eq('id', id);
+  const { error } = await supabase.from('segments').update(updateData).eq('id', id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return new NextResponse(null, { status: 204 });
 }
 
 export async function DELETE(request: NextRequest) {
-  const client = await getUserScopedClient();
-  const { data: { user } } = await client.auth.getUser();
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -102,9 +93,11 @@ export async function DELETE(request: NextRequest) {
 
   const { id } = await request.json();
 
-  const { error } = await client.from('segments').delete().eq('id', id);
+  const { error } = await supabase.from('segments').delete().eq('id', id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return new NextResponse(null, { status: 204 });
 }
