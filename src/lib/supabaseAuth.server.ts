@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-async function getServerClient() {
+export async function getSupabaseServerClient() {
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,12 +22,12 @@ async function getServerClient() {
           }
         },
       },
-    },
+    }
   );
 }
 
 export async function getUser() {
-  const supabase = await getServerClient();
+  const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
   if (error) {
     return null;
