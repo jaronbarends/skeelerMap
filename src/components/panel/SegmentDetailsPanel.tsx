@@ -43,7 +43,7 @@ export default function SegmentDetailsPanel({
   const currentRatingValue: number = segment.ratingValue;
   return (
     <Panel>
-      {mode === 'details' && (
+      {mode === 'segmentDetails' && (
         <>
           <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
             <h1 className="hln-2">Segment details</h1>
@@ -53,7 +53,7 @@ export default function SegmentDetailsPanel({
           </PanelBody>
         </>
       )}
-      {mode === 'edit' && (
+      {mode === 'editSegment' && (
         <>
           <PanelHeader onClose={onClose}>
             <h1 className="hln-2">Kwaliteit aanpassen</h1>
@@ -68,7 +68,7 @@ export default function SegmentDetailsPanel({
           </PanelBody>
         </>
       )}
-      {mode === 'delete' && (
+      {mode === 'deleteSegment' && (
         <>
           <PanelHeader onClose={onClose}>
             <h1 className="hln-2">Segment verwijderen?</h1>

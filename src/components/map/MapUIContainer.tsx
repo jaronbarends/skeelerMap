@@ -16,7 +16,7 @@ import styles from './MapUIContainer.module.css';
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false });
 
-export type MapUIMode = 'view' | 'details' | 'edit' | 'delete';
+export type MapUIMode = 'idle' | 'segmentDetails' | 'editSegment' | 'deleteSegment';
 
 type UIState = {
   mapUIMode: MapUIMode;
@@ -28,18 +28,18 @@ type UIState = {
 
 type UIAction =
   | { type: 'SELECT_SEGMENT'; payload: Segment }
-  | { type: 'UPDATE_SELECTED_SEGMENT_COORDINATES'; payload: { newCoordinates: [number, number][] } }
+  | { type: 'SEGMENT_COORDINATES_UPDATED'; payload: { newCoordinates: [number, number][] } }
   | { type: 'DESELECT_SEGMENT' }
-  | { type: 'START_CREATION' }
-  | { type: 'UPDATE_CONTROL_POINT_COUNT'; payload: number }
+  | { type: 'START_CREATE_SEGMENT' }
+  | { type: 'CONTROL_POINT_COUNT_UPDATED'; payload: number }
   | { type: 'SEGMENT_CREATED' }
-  | { type: 'CANCEL_CREATION' }
+  | { type: 'CANCEL_CREATE_SEGMENT' }
   | { type: 'SHOW_LOGIN_REQUIRED' }
   | { type: 'HIDE_LOGIN_REQUIRED' }
-  | { type: 'START_DELETE'; payload: Segment }
-  | { type: 'CANCEL_DELETE' }
-  | { type: 'CONFIRM_DELETE' }
-  | { type: 'EDIT_START' }
+  | { type: 'START_DELETE_SEGMENT'; payload: Segment }
+  | { type: 'CANCEL_DELETE_SEGMENT' }
+  | { type: 'SEGMENT_DELETED' }
+  | { type: 'START_EDIT_SEGMENT' }
   | { type: 'CANCEL_CURRENT_ACTION' };
 
 function uiReducer(state: UIState, action: UIAction): UIState {
@@ -49,28 +49,28 @@ function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         creationModeActive: false,
         controlPointCount: 0,
-        mapUIMode: 'view',
+        mapUIMode: 'idle',
         selectedSegment: null,
       };
     case 'SELECT_SEGMENT':
-      return { ...state, selectedSegment: action.payload, mapUIMode: 'details' };
+      return { ...state, selectedSegment: action.payload, mapUIMode: 'segmentDetails' };
     case 'DESELECT_SEGMENT':
-      return { ...state, selectedSegment: null, mapUIMode: 'view' };
-    case 'START_CREATION':
+      return { ...state, selectedSegment: null, mapUIMode: 'idle' };
+    case 'START_CREATE_SEGMENT':
       return {
         ...state,
         creationModeActive: true,
-        mapUIMode: 'edit',
+        mapUIMode: 'editSegment',
         loginRequiredPanelOpen: false,
       };
-    case 'UPDATE_CONTROL_POINT_COUNT':
+    case 'CONTROL_POINT_COUNT_UPDATED':
       return { ...state, controlPointCount: action.payload };
-    case 'CANCEL_CREATION':
+    case 'CANCEL_CREATE_SEGMENT':
       return {
         ...state,
         creationModeActive: false,
         controlPointCount: 0,
-        mapUIMode: 'view',
+        mapUIMode: 'idle',
         selectedSegment: null,
         loginRequiredPanelOpen: false,
       };
@@ -80,12 +80,12 @@ function uiReducer(state: UIState, action: UIAction): UIState {
         loginRequiredPanelOpen: true,
         creationModeActive: false,
         controlPointCount: 0,
-        mapUIMode: 'view',
+        mapUIMode: 'idle',
         selectedSegment: null,
       };
     case 'HIDE_LOGIN_REQUIRED':
       return { ...state, loginRequiredPanelOpen: false };
-    case 'UPDATE_SELECTED_SEGMENT_COORDINATES':
+    case 'SEGMENT_COORDINATES_UPDATED':
       if (!state.selectedSegment) {
         return state;
       }
@@ -93,18 +93,18 @@ function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         selectedSegment: { ...state.selectedSegment, coordinates: action.payload.newCoordinates },
       };
-    case 'EDIT_START':
-      return { ...state, mapUIMode: 'edit' };
-    case 'START_DELETE':
-      return { ...state, mapUIMode: 'delete' };
-    case 'CANCEL_DELETE':
-      return { ...state, mapUIMode: 'details' };
-    case 'CONFIRM_DELETE':
-      return { ...state, mapUIMode: 'view', selectedSegment: null };
+    case 'START_EDIT_SEGMENT':
+      return { ...state, mapUIMode: 'editSegment' };
+    case 'START_DELETE_SEGMENT':
+      return { ...state, mapUIMode: 'deleteSegment' };
+    case 'CANCEL_DELETE_SEGMENT':
+      return { ...state, mapUIMode: 'segmentDetails' };
+    case 'SEGMENT_DELETED':
+      return { ...state, mapUIMode: 'idle', selectedSegment: null };
     case 'CANCEL_CURRENT_ACTION':
       return {
         ...state,
-        mapUIMode: 'view',
+        mapUIMode: 'idle',
         selectedSegment: null,
         controlPointCount: 0,
         creationModeActive: false,
@@ -125,7 +125,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const [segments, setSegments] = useState<Segment[]>([]);
 
   const initialUiState: UIState = {
-    mapUIMode: 'view',
+    mapUIMode: 'idle',
     selectedSegment: null,
     controlPointCount: 0,
     creationModeActive: false,
@@ -141,7 +141,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       if (event.key === 'Delete') {
         const selectedSegment = selectedSegmentRef.current;
         if (selectedSegment && currentUserId !== null && selectedSegment.userId === currentUserId) {
-          uiDispatch({ type: 'START_DELETE', payload: selectedSegment });
+          uiDispatch({ type: 'START_DELETE_SEGMENT', payload: selectedSegment });
         }
       }
     },
@@ -237,7 +237,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   }
 
   function handleControlPointCountChange(count: number) {
-    uiDispatch({ type: 'UPDATE_CONTROL_POINT_COUNT', payload: count });
+    uiDispatch({ type: 'CONTROL_POINT_COUNT_UPDATED', payload: count });
   }
 
   function handleStartCreationClick() {
@@ -245,7 +245,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       uiDispatch({ type: 'SHOW_LOGIN_REQUIRED' });
       return;
     }
-    uiDispatch({ type: 'START_CREATION' });
+    uiDispatch({ type: 'START_CREATE_SEGMENT' });
   }
 
   function handleLoginRequiredClose() {
@@ -254,7 +254,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
   function handleCreationCancel() {
     mapRef.current?.cancelCreation();
-    uiDispatch({ type: 'CANCEL_CREATION' });
+    uiDispatch({ type: 'CANCEL_CREATE_SEGMENT' });
   }
 
   async function handleCreateSegment(ratingValue: RatingValue) {
@@ -295,7 +295,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   }
 
   function handleEditStart() {
-    uiDispatch({ type: 'EDIT_START' });
+    uiDispatch({ type: 'START_EDIT_SEGMENT' });
   }
 
   async function handleRatingUpdate(ratingValue: RatingValue) {
@@ -319,7 +319,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     setSegments((prev) =>
       prev.map((s) => (s.id === segmentId ? { ...s, coordinates: newCoordinates } : s))
     );
-    uiDispatch({ type: 'UPDATE_SELECTED_SEGMENT_COORDINATES', payload: { newCoordinates } });
+    uiDispatch({ type: 'SEGMENT_COORDINATES_UPDATED', payload: { newCoordinates } });
   }
 
   async function handleSegmentDragEnd(segmentId: string, newCoordinates: [number, number][]) {
@@ -346,11 +346,11 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       return;
     }
     (document.activeElement as HTMLElement)?.blur();
-    uiDispatch({ type: 'START_DELETE', payload: uiState.selectedSegment });
+    uiDispatch({ type: 'START_DELETE_SEGMENT', payload: uiState.selectedSegment });
   }
 
   function handleDeleteCancel() {
-    uiDispatch({ type: 'CANCEL_DELETE' });
+    uiDispatch({ type: 'CANCEL_DELETE_SEGMENT' });
   }
 
   async function handleDeleteConfirm() {
@@ -360,7 +360,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       setIsPending(true);
       await removeSegment(segment.id);
       setSegments((prev) => prev.filter((s) => s.id !== segment.id));
-      uiDispatch({ type: 'CONFIRM_DELETE' });
+      uiDispatch({ type: 'SEGMENT_DELETED' });
       setIsPending(false);
     } catch (error) {
       setIsPending(false);
