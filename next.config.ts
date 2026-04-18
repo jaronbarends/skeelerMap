@@ -2,9 +2,13 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   webpack(config) {
-    const fileLoaderRule = config.module.rules.find(
-      (rule: { test?: { test?: (s: string) => boolean } }) => rule.test?.test?.('.svg')
-    );
+    const fileLoaderRule = config.module.rules.find(isWebpackRuleWithSvgTest);
+
+    if (!fileLoaderRule) {
+      return config;
+    }
+
+    const issuer = fileLoaderRule.issuer;
 
     config.module.rules.push(
       {
@@ -14,8 +18,8 @@ const nextConfig: NextConfig = {
       },
       {
         test: /\.svg$/i,
-        issuer: fileLoaderRule.issuer,
-        resourceQuery: { not: [...fileLoaderRule.resourceQuery.not, /url/] },
+        ...(issuer !== undefined ? { issuer } : {}),
+        resourceQuery: { not: /url/ },
         use: ['@svgr/webpack'],
       }
     );
@@ -25,5 +29,20 @@ const nextConfig: NextConfig = {
     return config;
   },
 };
+
+// Locates Next's built-in SVG/file rule so we can exclude plain imports from it and route them to SVGR instead.
+function isWebpackRuleWithSvgTest(rule: unknown): rule is Record<string, unknown> {
+  if (typeof rule !== 'object' || rule === null || !('test' in rule)) {
+    return false;
+  }
+  const test = (rule as { test?: unknown }).test;
+  if (test instanceof RegExp) {
+    return test.test('.svg');
+  }
+  if (typeof test === 'object' && test !== null && typeof (test as { test?: unknown }).test === 'function') {
+    return (test as { test: (s: string) => boolean }).test('.svg');
+  }
+  return false;
+}
 
 export default nextConfig;
