@@ -3,9 +3,9 @@
 import L from 'leaflet';
 import { useCallback, useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 
-import { Segment } from '@/lib/segments';
-
 import type { MapUIMode } from '@/lib/mapUIMode';
+import type { Marker } from '@/lib/markers';
+import { Segment } from '@/lib/segments';
 import { useMapInit } from './useMapInit';
 import { useSegmentCreation } from './useSegmentCreation';
 import { useSegmentLayers } from './useSegmentLayers';
@@ -26,9 +26,13 @@ interface MapProps {
   mode: MapUIMode;
   fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
   segments: Segment[];
+  markers: Marker[];
   selectedSegment: Segment | null;
+  pendingMarkerLocation: { lat: number; lng: number } | null;
   onControlPointCountChange: (count: number) => void;
-  onMarkerLocationSelected: (lat: number, lng: number) => void;
+  onMapMarkerPlace: (lat: number, lng: number) => void;
+  onMarkerSelect: (marker: Marker) => void;
+  onMarkerDeselect: () => void;
   onSegmentSelect: (segment: Segment) => void;
   onSegmentDeselect: () => void;
   onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
@@ -42,9 +46,13 @@ export default function MapView({
   mode,
   fetchSegments,
   segments,
+  markers,
   selectedSegment,
+  pendingMarkerLocation,
   onControlPointCountChange,
-  onMarkerLocationSelected,
+  onMapMarkerPlace,
+  onMarkerSelect,
+  onMarkerDeselect,
   onSegmentSelect,
   onSegmentDeselect,
   onSegmentDragUpdate,
@@ -59,7 +67,7 @@ export default function MapView({
   const handleMapClick = useCallback(
     (latlng: L.LatLng) => {
       if (mode === 'placeMarker') {
-        onMarkerLocationSelected(latlng.lat, latlng.lng);
+        onMapMarkerPlace(latlng.lat, latlng.lng);
         return;
       }
       if (creationModeActive) {
@@ -68,8 +76,13 @@ export default function MapView({
         onSegmentDeselect();
       }
     },
-    [creationModeActive, mode, onMarkerLocationSelected, onSegmentDeselect]
+    [creationModeActive, mode, onMapMarkerPlace, onSegmentDeselect]
   );
+
+  void markers;
+  void pendingMarkerLocation;
+  void onMarkerSelect;
+  void onMarkerDeselect;
 
   const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchSegments, handleMapClick);
   const { addControlPoint, cancelCreation, getSegmentCoords } = useSegmentCreation(
