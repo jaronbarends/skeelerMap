@@ -68,7 +68,8 @@ export function useSegmentLayers(
       if (!polyline) {
         renderSegment(segment, map);
       } else {
-        const color = mapColors.rating[String(segment.ratingValue) as keyof typeof mapColors.rating];
+        const color =
+          mapColors.rating[String(segment.ratingValue) as keyof typeof mapColors.rating];
         if (polyline.options.color !== color) {
           polyline.setStyle({ color });
         }
