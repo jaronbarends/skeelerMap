@@ -15,9 +15,13 @@ export async function createMarker(data: {
   lat: number;
   lng: number;
 }): Promise<{ id: string }> {
+  const sanitizedData = {
+    ...data,
+    description: stripTags(data.description),
+  };
   const res = await fetch('/api/markers', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(sanitizedData),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -35,9 +39,13 @@ export async function updateMarker(
   id: string,
   data: { type: MarkerType; description: string | null }
 ): Promise<void> {
+  const sanitizedData = {
+    ...data,
+    description: stripTags(data.description),
+  };
   const res = await fetch('/api/markers', {
     method: 'PATCH',
-    body: JSON.stringify({ id, ...data }),
+    body: JSON.stringify({ id, ...sanitizedData }),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -64,4 +72,11 @@ export async function removeMarker(id: string): Promise<void> {
     console.error(body.error);
     throw new Error('Kan de marker niet verwijderen');
   }
+}
+
+function stripTags(html: string | null): string | null {
+  if (!html) {
+    return null;
+  }
+  return html.replace(/<[^>]*>?/g, '');
 }

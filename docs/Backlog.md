@@ -170,6 +170,10 @@ Explain the 5 rating levels to the user.
 
 ### Logo / branding
 
+### Add max length to marker description
+
+Add a max length; include a counter showing how many characters are left
+
 ### FAQ or other pages
 
 Deferred until core app is stable.
