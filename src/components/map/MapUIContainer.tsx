@@ -325,12 +325,12 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   }
 
   function handleCreationCancel() {
-    mapRef.current?.cancelCreation();
+    mapRef.current?.cancelCreateSegment();
     uiDispatch({ type: 'CANCEL_CREATE_SEGMENT' });
   }
 
   function handleAddMarkerStart() {
-    mapRef.current?.cancelCreation();
+    mapRef.current?.cancelCreateSegment();
     uiDispatch({ type: 'START_CREATE_MARKER' });
   }
 

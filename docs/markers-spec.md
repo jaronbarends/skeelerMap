@@ -10,14 +10,14 @@ Users can place point markers on the map to flag hazards. Markers are independen
 
 ### Supabase table: `markers`
 
-| Column        | Type                     | Notes                           |
-| ------------- | ------------------------ | ------------------------------- |
-| `id`          | `uuid`                   | PK, default `gen_random_uuid()` |
-| `user_id`     | `uuid`                   | FK to `auth.users`, not null    |
-| `location`    | `geography(Point, 4326)` | PostGIS point                   |
+| Column        | Type                     | Notes                               |
+| ------------- | ------------------------ | ----------------------------------- |
+| `id`          | `uuid`                   | PK, default `gen_random_uuid()`     |
+| `user_id`     | `uuid`                   | FK to `auth.users`, not null        |
+| `location`    | `geography(Point, 4326)` | PostGIS point                       |
 | `type`        | `text`                   | `'danger' \| 'slope' \| 'crossing'` |
-| `description` | `text`                   | nullable                        |
-| `created_at`  | `timestamptz`            | default `now()`                 |
+| `description` | `text`                   | nullable                            |
+| `created_at`  | `timestamptz`            | default `now()`                     |
 
 ### RLS policies (same pattern as `segments`)
 
@@ -38,9 +38,9 @@ New file: `src/lib/markers.ts`
 
 ```ts
 export const MARKER_TYPES = {
-  danger:   { iconName: 'trafficSignDanger',   title: 'Gevaarlijk punt' },
-  slope:    { iconName: 'trafficSignSlope',     title: 'Steile helling' },
-  crossing: { iconName: 'trafficSignCrossing',  title: 'Gevaarlijke kruising' },
+  danger: { iconName: 'trafficSignDanger', title: 'Gevaarlijk punt' },
+  slope: { iconName: 'trafficSignSlope', title: 'Steile helling' },
+  crossing: { iconName: 'trafficSignCrossing', title: 'Gevaarlijke kruising' },
 } as const;
 
 export type MarkerType = keyof typeof MARKER_TYPES;
@@ -77,6 +77,7 @@ Uses `getSupabaseServerClient()` from `src/lib/supabaseAuth.server.ts` — same 
 Client-side `fetch` wrappers — same pattern as `segmentService.ts`.
 
 Functions:
+
 - `fetchMarkers(abortSignal): Promise<Marker[]>`
 - `createMarker(data): Promise<{ id: string }>`
 - `updateMarker(id, data): Promise<void>`
@@ -88,12 +89,12 @@ Functions:
 
 Current modes renamed for clarity:
 
-| Old            | New                |
-| -------------- | ------------------ |
-| `'view'`       | `'idle'`           |
-| `'details'`    | `'segmentDetails'` |
-| `'edit'`       | `'editSegment'`    |
-| `'delete'`     | `'deleteSegment'`  |
+| Old         | New                |
+| ----------- | ------------------ |
+| `'view'`    | `'idle'`           |
+| `'details'` | `'segmentDetails'` |
+| `'edit'`    | `'editSegment'`    |
+| `'delete'`  | `'deleteSegment'`  |
 
 New marker modes added:
 
@@ -109,16 +110,16 @@ New marker modes added:
 
 ### Renamed (segments)
 
-| Old                                   | New                            |
-| ------------------------------------- | ------------------------------ |
-| `START_CREATION`                      | `START_CREATE_SEGMENT`         |
-| `CANCEL_CREATION`                     | `CANCEL_CREATE_SEGMENT`        |
-| `EDIT_START`                          | `START_EDIT_SEGMENT`           |
-| `START_DELETE`                        | `START_DELETE_SEGMENT`         |
-| `CANCEL_DELETE`                       | `CANCEL_DELETE_SEGMENT`        |
-| `CONFIRM_DELETE`                      | `SEGMENT_DELETED`              |
-| `UPDATE_SELECTED_SEGMENT_COORDINATES` | `SEGMENT_COORDINATES_UPDATED`  |
-| `UPDATE_CONTROL_POINT_COUNT`          | `CONTROL_POINT_COUNT_UPDATED`  |
+| Old                                   | New                           |
+| ------------------------------------- | ----------------------------- |
+| `START_CREATION`                      | `START_CREATE_SEGMENT`        |
+| `CANCEL_CREATION`                     | `CANCEL_CREATE_SEGMENT`       |
+| `EDIT_START`                          | `START_EDIT_SEGMENT`          |
+| `START_DELETE`                        | `START_DELETE_SEGMENT`        |
+| `CANCEL_DELETE`                       | `CANCEL_DELETE_SEGMENT`       |
+| `CONFIRM_DELETE`                      | `SEGMENT_DELETED`             |
+| `UPDATE_SELECTED_SEGMENT_COORDINATES` | `SEGMENT_COORDINATES_UPDATED` |
+| `UPDATE_CONTROL_POINT_COUNT`          | `CONTROL_POINT_COUNT_UPDATED` |
 
 `SEGMENT_CREATED` is kept as-is.
 
@@ -147,15 +148,15 @@ New marker modes added:
 
 The panel now receives an explicit `mode` prop instead of `isReadyToRate`. `MapUIContainer` is the single source of truth for what is displayed.
 
-| Mode            | Content                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------ |
-| `'drawSegment'` | Instruction text + inline "voeg een waarschuwing toe" link. Link hidden once 1+ points placed.  |
-| `'rateSegment'` | Rating buttons (2+ points placed)                                                                |
-| `'placeMarker'` | Placement instruction + "Annuleren" button                                                       |
-| `'markerForm'`  | Icon picker + description field + "Opslaan" + "Annuleren" button. Temporary marker on map.      |
+| Mode            | Content                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| `'drawSegment'` | Instruction text + inline "voeg een waarschuwing toe" link. Link hidden once 1+ points placed. |
+| `'rateSegment'` | Rating buttons (2+ points placed)                                                              |
+| `'placeMarker'` | Placement instruction + "Annuleren" button                                                     |
+| `'markerForm'`  | Icon picker + description field + "Opslaan" + "Annuleren" button. Temporary marker on map.     |
 
 **Transition: `'drawSegment'` → `'placeMarker'`**
-When the user taps "voeg een waarschuwing toe", any placed control points are cleared via `mapRef.current?.cancelCreation()` before dispatching `START_CREATE_MARKER`.
+When the user taps "voeg een waarschuwing toe", any placed control points are cleared via `mapRef.current?.cancelCreateSegment()` before dispatching `START_CREATE_MARKER`.
 
 **"Annuleren" behavior**
 Both `'placeMarker'` and `'markerForm'` show a secondary "Annuleren" button. Both dispatch `CANCEL_CREATE_MARKER`, which returns to `'drawSegment'`. They are visually and functionally identical.

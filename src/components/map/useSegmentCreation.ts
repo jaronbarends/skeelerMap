@@ -20,7 +20,7 @@ export function useSegmentCreation(
   onControlPointCountChange: (count: number) => void
 ): {
   addControlPoint: (latlng: L.LatLng) => void;
-  cancelCreation: () => void;
+  removeTempSegment: () => void;
   getSegmentCoords: () => [number, number][];
 } {
   const tempSegmentRef = useRef<TempSegment>({
@@ -30,7 +30,7 @@ export function useSegmentCreation(
     routeCoordinates: [],
   });
 
-  return { addControlPoint, cancelCreation, getSegmentCoords };
+  return { addControlPoint, removeTempSegment, getSegmentCoords };
 
   function addControlPoint(latlng: L.LatLng) {
     const map = mapRef.current;
@@ -75,7 +75,7 @@ export function useSegmentCreation(
     tempSegment.routeCoordinates[legIndex] = null;
 
     fetchRoute(from, to).then((coords) => {
-      // If cancelCreation was called, tempSegmentRef.current is a new object and the slot is gone
+      // If removeTempSegment was called, tempSegmentRef.current is a new object and the slot is gone
       if (tempSegmentRef.current.routeCoordinates[legIndex] === undefined) return;
       tempSegment.routeCoordinates[legIndex] = coords;
       const polyline = L.polyline(coords, {
@@ -87,7 +87,7 @@ export function useSegmentCreation(
     });
   }
 
-  function cancelCreation() {
+  function removeTempSegment() {
     const tempSegment = tempSegmentRef.current;
     const map = mapRef.current;
     if (map) {

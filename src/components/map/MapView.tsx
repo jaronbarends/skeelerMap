@@ -5,8 +5,9 @@ import { useCallback, useEffect, useImperativeHandle, useRef, type Ref } from 'r
 import { renderToStaticMarkup } from 'react-dom/server.browser';
 import { FaLocationDot } from 'react-icons/fa6';
 
-import type { MapUIMode } from '@/lib/mapUIMode';
 import { getIconByName } from '@/lib/getIconByName';
+import type { MapUIMode } from '@/lib/mapUIMode';
+import { isCreateSegmentMode } from '@/lib/mapUIMode';
 import type { Marker } from '@/lib/markers';
 import { MARKER_TYPES } from '@/lib/markers';
 import { Segment } from '@/lib/segments';
@@ -19,7 +20,7 @@ import { useSegmentSelection } from './useSegmentSelection';
 import styles from './MapView.module.css';
 
 export interface MapHandle {
-  cancelCreation: () => void;
+  cancelCreateSegment: () => void;
   getSegmentCoords: () => [number, number][];
   onSegmentSaved: () => void;
   centerOnLocation: () => void;
@@ -84,18 +85,18 @@ export default function MapView({
         onMarkerLocationClicked(latlng.lat, latlng.lng);
         return;
       }
-      if (creationModeActive) {
+      if (isCreateSegmentMode(mode)) {
         addControlPointRef.current(latlng);
       } else {
         onMarkerDeselect();
         onSegmentDeselect();
       }
     },
-    [creationModeActive, mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect]
+    [mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect]
   );
 
   const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchSegments, handleMapClick);
-  const { addControlPoint, cancelCreation, getSegmentCoords } = useSegmentCreation(
+  const { addControlPoint, removeTempSegment, getSegmentCoords } = useSegmentCreation(
     mapRef,
     onControlPointCountChange
   );
@@ -201,9 +202,9 @@ export default function MapView({
 
   // expose methods to the ref in parent component
   useImperativeHandle(ref, () => ({
-    cancelCreation,
+    cancelCreateSegment: removeTempSegment,
     getSegmentCoords,
-    onSegmentSaved: cancelCreation,
+    onSegmentSaved: removeTempSegment,
     centerOnLocation,
   }));
 
