@@ -55,12 +55,12 @@ export function useSegmentSelection(
     const endCoord = segment.coordinates[segment.coordinates.length - 1];
 
     const startMarker = L.marker(startCoord, {
-      icon: createEndpointIcon(segment.ratingValue),
+      icon: createControlMarkerIcon(segment.ratingValue),
       draggable: dragEnabled,
     }).addTo(map);
 
     const endMarker = L.marker(endCoord, {
-      icon: createEndpointIcon(segment.ratingValue),
+      icon: createControlMarkerIcon(segment.ratingValue),
       draggable: dragEnabled,
     }).addTo(map);
 
@@ -110,8 +110,7 @@ export function useSegmentSelection(
   }
 }
 
-// function createEndpointIcon(borderColor: string): L.DivIcon {
-function createEndpointIcon(ratingValue: number): L.DivIcon {
+function createControlMarkerIcon(ratingValue: number): L.DivIcon {
   const size = 16;
   const anchor = size / 2;
   return L.divIcon({

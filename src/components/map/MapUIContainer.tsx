@@ -210,29 +210,6 @@ function uiReducer(state: UIState, action: UIAction): UIState {
   }
 }
 
-function getMapUIModeForControlPointCount(
-  currentState: UIState,
-  newControlPointCount: number
-): MapUIMode {
-  if (!currentState.creationModeActive) {
-    return currentState.mapUIMode;
-  }
-
-  if (currentState.mapUIMode === 'placeMarker' || currentState.mapUIMode === 'markerForm') {
-    return currentState.mapUIMode;
-  }
-
-  if (currentState.mapUIMode !== 'drawSegment' && currentState.mapUIMode !== 'rateSegment') {
-    return currentState.mapUIMode;
-  }
-
-  if (newControlPointCount >= 2) {
-    return 'rateSegment';
-  }
-
-  return 'drawSegment';
-}
-
 export default function MapUIContainer({ currentUserId }: { currentUserId: string | null }) {
   const mapRef = useRef<MapHandle>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -286,6 +263,113 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     selectedSegmentRef.current = uiState.selectedSegment;
   }, [uiState.selectedSegment]);
 
+  return (
+    <div className={styles.component}>
+      <MapView
+        ref={mapRef}
+        creationModeActive={uiState.creationModeActive}
+        mode={uiState.mapUIMode}
+        fetchMapData={fetchMapData}
+        segments={segments}
+        markers={markers}
+        selectedSegment={uiState.selectedSegment}
+        pendingMarkerLocation={uiState.pendingMarkerLocation}
+        onControlPointCountChange={handleControlPointCountChange}
+        onMarkerLocationClicked={handleMarkerLocationClicked}
+        onMarkerSelect={handleSelectMarker}
+        onMarkerDeselect={handleDeselectMarker}
+        onSegmentSelect={handleSegmentSelect}
+        onSegmentDeselect={handleSegmentDeselect}
+        onSegmentDragUpdate={updateSegmentCoordinates}
+        onSegmentDragEnd={handleSegmentDragEnd}
+      />
+      <FabContainer>
+        <FabButton
+          onClick={handleClickCreateButton}
+          ariaLabel="Segment toevoegen"
+          disabled={
+            uiState.creationModeActive ||
+            uiState.selectedSegment !== null ||
+            uiState.selectedMarker !== null ||
+            uiState.loginRequiredPanelOpen
+          }
+          iconName="plus"
+          tooltip="Segment toevoegen"
+        />
+        <FabButton
+          onClick={() => mapRef.current?.centerOnLocation()}
+          ariaLabel="Centreer op locatie"
+          disabled={false}
+          iconName="userLocation"
+          tooltip="Centreer op locatie"
+        />
+      </FabContainer>
+
+      {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
+
+      {uiState.creationModeActive && (
+        <>
+          {isCreateSegmentMode(uiState.mapUIMode) && (
+            <SegmentCreationPanel
+              mode={uiState.mapUIMode}
+              isPending={isPending}
+              onCancel={handleCancelCreateSegment}
+              onRatingSelect={handleSaveNewSegment}
+              onStartCreateMarker={handleStartCreateMarker}
+            />
+          )}
+
+          {isCreateMarkerMode(uiState.mapUIMode) && (
+            <MarkerCreationPanel
+              mode={uiState.mapUIMode}
+              onCancel={handleCancelCreateMarker}
+              onSaveMarker={handleSaveNewMarker}
+            />
+          )}
+        </>
+      )}
+
+      {uiState.selectedSegment && (
+        <SegmentDetailsPanel
+          segment={uiState.selectedSegment}
+          mode={uiState.mapUIMode}
+          currentUserOwnsSegment={segmentIsOwnedByCurrentUser(uiState.selectedSegment)}
+          onClose={handleDetailsClose}
+          onEditStart={
+            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined
+          }
+          onDeleteStart={
+            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleDeleteStart : undefined
+          }
+          onDeleteCancel={handleDeleteCancel}
+          onDeleteConfirm={handleDeleteConfirm}
+          onRatingSelect={handleRatingUpdate}
+          isPending={isPending}
+        />
+      )}
+
+      {uiState.selectedMarker && isMarkerDetailsMode(uiState.mapUIMode) && (
+        <MarkerDetailsPanel
+          marker={uiState.selectedMarker}
+          mode={uiState.mapUIMode}
+          currentUserOwnsMarker={markerIsOwnedByCurrentUser(uiState.selectedMarker)}
+          onClose={handleCloseMarkerDetails}
+          onEditStart={
+            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartEditMarker : undefined
+          }
+          onDeleteStart={
+            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartDeleteMarker : undefined
+          }
+          onEditCancel={handleCancelEditMarker}
+          onDeleteCancel={handleCancelDeleteMarker}
+          onDeleteConfirm={handleConfirmDeleteMarker}
+          onSave={handleMarkerUpdate}
+          isPending={isPending}
+        />
+      )}
+    </div>
+  );
+
   function segmentIsOwnedByCurrentUser(segment: Segment): boolean {
     return currentUserId !== null && segment.userId === currentUserId;
   }
@@ -302,7 +386,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'MARKER_LOCATION_CLICKED', payload: { lat, lng } });
   }
 
-  function handleStartCreation() {
+  function handleClickCreateButton() {
     if (currentUserId === null) {
       uiDispatch({ type: 'SHOW_LOGIN_REQUIRED' });
       return;
@@ -542,111 +626,27 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       alert('Kan het segment niet verwijderen');
     }
   }
+}
 
-  return (
-    <div className={styles.component}>
-      <MapView
-        ref={mapRef}
-        creationModeActive={uiState.creationModeActive}
-        mode={uiState.mapUIMode}
-        fetchMapData={fetchMapData}
-        segments={segments}
-        markers={markers}
-        selectedSegment={uiState.selectedSegment}
-        pendingMarkerLocation={uiState.pendingMarkerLocation}
-        onControlPointCountChange={handleControlPointCountChange}
-        onMarkerLocationClicked={handleMarkerLocationClicked}
-        onMarkerSelect={handleSelectMarker}
-        onMarkerDeselect={handleDeselectMarker}
-        onSegmentSelect={handleSegmentSelect}
-        onSegmentDeselect={handleSegmentDeselect}
-        onSegmentDragUpdate={updateSegmentCoordinates}
-        onSegmentDragEnd={handleSegmentDragEnd}
-      />
-      <FabContainer>
-        <FabButton
-          onClick={handleStartCreation}
-          ariaLabel="Segment toevoegen"
-          disabled={
-            uiState.creationModeActive ||
-            uiState.selectedSegment !== null ||
-            uiState.selectedMarker !== null ||
-            uiState.loginRequiredPanelOpen
-          }
-          iconName="plus"
-          tooltip="Segment toevoegen"
-        />
-        <FabButton
-          onClick={() => mapRef.current?.centerOnLocation()}
-          ariaLabel="Centreer op locatie"
-          disabled={false}
-          iconName="userLocation"
-          tooltip="Centreer op locatie"
-        />
-      </FabContainer>
+function getMapUIModeForControlPointCount(
+  currentState: UIState,
+  newControlPointCount: number
+): MapUIMode {
+  if (!currentState.creationModeActive) {
+    return currentState.mapUIMode;
+  }
 
-      {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
+  if (currentState.mapUIMode === 'placeMarker' || currentState.mapUIMode === 'markerForm') {
+    return currentState.mapUIMode;
+  }
 
-      {uiState.creationModeActive && (
-        <>
-          {isCreateSegmentMode(uiState.mapUIMode) && (
-            <SegmentCreationPanel
-              mode={uiState.mapUIMode}
-              isPending={isPending}
-              onCancel={handleCancelCreateSegment}
-              onRatingSelect={handleSaveNewSegment}
-              onStartCreateMarker={handleStartCreateMarker}
-            />
-          )}
+  if (currentState.mapUIMode !== 'drawSegment' && currentState.mapUIMode !== 'rateSegment') {
+    return currentState.mapUIMode;
+  }
 
-          {isCreateMarkerMode(uiState.mapUIMode) && (
-            <MarkerCreationPanel
-              mode={uiState.mapUIMode}
-              onCancel={handleCancelCreateMarker}
-              onSaveMarker={handleSaveNewMarker}
-            />
-          )}
-        </>
-      )}
+  if (newControlPointCount >= 2) {
+    return 'rateSegment';
+  }
 
-      {uiState.selectedSegment && (
-        <SegmentDetailsPanel
-          segment={uiState.selectedSegment}
-          mode={uiState.mapUIMode}
-          currentUserOwnsSegment={segmentIsOwnedByCurrentUser(uiState.selectedSegment)}
-          onClose={handleDetailsClose}
-          onEditStart={
-            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined
-          }
-          onDeleteStart={
-            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleDeleteStart : undefined
-          }
-          onDeleteCancel={handleDeleteCancel}
-          onDeleteConfirm={handleDeleteConfirm}
-          onRatingSelect={handleRatingUpdate}
-          isPending={isPending}
-        />
-      )}
-
-      {uiState.selectedMarker && isMarkerDetailsMode(uiState.mapUIMode) && (
-        <MarkerDetailsPanel
-          marker={uiState.selectedMarker}
-          mode={uiState.mapUIMode}
-          currentUserOwnsMarker={markerIsOwnedByCurrentUser(uiState.selectedMarker)}
-          onClose={handleCloseMarkerDetails}
-          onEditStart={
-            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartEditMarker : undefined
-          }
-          onDeleteStart={
-            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartDeleteMarker : undefined
-          }
-          onEditCancel={handleCancelEditMarker}
-          onDeleteCancel={handleCancelDeleteMarker}
-          onDeleteConfirm={handleConfirmDeleteMarker}
-          onSave={handleMarkerUpdate}
-          isPending={isPending}
-        />
-      )}
-    </div>
-  );
+  return 'drawSegment';
 }
