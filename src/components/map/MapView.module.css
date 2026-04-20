@@ -13,3 +13,16 @@
   border: 3px solid var(--rating-color);
   cursor: move;
 }
+
+.mapMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pendingMapMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+}

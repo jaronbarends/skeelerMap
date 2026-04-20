@@ -11,8 +11,8 @@ import MarkerDetailsPanel from '@/components/panel/MarkerDetailsPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
 import { isCreateMarkerMode, isMarkerDetailsMode, type MapUIMode } from '@/lib/mapUIMode';
-import type { Marker, MarkerType } from '@/lib/markers';
 import { createMarker, fetchMarkers, removeMarker, updateMarker } from '@/lib/markerService';
+import type { Marker, MarkerType } from '@/lib/markers';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
 import type { RatingValue, Segment } from '@/lib/segments';
 
@@ -308,7 +308,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'CONTROL_POINT_COUNT_UPDATED', payload: count });
   }
 
-  function handleMapMarkerPlace(lat: number, lng: number) {
+  function handleMarkerLocationClicked(lat: number, lng: number) {
     uiDispatch({ type: 'MARKER_LOCATION_CLICKED', payload: { lat, lng } });
   }
 
@@ -567,7 +567,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         selectedSegment={uiState.selectedSegment}
         pendingMarkerLocation={uiState.pendingMarkerLocation}
         onControlPointCountChange={handleControlPointCountChange}
-        onMapMarkerPlace={handleMapMarkerPlace}
+        onMarkerLocationClicked={handleMarkerLocationClicked}
         onMarkerSelect={handleMarkerSelect}
         onMarkerDeselect={handleMarkerDeselect}
         onSegmentSelect={handleSegmentSelect}
