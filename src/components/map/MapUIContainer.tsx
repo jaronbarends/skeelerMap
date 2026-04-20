@@ -7,10 +7,16 @@ import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
 import type { MapHandle } from '@/components/map/MapView';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
+import MarkerCreationPanel from '@/components/panel/MarkerCreationPanel';
 import MarkerDetailsPanel from '@/components/panel/MarkerDetailsPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
-import { isCreateMarkerMode, isMarkerDetailsMode, type MapUIMode } from '@/lib/mapUIMode';
+import {
+  isCreateMarkerMode,
+  isCreateSegmentMode,
+  isMarkerDetailsMode,
+  type MapUIMode,
+} from '@/lib/mapUIMode';
 import { createMarker, fetchMarkers, removeMarker, updateMarker } from '@/lib/markerService';
 import type { Marker, MarkerType } from '@/lib/markers';
 import { createSegment, fetchSegments, removeSegment, updateSegment } from '@/lib/segmentService';
@@ -245,23 +251,14 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   };
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
-  const fetchMarkersForMap = useCallback(async (abortSignal: AbortSignal): Promise<Marker[]> => {
-    const result = await fetchMarkers(abortSignal);
-    setMarkers(result);
-    return result;
+  const fetchMapData = useCallback(async (abortSignal: AbortSignal) => {
+    const [segmentsResult, markersResult] = await Promise.all([
+      fetchSegments(abortSignal),
+      fetchMarkers(abortSignal),
+    ]);
+    setSegments(segmentsResult);
+    setMarkers(markersResult);
   }, []);
-
-  const fetchSegmentsForMap = useCallback(
-    async (abortSignal: AbortSignal): Promise<Segment[]> => {
-      const [segmentResult] = await Promise.all([
-        fetchSegments(abortSignal),
-        fetchMarkersForMap(abortSignal),
-      ]);
-      setSegments(segmentResult);
-      return segmentResult;
-    },
-    [fetchMarkersForMap]
-  );
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -289,13 +286,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     selectedSegmentRef.current = uiState.selectedSegment;
   }, [uiState.selectedSegment]);
 
-  function getCreationPanelMode(state: UIState): MapUIMode {
-    if (isCreateMarkerMode(state.mapUIMode)) {
-      return state.mapUIMode;
-    }
-    return state.controlPointCount >= 2 ? 'rateSegment' : 'drawSegment';
-  }
-
   function segmentIsOwnedByCurrentUser(segment: Segment): boolean {
     return currentUserId !== null && segment.userId === currentUserId;
   }
@@ -312,7 +302,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'MARKER_LOCATION_CLICKED', payload: { lat, lng } });
   }
 
-  function handleStartCreationClick() {
+  function handleStartCreation() {
     if (currentUserId === null) {
       uiDispatch({ type: 'SHOW_LOGIN_REQUIRED' });
       return;
@@ -320,25 +310,25 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'START_CREATE_SEGMENT' });
   }
 
-  function handleLoginRequiredClose() {
+  function handleCloseLoginRequired() {
     uiDispatch({ type: 'HIDE_LOGIN_REQUIRED' });
   }
 
-  function handleCreationCancel() {
+  function handleCancelCreateSegment() {
     mapRef.current?.cancelCreateSegment();
     uiDispatch({ type: 'CANCEL_CREATE_SEGMENT' });
   }
 
-  function handleAddMarkerStart() {
+  function handleStartCreateMarker() {
     mapRef.current?.cancelCreateSegment();
     uiDispatch({ type: 'START_CREATE_MARKER' });
   }
 
-  function handleCancelMarker() {
+  function handleCancelCreateMarker() {
     uiDispatch({ type: 'CANCEL_CREATE_MARKER' });
   }
 
-  async function handleCreateMarker(type: MarkerType, description: string | null) {
+  async function handleSaveNewMarker(type: MarkerType, description: string | null) {
     const pendingLocation = uiState.pendingMarkerLocation;
     if (!pendingLocation || currentUserId === null) {
       return;
@@ -370,27 +360,27 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     }
   }
 
-  function handleMarkerSelect(marker: Marker) {
+  function handleSelectMarker(marker: Marker) {
     uiDispatch({ type: 'SELECT_MARKER', payload: marker });
   }
 
-  function handleMarkerDeselect() {
+  function handleDeselectMarker() {
     uiDispatch({ type: 'DESELECT_MARKER' });
   }
 
-  function handleMarkerDetailsClose() {
+  function handleCloseMarkerDetails() {
     uiDispatch({ type: 'DESELECT_MARKER' });
   }
 
-  function handleMarkerEditStart() {
+  function handleStartEditMarker() {
     uiDispatch({ type: 'START_EDIT_MARKER' });
   }
 
-  function handleMarkerEditCancel() {
+  function handleCancelEditMarker() {
     uiDispatch({ type: 'CANCEL_EDIT_MARKER' });
   }
 
-  function handleMarkerDeleteStart() {
+  function handleStartDeleteMarker() {
     if (!uiState.selectedMarker) {
       return;
     }
@@ -398,11 +388,11 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'START_DELETE_MARKER' });
   }
 
-  function handleMarkerDeleteCancel() {
+  function handleCancelDeleteMarker() {
     uiDispatch({ type: 'CANCEL_DELETE_MARKER' });
   }
 
-  async function handleMarkerDeleteConfirm() {
+  async function handleConfirmDeleteMarker() {
     const marker = uiState.selectedMarker;
     if (!marker) {
       return;
@@ -440,7 +430,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     }
   }
 
-  async function handleCreateSegment(ratingValue: RatingValue) {
+  async function handleSaveNewSegment(ratingValue: RatingValue) {
     if (!mapRef.current) return;
     try {
       const coords = mapRef.current.getSegmentCoords();
@@ -553,23 +543,21 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     }
   }
 
-  const creationPanelMode = getCreationPanelMode(uiState);
-
   return (
     <div className={styles.component}>
       <MapView
         ref={mapRef}
         creationModeActive={uiState.creationModeActive}
         mode={uiState.mapUIMode}
-        fetchSegments={fetchSegmentsForMap}
+        fetchMapData={fetchMapData}
         segments={segments}
         markers={markers}
         selectedSegment={uiState.selectedSegment}
         pendingMarkerLocation={uiState.pendingMarkerLocation}
         onControlPointCountChange={handleControlPointCountChange}
         onMarkerLocationClicked={handleMarkerLocationClicked}
-        onMarkerSelect={handleMarkerSelect}
-        onMarkerDeselect={handleMarkerDeselect}
+        onMarkerSelect={handleSelectMarker}
+        onMarkerDeselect={handleDeselectMarker}
         onSegmentSelect={handleSegmentSelect}
         onSegmentDeselect={handleSegmentDeselect}
         onSegmentDragUpdate={updateSegmentCoordinates}
@@ -577,7 +565,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       />
       <FabContainer>
         <FabButton
-          onClick={handleStartCreationClick}
+          onClick={handleStartCreation}
           ariaLabel="Segment toevoegen"
           disabled={
             uiState.creationModeActive ||
@@ -597,18 +585,28 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         />
       </FabContainer>
 
-      {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleLoginRequiredClose} />}
+      {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
 
       {uiState.creationModeActive && (
-        <SegmentCreationPanel
-          mode={creationPanelMode}
-          isPending={isPending}
-          onCancel={handleCreationCancel}
-          onRatingSelect={handleCreateSegment}
-          onAddMarkerStart={handleAddMarkerStart}
-          onCancelMarker={handleCancelMarker}
-          onSaveMarker={handleCreateMarker}
-        />
+        <>
+          {isCreateSegmentMode(uiState.mapUIMode) && (
+            <SegmentCreationPanel
+              mode={uiState.mapUIMode}
+              isPending={isPending}
+              onCancel={handleCancelCreateSegment}
+              onRatingSelect={handleSaveNewSegment}
+              onStartCreateMarker={handleStartCreateMarker}
+            />
+          )}
+
+          {isCreateMarkerMode(uiState.mapUIMode) && (
+            <MarkerCreationPanel
+              mode={uiState.mapUIMode}
+              onCancel={handleCancelCreateMarker}
+              onSaveMarker={handleSaveNewMarker}
+            />
+          )}
+        </>
       )}
 
       {uiState.selectedSegment && (
@@ -635,16 +633,16 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           marker={uiState.selectedMarker}
           mode={uiState.mapUIMode}
           currentUserOwnsMarker={markerIsOwnedByCurrentUser(uiState.selectedMarker)}
-          onClose={handleMarkerDetailsClose}
+          onClose={handleCloseMarkerDetails}
           onEditStart={
-            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleMarkerEditStart : undefined
+            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartEditMarker : undefined
           }
           onDeleteStart={
-            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleMarkerDeleteStart : undefined
+            markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartDeleteMarker : undefined
           }
-          onEditCancel={handleMarkerEditCancel}
-          onDeleteCancel={handleMarkerDeleteCancel}
-          onDeleteConfirm={handleMarkerDeleteConfirm}
+          onEditCancel={handleCancelEditMarker}
+          onDeleteCancel={handleCancelDeleteMarker}
+          onDeleteConfirm={handleConfirmDeleteMarker}
           onSave={handleMarkerUpdate}
           isPending={isPending}
         />

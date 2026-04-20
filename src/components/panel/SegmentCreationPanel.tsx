@@ -1,9 +1,6 @@
-import Button from '@/components/button/Button';
-import { isCreateMarkerMode, isCreateSegmentMode, type MapUIMode } from '@/lib/mapUIMode';
-import type { MarkerType } from '@/lib/markers';
+import { isCreateSegmentMode, type MapUIMode } from '@/lib/mapUIMode';
 import type { RatingValue } from '@/lib/segments';
 
-import MarkerForm from './MarkerForm';
 import Panel from './Panel';
 import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
@@ -16,9 +13,7 @@ interface Props {
   isPending: boolean;
   onCancel: () => void;
   onRatingSelect: (ratingValue: RatingValue) => void;
-  onAddMarkerStart: () => void;
-  onCancelMarker: () => void;
-  onSaveMarker: (type: MarkerType, description: string | null) => void;
+  onStartCreateMarker: () => void;
 }
 
 export default function SegmentCreationPanel({
@@ -26,20 +21,16 @@ export default function SegmentCreationPanel({
   isPending,
   onCancel,
   onRatingSelect,
-  onAddMarkerStart,
-  onCancelMarker,
-  onSaveMarker,
+  onStartCreateMarker,
 }: Props) {
-  if (!isCreateSegmentMode(mode) && !isCreateMarkerMode(mode)) {
+  if (!isCreateSegmentMode(mode)) {
     return null;
   }
-
-  const title = isCreateSegmentMode(mode) ? 'Segment toevoegen' : 'Waarschuwing toevoegen';
 
   return (
     <Panel>
       <PanelHeader onClose={onCancel}>
-        <h1 className="hln-2">{title}</h1>
+        <h1 className="hln-2">Segment toevoegen</h1>
       </PanelHeader>
       <PanelBody>
         {mode === 'drawSegment' && (
@@ -48,7 +39,11 @@ export default function SegmentCreationPanel({
               Klik minstens 2 punten om een segment te maken
               <br />
               of{' '}
-              <button className={styles.inlineLinkButton} type="button" onClick={onAddMarkerStart}>
+              <button
+                className={styles.inlineLinkButton}
+                type="button"
+                onClick={onStartCreateMarker}
+              >
                 voeg een waarschuwing toe
               </button>
             </p>
@@ -60,22 +55,6 @@ export default function SegmentCreationPanel({
             isPending={isPending}
             isReadyToRate={true}
             onRatingSelect={onRatingSelect}
-          />
-        )}
-
-        {mode === 'placeMarker' && (
-          <>
-            <p>Tik op de kaart om de locatie te kiezen</p>
-            <Button label="Annuleren" variant="secondary" onClick={onCancelMarker} />
-          </>
-        )}
-
-        {mode === 'markerForm' && (
-          <MarkerForm
-            defaultMarkerType="danger"
-            defaultDescription=""
-            onSave={onSaveMarker}
-            onCancel={onCancelMarker}
           />
         )}
       </PanelBody>

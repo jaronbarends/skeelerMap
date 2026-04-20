@@ -30,7 +30,7 @@ interface MapProps {
   ref?: Ref<MapHandle>;
   creationModeActive: boolean;
   mode: MapUIMode;
-  fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
+  fetchMapData: (abortSignal: AbortSignal) => Promise<void>;
   segments: Segment[];
   markers: Marker[];
   selectedSegment: Segment | null;
@@ -50,7 +50,7 @@ export default function MapView({
   ref,
   creationModeActive,
   mode,
-  fetchSegments,
+  fetchMapData,
   segments,
   markers,
   selectedSegment,
@@ -95,7 +95,7 @@ export default function MapView({
     [mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect]
   );
 
-  const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchSegments, handleMapClick);
+  const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchMapData, handleMapClick);
   const { addControlPoint, removeTempSegment, getSegmentCoords } = useSegmentCreation(
     mapRef,
     onControlPointCountChange
@@ -201,6 +201,7 @@ export default function MapView({
   }, []);
 
   // expose methods to the ref in parent component
+  // we do not need onMarkerSaved, because when marker creation is cancelled, pendingMarkerLocation is set to null, removing the marker
   useImperativeHandle(ref, () => ({
     cancelCreateSegment: removeTempSegment,
     getSegmentCoords,
