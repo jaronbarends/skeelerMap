@@ -25,11 +25,12 @@ export function useInitPendingMarker(
     }
 
     const svgHtml = renderToStaticMarkup(<FaLocationDot />);
+    const size = 32;
     const icon = L.divIcon({
       className: '',
       html: `<div class="${styles.pendingMapMarker}">${svgHtml}</div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 24],
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
     });
 
     if (!pendingMarkerRef.current) {

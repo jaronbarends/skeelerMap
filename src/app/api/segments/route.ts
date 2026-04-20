@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { Segment } from '@/lib/segments';
 import { getSupabaseServerClient } from '@/lib/supabaseAuth.server';
 
 export async function GET() {
@@ -10,7 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const segments = data.map((row: any) => ({
+  const segments: Segment[] = data.map((row: any) => ({
     id: row.id,
     ratingValue: row.rating,
     userId: row.user_id ?? null,
