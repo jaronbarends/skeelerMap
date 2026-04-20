@@ -46,7 +46,11 @@ export function useMapInit(
 
     // in React's strict mode, this function will be called twice. In that case we want to abort the fetch request. Otherwise, we would end up with two parallel fetch requests.
     const abortController = new AbortController();
-    fetchMapData(abortController.signal);
+    fetchMapData(abortController.signal).catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      // eslint-disable-next-line no-console
+      console.error('fetchMapData failed:', err);
+    });
 
     return () => {
       abortController.abort();

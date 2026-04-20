@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
       {
         test: /\.svg$/i,
         ...(issuer !== undefined ? { issuer } : {}),
-        resourceQuery: { not: /url/ },
+        resourceQuery: { not: [...fileLoaderRule.resourceQuery.not, /url/] },
         use: ['@svgr/webpack'],
       }
     );
@@ -39,7 +39,11 @@ function isWebpackRuleWithSvgTest(rule: unknown): rule is Record<string, unknown
   if (test instanceof RegExp) {
     return test.test('.svg');
   }
-  if (typeof test === 'object' && test !== null && typeof (test as { test?: unknown }).test === 'function') {
+  if (
+    typeof test === 'object' &&
+    test !== null &&
+    typeof (test as { test?: unknown }).test === 'function'
+  ) {
     return (test as { test: (s: string) => boolean }).test('.svg');
   }
   return false;

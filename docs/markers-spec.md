@@ -134,7 +134,7 @@ New marker modes added:
 
 - `START_CREATE_MARKER` — user tapped "voeg een waarschuwing toe"
 - `CANCEL_CREATE_MARKER` — user tapped "Annuleren" from either `'placeMarker'` or `'markerForm'`; always returns to `'drawSegment'`
-- `PLACE_MARKER` — user tapped map in `'placeMarker'` mode; stores temporary lat/lng
+- `MARKER_LOCATION_CLICKED` — user tapped map in `'placeMarker'` mode; stores temporary lat/lng
 - `MARKER_CREATED` — marker saved to Supabase
 - `SELECT_MARKER` — user tapped an existing marker
 - `DESELECT_MARKER` — panel closed

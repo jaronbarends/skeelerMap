@@ -40,9 +40,7 @@ export default function MarkerForm({
             role="radio"
             aria-checked={type === markerType}
           >
-            <span className={styles.icon}>
-              {getIconByName(MARKER_TYPES[type].iconName)({})}
-            </span>
+            <span className={styles.icon}>{getIconByName(MARKER_TYPES[type].iconName)({})}</span>
             <span className={styles.iconTitle}>{MARKER_TYPES[type].title}</span>
           </button>
         ))}
