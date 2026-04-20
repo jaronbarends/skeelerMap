@@ -144,9 +144,11 @@ is small. Revisit before launch.
 
 The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
 
-### Option to add warning sign
+### ~~Add markers (warnings)~~ ✓ Done
 
-Add option to add a traffic sign for warning, dangerous crossing, dangerous slope
+Add option to add markers on the map. For now, markers represent warnings: dangerous point, dangerous crossing, steep slope.
+
+_Implemented 2026-04-20._
 
 ### ~~Don't allow drawing segments when not logged in~~ ✓ Done
 

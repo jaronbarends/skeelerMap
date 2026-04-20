@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-04-14
-**Current phase:** Auth implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
+**Last updated:** 2026-04-20
+**Current phase:** Auth implemented; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
 
 ---
 
@@ -15,6 +15,7 @@
 - Open Sans via `next/font/google`
 - `react-icons` (fa6) for FAB and panel close button
 - Segment creation flow: FAB → drawing mode → control points → OSRM routing → rating → Supabase
+- Markers: add/select/edit/delete point markers (currently warning markers: dangerous point, dangerous crossing, steep slope)
 - Panel component system: `Panel`, `PanelHeader`, `PanelInstruction`, `PanelIconButton`,
   `RatingButtons`, `SegmentCreation`, `SegmentEditPanel` — all in `src/components/panel/`
 - Segment selection and editing flow: tap segment → panel with length + edit/delete/close;

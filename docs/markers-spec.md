@@ -2,7 +2,9 @@
 
 ## Overview
 
-Users can place point markers on the map to flag hazards. Markers are independent of segments. They are stored in Supabase, owned by a user, and visible to everyone.
+Users can place point markers on the map. Markers are independent of segments. They are stored in Supabase, owned by a user, and visible to everyone.
+
+For now, marker types represent warnings/hazards (dangerous point, steep slope, dangerous crossing). The system is designed to be extensible to other marker types later. In the UI, these are currently referred to as “waarschuwingen”.
 
 ---
 
