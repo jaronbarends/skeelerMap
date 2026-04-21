@@ -6,44 +6,15 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### ~~Drag-to-edit segment endpoints~~ ✓ Done
+### only show "aangemaakt door jou" or "aangemaakt door andere gebruiker" for logged in user
 
-Allow users to drag the start or end point of a saved segment to adjust it. Operates on routed geometry endpoints only — not intermediate control points (those are not stored).
-_Implemented 2026-04-01._
+### when logging out, cancel all current actions
 
-### ~~Indicate saving~~ ✓ Done
+### handle pending segment save
 
-Saving a segment may take some time. Give the user feedback that something's happening.
-_Implemented 2026-04-07._
+show indicator while saving segment; disable buttons
 
-### ~~Menubar~~ ✓ Done
-
-Replace placeholder with real menubar: app name + tagline stacked left, auth controls right.
-_Implemented 2026-04-08._
-
-### ~~Auth: login + signup~~ ✓ Done
-
-`/inloggen` and `/registreren` pages with Supabase email/password auth.
-_Implemented 2026-04-08._
-
-### ~~Toast component~~ ✓ Done
-
-Map-level feedback component. Rendered in `page.tsx`, triggered by `?toast=` query param.
-_Implemented 2026-04-08._
-
-### ~~Add `user_id` to segments table~~ ✓ Done
-
-Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
-_Implemented 2026-04-08._
-
-### ~~Add toast after logging out~~ ✓ Done
-
-When the user logs out, they don't see any confirmation of that. Show a toast with the text "Je bent nu uitgelogd."
-_Implemented 2026-04-14._
-
-### ~~Hide edit/delete controls for segments not owned by current user~~ ✓ Done
-
-_Implemented 2026-04-08._
+### show indicator while loading map data
 
 ### use Dutch error messages
 
@@ -52,11 +23,6 @@ Supabase error messages are in English by default; for Dutch errors, add a trans
 ### re-evaluate error messages on change
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
-
-### ~~use DRY solution for buttons and forms~~ ✓ Done
-
-`Button` component for interactive buttons; global element and component stylesheets for forms.
-_Implemented 2026-04-09._
 
 ### Auth: confirmation failure page
 
@@ -68,30 +34,22 @@ verification email, contact support, or try signing up again).
 - Create `/auth/confirmation-failed` page with a clear error message and next steps
 - Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
 
-### ~~update GitHub repo name~~ ✓ Done
-
-Change SkateMap to SkeelerMap
-_Implemented 2026-04-09._
-
 ---
 
 ## Medium priority
-
-### ~~Layout for content pages~~ ✓ Done
-
-In LoginForm and SignUpForm we now have a div.formPage that defines the page's layout. Come up with a generic page layout.
-_Implemented 2026-04-10._
-
-### ~~Keyboard shortcuts~~ ✓ Done
-
-- `Esc` — cancel drawing mode
-- `Delete` — delete selected segment in edit mode
-  _Implemented 2026-04-01._
 
 ### Auto-follow location mode
 
 Map stays centered on user while moving. Panning/zooming pauses auto-follow. Tapping the location button resumes it.
 _Post-MVP behavior noted in decisions.md._
+
+### [techdebt] move inlineLinkButton somewhere else
+
+### [techdebt] in MapUIContainer `getMapUIModeForControlPointCount` feels bloated
+
+### [techdebt]
+
+discuss: UIActions and uiReducer from MapUIContainer to separate file(s)?
 
 ### Location permission flow
 
@@ -144,18 +102,6 @@ is small. Revisit before launch.
 
 The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
 
-### ~~Add markers (warnings)~~ ✓ Done
-
-Add option to add markers on the map. For now, markers represent warnings: dangerous point, dangerous crossing, steep slope.
-
-_Implemented 2026-04-20._
-
-### ~~Don't allow drawing segments when not logged in~~ ✓ Done
-
-When user is not logged in, when clicking on add segment button, they should be shown a panel with a text that they need to login (or register) to create segments.
-
-_Implemented 2026-04-15._
-
 ### Only show user-info when user is logged in
 
 In SegmentDetailsPanel (and if we already have it, MarkerDetailsPanel), only show the user information ('Segment aangemaakt door jou' or 'Segment aangemaakt door andere gebruiker') if the user is logged in.
@@ -203,3 +149,77 @@ Present in the PoC, intentionally removed for MVP. Revisit only if there's a cle
 ### Editing intermediate control points
 
 Not planned — stored data is routed geometry only, control points are discarded after routing.
+
+## Done
+
+### ~~Keyboard shortcuts~~ ✓ Done
+
+- `Esc` — cancel drawing mode
+- `Delete` — delete selected segment in edit mode
+  _Implemented 2026-04-01._
+
+### ~~Drag-to-edit segment endpoints~~ ✓ Done
+
+Allow users to drag the start or end point of a saved segment to adjust it. Operates on routed geometry endpoints only — not intermediate control points (those are not stored).
+_Implemented 2026-04-01._
+
+### ~~Indicate saving~~ ✓ Done
+
+Saving a segment may take some time. Give the user feedback that something's happening.
+_Implemented 2026-04-07._
+
+### ~~Menubar~~ ✓ Done
+
+Replace placeholder with real menubar: app name + tagline stacked left, auth controls right.
+_Implemented 2026-04-08._
+
+### ~~Auth: login + signup~~ ✓ Done
+
+`/inloggen` and `/registreren` pages with Supabase email/password auth.
+_Implemented 2026-04-08._
+
+### ~~Toast component~~ ✓ Done
+
+Map-level feedback component. Rendered in `page.tsx`, triggered by `?toast=` query param.
+_Implemented 2026-04-08._
+
+### ~~Add `user_id` to segments table~~ ✓ Done
+
+Supabase migration: add `user_id` (uuid, nullable) to segments table. Enable RLS with policies per decisions.md.
+_Implemented 2026-04-08._
+
+### ~~Hide edit/delete controls for segments not owned by current user~~ ✓ Done
+
+_Implemented 2026-04-08._
+
+### ~~use DRY solution for buttons and forms~~ ✓ Done
+
+`Button` component for interactive buttons; global element and component stylesheets for forms.
+_Implemented 2026-04-09._
+
+### ~~update GitHub repo name~~ ✓ Done
+
+Change SkateMap to SkeelerMap
+_Implemented 2026-04-09._
+
+### ~~Layout for content pages~~ ✓ Done
+
+In LoginForm and SignUpForm we now have a div.formPage that defines the page's layout. Come up with a generic page layout.
+_Implemented 2026-04-10._
+
+### ~~Add toast after logging out~~ ✓ Done
+
+When the user logs out, they don't see any confirmation of that. Show a toast with the text "Je bent nu uitgelogd."
+_Implemented 2026-04-14._
+
+### ~~Don't allow drawing segments when not logged in~~ ✓ Done
+
+When user is not logged in, when clicking on add segment button, they should be shown a panel with a text that they need to login (or register) to create segments.
+
+_Implemented 2026-04-15._
+
+### ~~Add markers (warnings)~~ ✓ Done
+
+Add option to add markers on the map. For now, markers represent warnings: dangerous point, dangerous crossing, steep slope.
+
+_Implemented 2026-04-20._
