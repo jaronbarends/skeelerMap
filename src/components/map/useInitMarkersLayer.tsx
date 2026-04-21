@@ -49,14 +49,10 @@ export function useInitMarkersLayer(
     const group = L.layerGroup().addTo(map);
     markerLayerGroupRef.current = group;
 
-    for (const m of markers) {
-      const iconName = MARKER_TYPES[m.type].iconName;
+    for (const marker of markers) {
+      const iconName = MARKER_TYPES[marker.type].iconName;
       const Icon = getIconByName(iconName);
       const svgHtml = renderToStaticMarkup(<Icon />);
-      // const isSelected = selectedMarkerRef.current?.id === m.id;
-      // const markerClassName = isSelected
-      //   ? `${styles.mapMarker} ${styles.selectedMapMarker}`
-      //   : styles.mapMarker;
       const icon = L.divIcon({
         className: '',
         html: `<div class="${styles.mapMarker}">${svgHtml}</div>`,
@@ -64,8 +60,8 @@ export function useInitMarkersLayer(
         iconAnchor: [12, 24],
       });
 
-      const layer = L.marker([m.lat, m.lng], { icon }).addTo(group);
-      layer.on('click', (e) => {
+      const markerInstance = L.marker([marker.lat, marker.lng], { icon }).addTo(group);
+      markerInstance.on('click', (e) => {
         const currentMode = modeRef.current;
         if (
           // do not allow selecting a marker when in create marker or create segment mode
@@ -75,10 +71,11 @@ export function useInitMarkersLayer(
           return;
         }
         L.DomEvent.stopPropagation(e);
-        const latestMarker = markersRef.current.find((marker) => marker.id === m.id) ?? m;
+        const latestMarker = markersRef.current.find((m) => m.id === marker.id) ?? marker;
         onMarkerSelectRef.current(latestMarker);
       });
-      markerInstancesMapRef.current.set(m.id, layer);
+
+      markerInstancesMapRef.current.set(marker.id, markerInstance);
     }
 
     mapRef.current?.on('zoomend', (e) => {

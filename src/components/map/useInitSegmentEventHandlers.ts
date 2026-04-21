@@ -9,7 +9,7 @@ import { mapColors } from '@/styles/mapColorTokens';
 
 import { fetchRoute } from './mapUtils';
 
-export function useSegmentSelection(
+export function useInitSegmentEventHandlers(
   mapRef: RefObject<L.Map | null>,
   segmentLayersRef: RefObject<Map<string, L.Polyline>>,
   selectedSegment: Segment | null,

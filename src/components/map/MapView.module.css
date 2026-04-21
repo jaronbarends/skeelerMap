@@ -6,7 +6,7 @@
 }
 
 .controlMarker {
-  /* --size is set in the useSegmentSelection.ts file */
+  /* --size is set in the useInitSegmentEventHandlers.ts file */
   width: var(--size);
   height: var(--size);
   border-radius: 50%;
