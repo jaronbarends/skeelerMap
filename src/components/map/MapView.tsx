@@ -113,7 +113,8 @@ export default function MapView({
     mapRef,
     segments,
     onSegmentSelect,
-    creationModeActive
+    creationModeActive,
+    mode
   );
   useSegmentSelection(
     mapRef,
