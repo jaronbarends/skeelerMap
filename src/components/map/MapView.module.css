@@ -14,3 +14,23 @@
   border: 3px solid var(--rating-color);
   cursor: move;
 }
+
+.mapMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pendingMapMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-rating-neutral);
+  filter: drop-shadow(1px 1px black) drop-shadow(-1px 1px black) drop-shadow(-1px -1px black)
+    drop-shadow(1px -1px black);
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+}

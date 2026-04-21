@@ -10,8 +10,13 @@ import {
   type Ref,
 } from 'react';
 
+import type { MapUIMode } from '@/lib/mapUIMode';
+import { isCreateSegmentMode } from '@/lib/mapUIMode';
+import type { Marker } from '@/lib/markers';
 import { Segment } from '@/lib/segments';
 
+import { useInitMarkersLayer } from './useInitMarkersLayer';
+import { useInitPendingMarker } from './useInitPendingMarker';
 import { useMapInit } from './useMapInit';
 import { useSegmentCreation } from './useSegmentCreation';
 import { useSegmentLayers } from './useSegmentLayers';
@@ -20,7 +25,7 @@ import { useSegmentSelection } from './useSegmentSelection';
 import styles from './MapView.module.css';
 
 export interface MapHandle {
-  cancelCreation: () => void;
+  cancelCreateSegment: () => void;
   getSegmentCoords: () => [number, number][];
   onSegmentSaved: () => void;
   centerOnLocation: () => void;
@@ -29,10 +34,16 @@ export interface MapHandle {
 interface MapProps {
   ref?: Ref<MapHandle>;
   creationModeActive: boolean;
-  fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>;
+  mode: MapUIMode;
+  fetchMapData: (abortSignal: AbortSignal) => Promise<void>;
   segments: Segment[];
+  markers: Marker[];
   selectedSegment: Segment | null;
+  pendingMarkerLocation: { lat: number; lng: number } | null;
   onControlPointCountChange: (count: number) => void;
+  onMarkerLocationClicked: (lat: number, lng: number) => void;
+  onMarkerSelect: (marker: Marker) => void;
+  onMarkerDeselect: () => void;
   onSegmentSelect: (segment: Segment) => void;
   onSegmentDeselect: () => void;
   onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
@@ -43,10 +54,16 @@ interface MapProps {
 export default function MapView({
   ref,
   creationModeActive,
-  fetchSegments,
+  mode,
+  fetchMapData,
   segments,
+  markers,
   selectedSegment,
+  pendingMarkerLocation,
   onControlPointCountChange,
+  onMarkerLocationClicked,
+  onMarkerSelect,
+  onMarkerDeselect,
   onSegmentSelect,
   onSegmentDeselect,
   onSegmentDragUpdate,
@@ -67,17 +84,22 @@ export default function MapView({
 
   const handleMapClick = useCallback(
     (latlng: L.LatLng) => {
-      if (creationModeActive) {
+      if (mode === 'placeMarker') {
+        onMarkerLocationClicked(latlng.lat, latlng.lng);
+        return;
+      }
+      if (isCreateSegmentMode(mode)) {
         addControlPointRef.current(latlng);
       } else {
+        onMarkerDeselect();
         onSegmentDeselect();
       }
     },
-    [creationModeActive, onSegmentDeselect]
+    [mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect]
   );
 
-  const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchSegments, handleMapClick);
-  const { addControlPoint, cancelCreation, getSegmentCoords } = useSegmentCreation(
+  const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchMapData, handleMapClick);
+  const { addControlPoint, removeTempSegment, getSegmentCoords } = useSegmentCreation(
     mapRef,
     onControlPointCountChange
   );
@@ -101,11 +123,15 @@ export default function MapView({
     onSegmentDragEnd
   );
 
+  useInitMarkersLayer(mapRef, markers, mode, onMarkerSelect);
+  useInitPendingMarker(mapRef, pendingMarkerLocation);
+
   // expose methods to the ref in parent component
+  // we do not need onMarkerSaved, because when marker creation is cancelled, pendingMarkerLocation is set to null, removing the marker
   useImperativeHandle(ref, () => ({
-    cancelCreation,
+    cancelCreateSegment: removeTempSegment,
     getSegmentCoords,
-    onSegmentSaved: cancelCreation,
+    onSegmentSaved: removeTempSegment,
     centerOnLocation,
   }));
 

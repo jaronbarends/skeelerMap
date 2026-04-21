@@ -144,15 +144,21 @@ is small. Revisit before launch.
 
 The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
 
-### Option to add warning sign
+### ~~Add markers (warnings)~~ ✓ Done
 
-Add option to add a traffic sign for warning, dangerous crossing, dangerous slope
+Add option to add markers on the map. For now, markers represent warnings: dangerous point, dangerous crossing, steep slope.
+
+_Implemented 2026-04-20._
 
 ### ~~Don't allow drawing segments when not logged in~~ ✓ Done
 
 When user is not logged in, when clicking on add segment button, they should be shown a panel with a text that they need to login (or register) to create segments.
 
 _Implemented 2026-04-15._
+
+### Only show user-info when user is logged in
+
+In SegmentDetailsPanel (and if we already have it, MarkerDetailsPanel), only show the user information ('Segment aangemaakt door jou' or 'Segment aangemaakt door andere gebruiker') if the user is logged in.
 
 ---
 
@@ -163,6 +169,10 @@ _Implemented 2026-04-15._
 Explain the 5 rating levels to the user.
 
 ### Logo / branding
+
+### Add max length to marker description
+
+Add a max length; include a counter showing how many characters are left
 
 ### FAQ or other pages
 

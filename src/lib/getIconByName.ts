@@ -1,11 +1,15 @@
 import {
+  FaCircleInfo,
   FaLocationCrosshairs,
   FaPenToSquare,
   FaPlus,
   FaRegTrashCan,
   FaXmark,
-  FaCircleInfo,
 } from 'react-icons/fa6';
+
+import TrafficSignCrossing from '@/assets/icons/traffic-sign-crossing.svg';
+import TrafficSignDanger from '@/assets/icons/traffic-sign-danger.svg';
+import TrafficSignSlope from '@/assets/icons/traffic-sign-slope.svg';
 
 const ICONS = {
   close: FaXmark,
@@ -14,15 +18,13 @@ const ICONS = {
   info: FaCircleInfo,
   plus: FaPlus,
   userLocation: FaLocationCrosshairs,
+  trafficSignSlope: TrafficSignSlope,
+  trafficSignDanger: TrafficSignDanger,
+  trafficSignCrossing: TrafficSignCrossing,
 } as const;
 
 export type IconName = keyof typeof ICONS;
 
-export function getIconByName(iconName: string) {
-  const Icon = ICONS[iconName as keyof typeof ICONS];
-  if (!Icon) {
-    throw new Error(`Icon ${iconName} not found`);
-  }
-
-  return Icon;
+export function getIconByName(iconName: IconName) {
+  return ICONS[iconName];
 }

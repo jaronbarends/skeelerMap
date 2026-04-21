@@ -19,7 +19,13 @@
   - [ ] Edit rating (rating picker, current rating indicated)
   - [ ] Delete with confirmation prompt
   - [ ] Close deselects without changes
-- [ ] Segments persist across sessions (local storage for MVP, BaaS later)
+- [ ] Markers (point markers)
+  - [ ] Place marker on the map
+  - [ ] Choose marker type (currently warning markers)
+  - [ ] Save marker (requires login)
+  - [ ] Select existing marker to view details
+  - [ ] Edit/delete owned markers
+- [ ] Segments persist across sessions (Supabase)
 - [ ] Location button — centers map on user
 - [ ] Default map center (Netherlands) when location unavailable
 
@@ -29,14 +35,11 @@
 
 ### Not in MVP
 
-- Store segments in a BaaS
 - FAQ or other pages
-- Drag-to-edit segment endpoints (v1.1)
 - Auto-follow location mode
 - Zoom-based visual scaling
 - Legend / info panel
 - Logo / branding
-- keyboard shortcuts (esc to cancel, delete to delete segment in edit mode)
 
 ---
 

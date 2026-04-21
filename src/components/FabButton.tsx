@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import type { CSSProperties } from 'react';
 
-import { getIconByName } from '@/lib/getIconByName';
+import { getIconByName, type IconName } from '@/lib/getIconByName';
 
 import styles from './FabButton.module.css';
 
@@ -15,7 +15,7 @@ export default function FabButton({
   onClick: () => void;
   ariaLabel: string;
   disabled: boolean;
-  iconName: string;
+  iconName: IconName;
   tooltip?: string;
 }) {
   const Icon = getIconByName(iconName);

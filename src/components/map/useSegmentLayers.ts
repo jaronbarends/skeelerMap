@@ -15,6 +15,7 @@ export function useSegmentLayers(
 ): {
   segmentLayersRef: RefObject<Map<string, L.Polyline>>;
 } {
+  // create Map (js Map, don't confuse with map showing streets) that contains the polylines for the segments
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
 
   // Refs mirror props so Leaflet event callbacks always call the latest version
@@ -29,11 +30,6 @@ export function useSegmentLayers(
       console.error('Map not found');
     }
     const color = mapColors.rating[String(segment.ratingValue) as keyof typeof mapColors.rating];
-    // const polylineBackground = L.polyline(segment.coordinates, {
-    //   color: '#000000',
-    //   weight: 7,
-    //   opacity: 0.85,
-    // }).addTo(map);
     const polyline = L.polyline(segment.coordinates, {
       color,
       weight: 5,
@@ -61,7 +57,9 @@ export function useSegmentLayers(
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map) {
+      return;
+    }
 
     for (const segment of segments) {
       const polyline = segmentLayersRef.current.get(segment.id);
@@ -90,6 +88,9 @@ export function useSegmentLayers(
   useEffect(() => {
     const layerMap = segmentLayersRef.current;
     return () => {
+      for (const polyline of layerMap.values()) {
+        polyline.remove();
+      }
       layerMap.clear();
     };
   }, []);

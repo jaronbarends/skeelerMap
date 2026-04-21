@@ -4,7 +4,6 @@ import L from 'leaflet';
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
-import { Segment } from '@/lib/segments';
 import { tilesProvider } from '@/lib/tilesProvider';
 import { mapColors } from '@/styles/mapColorTokens';
 
@@ -13,7 +12,7 @@ const DEFAULT_ZOOM = 12;
 
 export function useMapInit(
   containerRef: RefObject<HTMLDivElement | null>,
-  fetchSegments: (abortSignal: AbortSignal) => Promise<Segment[]>,
+  fetchMapData: (abortSignal: AbortSignal) => Promise<void>,
   onMapClick: (latlng: L.LatLng) => void
 ): {
   mapRef: RefObject<L.Map | null>;
@@ -60,7 +59,11 @@ export function useMapInit(
 
     // in React's strict mode, this function will be called twice. In that case we want to abort the fetch request. Otherwise, we would end up with two parallel fetch requests.
     const abortController = new AbortController();
-    fetchSegments(abortController.signal);
+    fetchMapData(abortController.signal).catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      // eslint-disable-next-line no-console
+      console.error('fetchMapData failed:', err);
+    });
 
     return () => {
       abortController.abort();
@@ -71,7 +74,7 @@ export function useMapInit(
       map.remove();
       mapRef.current = null;
     };
-  }, [containerRef, fetchSegments]);
+  }, [containerRef, fetchMapData]);
 
   return { mapRef, centerOnLocation };
 
