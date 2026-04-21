@@ -5,7 +5,12 @@ import type { RefObject } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server.browser';
 
 import { getIconByName } from '@/lib/getIconByName';
-import { isCreateMarkerMode, isCreateSegmentMode, MapUIMode } from '@/lib/mapUIMode';
+import {
+  isCreateMarkerMode,
+  isCreateSegmentMode,
+  isMarkerDetailsMode,
+  MapUIMode,
+} from '@/lib/mapUIMode';
 import { Marker } from '@/lib/markers';
 import { MARKER_TYPES } from '@/lib/markers';
 
@@ -66,6 +71,19 @@ export function useInitMarkersLayer(
         onMarkerSelectRef.current(latestMarker);
       });
     }
+
+    mapRef.current?.on('zoomend', (e) => {
+      const zoomLevel = e.target.getZoom();
+      const shouldShow =
+        zoomLevel >= 12 ||
+        isCreateMarkerMode(modeRef.current) ||
+        isMarkerDetailsMode(modeRef.current);
+      if (shouldShow) {
+        group.addTo(map);
+      } else {
+        group.remove();
+      }
+    });
 
     return () => {
       group.remove();
