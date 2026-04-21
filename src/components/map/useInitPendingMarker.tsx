@@ -42,12 +42,10 @@ export function useInitPendingMarker(
       pendingMarkerRef.current.setLatLng([pendingMarkerLocation.lat, pendingMarkerLocation.lng]);
       pendingMarkerRef.current.setIcon(icon);
     }
-  }, [mapRef, pendingMarkerLocation]);
 
-  useEffect(() => {
     return () => {
       pendingMarkerRef.current?.remove();
       pendingMarkerRef.current = null;
     };
-  }, []);
+  }, [mapRef, pendingMarkerLocation]);
 }

@@ -210,6 +210,16 @@ function uiReducer(state: UIState, action: UIAction): UIState {
   }
 }
 
+const initialUiState: UIState = {
+  mapUIMode: 'idle',
+  selectedSegment: null,
+  selectedMarker: null,
+  controlPointCount: 0,
+  creationModeActive: false,
+  loginRequiredPanelOpen: false,
+  pendingMarkerLocation: null,
+};
+
 export default function MapUIContainer({ currentUserId }: { currentUserId: string | null }) {
   const mapRef = useRef<MapHandle>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -217,15 +227,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const [segments, setSegments] = useState<Segment[]>([]);
   const [markers, setMarkers] = useState<Marker[]>([]);
 
-  const initialUiState: UIState = {
-    mapUIMode: 'idle',
-    selectedSegment: null,
-    selectedMarker: null,
-    controlPointCount: 0,
-    creationModeActive: false,
-    loginRequiredPanelOpen: false,
-    pendingMarkerLocation: null,
-  };
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const fetchMapData = useCallback(async (abortSignal: AbortSignal) => {

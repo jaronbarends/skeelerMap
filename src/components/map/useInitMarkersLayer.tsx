@@ -62,12 +62,10 @@ export function useInitMarkersLayer(
         onMarkerSelectRef.current(latestMarker);
       });
     }
-  }, [mapRef, markers]);
 
-  useEffect(() => {
     return () => {
-      markerLayerGroupRef.current?.remove();
+      group.remove();
       markerLayerGroupRef.current = null;
     };
-  }, []);
+  }, [mapRef, markers]); //
 }

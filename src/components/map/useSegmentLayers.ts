@@ -15,6 +15,7 @@ export function useSegmentLayers(
 ): {
   segmentLayersRef: RefObject<Map<string, L.Polyline>>;
 } {
+  // create Map (js Map, don't confuse with map showing streets) that contains the polylines for the segments
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
 
   // Refs mirror props so Leaflet event callbacks always call the latest version
@@ -56,7 +57,9 @@ export function useSegmentLayers(
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map) {
+      return;
+    }
 
     for (const segment of segments) {
       const polyline = segmentLayersRef.current.get(segment.id);
@@ -79,15 +82,22 @@ export function useSegmentLayers(
         segmentLayersRef.current.delete(id);
       }
     }
+
+    return () => {
+      for (const polyline of segmentLayersRef.current.values()) {
+        polyline.remove();
+      }
+      segmentLayersRef.current.clear();
+    };
   }, [segments, renderSegment, mapRef]);
 
   // Clear the layer map on unmount so stale polyline refs don't prevent re-render after remount
-  useEffect(() => {
-    const layerMap = segmentLayersRef.current;
-    return () => {
-      layerMap.clear();
-    };
-  }, []);
+  // useEffect(() => {
+  //   const layerMap = segmentLayersRef.current;
+  //   return () => {
+  //     layerMap.clear();
+  //   };
+  // }, []);
 
   return { segmentLayersRef };
 }
