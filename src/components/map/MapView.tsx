@@ -1,7 +1,14 @@
 'use client';
 
 import L from 'leaflet';
-import { useCallback, useEffect, useImperativeHandle, useRef, type Ref } from 'react';
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  type Ref,
+} from 'react';
 
 import type { MapUIMode } from '@/lib/mapUIMode';
 import { isCreateSegmentMode } from '@/lib/mapUIMode';
@@ -64,6 +71,13 @@ export default function MapView({
 }: MapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Critical layout is inline so Fast Refresh / CSS-module hash drift can't break Leaflet sizing.
+  const containerStyle: CSSProperties = {
+    position: 'absolute',
+    inset: 0,
+    zIndex: 'var(--z-map)',
+  };
+
   // addControlPoint comes from useSegmentCreation below, so we use a ref to avoid
   // a before-declaration access in the useCallback closure.
   const addControlPointRef = useRef<(latlng: L.LatLng) => void>(() => {});
@@ -122,5 +136,5 @@ export default function MapView({
   }));
 
   // return the component's DOM element
-  return <div ref={containerRef} className={styles.container} />;
+  return <div ref={containerRef} className={styles.container} style={containerStyle} />;
 }

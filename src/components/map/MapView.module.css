@@ -1,7 +1,8 @@
 .container {
-  position: absolute;
-  inset: 0;
-  z-index: var(--z-map);
+  /*
+  Critical layout (position, inset, z-index) is defined inline in MapView.tsx so Fast Refresh / CSS-module hash drift can't break Leaflet sizing.
+  If we need any decorative styling, that can go here as usual.
+  */
 }
 
 .controlMarker {

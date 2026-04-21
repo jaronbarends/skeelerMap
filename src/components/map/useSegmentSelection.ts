@@ -5,10 +5,9 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
 import { Segment } from '@/lib/segments';
+import { mapColors } from '@/styles/mapColorTokens';
 
 import { fetchRoute } from './mapUtils';
-
-import styles from './MapView.module.css';
 
 export function useSegmentSelection(
   mapRef: RefObject<L.Map | null>,
@@ -40,12 +39,18 @@ export function useSegmentSelection(
 
   function updateSelectedSegmentEffect() {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map) {
+      return;
+    }
     const selectedSegment = selectedSegmentRef.current;
-    if (!selectedSegment) return;
+    if (!selectedSegment) {
+      return;
+    }
 
     const polyline = segmentLayersRef.current.get(selectedSegment.id);
-    if (!polyline) return;
+    if (!polyline) {
+      return;
+    }
 
     polyline.setStyle({ weight: 8 });
 
@@ -87,7 +92,9 @@ export function useSegmentSelection(
 
     function handleDrag() {
       const markers = selectionMarkersRef.current;
-      if (!markers) return;
+      if (!markers) {
+        return;
+      }
       if (markers.debounceTimer) {
         clearTimeout(markers.debounceTimer);
       }
@@ -99,7 +106,9 @@ export function useSegmentSelection(
 
     async function handleDragEnd() {
       const markers = selectionMarkersRef.current;
-      if (!markers) return;
+      if (!markers) {
+        return;
+      }
       if (markers.debounceTimer) {
         clearTimeout(markers.debounceTimer);
         markers.debounceTimer = null;
@@ -111,12 +120,19 @@ export function useSegmentSelection(
 }
 
 function createControlMarkerIcon(ratingValue: number): L.DivIcon {
-  const size = 16;
-  const anchor = size / 2;
+  const sizePx = 16;
+  const anchor = sizePx / 2;
+  const borderColor =
+    mapColors.rating[String(ratingValue) as keyof typeof mapColors.rating] ??
+    mapColors.rating.neutral;
+
+  // Inline styles keep endpoint markers visible even if CSS modules hot-reload in a mismatched state.
+  const html = `<div data-rating="${ratingValue}" style="width:${sizePx}px;height:${sizePx}px;border-radius:50%;background-color:var(--color-black);border:3px solid ${borderColor};cursor:move;"></div>`;
+
   return L.divIcon({
     className: '',
-    html: `<div class="${styles.controlMarker}" style="--size:  ${size}px;" data-rating="${ratingValue}"></div>`,
-    iconSize: [size, size],
+    html,
+    iconSize: [sizePx, sizePx],
     iconAnchor: [anchor, anchor],
   });
 }

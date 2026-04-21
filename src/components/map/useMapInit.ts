@@ -42,6 +42,19 @@ export function useMapInit(
     map.on('click', (e) => {
       onMapClickRef.current(e.latlng);
     });
+
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => {
+            map.invalidateSize();
+          })
+        : null;
+    resizeObserver?.observe(container);
+
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
     const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
 
     // in React's strict mode, this function will be called twice. In that case we want to abort the fetch request. Otherwise, we would end up with two parallel fetch requests.
@@ -57,6 +70,7 @@ export function useMapInit(
       if (userLocationWatchId !== null) {
         navigator.geolocation.clearWatch(userLocationWatchId);
       }
+      resizeObserver?.disconnect();
       map.remove();
       mapRef.current = null;
     };
@@ -67,7 +81,9 @@ export function useMapInit(
   function centerOnLocation() {
     const map = mapRef.current;
     const position = lastPositionRef.current;
-    if (!map || !position) return;
+    if (!map || !position) {
+      return;
+    }
     map.setView(position, Math.max(map.getZoom(), 15));
   }
 
@@ -86,7 +102,9 @@ function createWatchedLocationMarker(
   map: L.Map,
   onPositionUpdate: (latlng: L.LatLngExpression) => void
 ) {
-  if (!navigator.geolocation) return null;
+  if (!navigator.geolocation) {
+    return null;
+  }
 
   let locationMarker: L.CircleMarker | null = null;
   let firstFix = true;
