@@ -4,6 +4,7 @@ import L from 'leaflet';
 import { useCallback, useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
+import { MapUIMode } from '@/lib/mapUIMode';
 import { Segment } from '@/lib/segments';
 import { mapColors } from '@/styles/mapColorTokens';
 
@@ -11,7 +12,8 @@ export function useSegmentLayers(
   mapRef: RefObject<L.Map | null>,
   segments: Segment[],
   onSegmentSelect: (segment: Segment) => void,
-  creationModeActive: boolean
+  creationModeActive: boolean,
+  mode: MapUIMode
 ): {
   segmentLayersRef: RefObject<Map<string, L.Polyline>>;
 } {
@@ -23,6 +25,7 @@ export function useSegmentLayers(
   const onSegmentSelectRef = useRef(onSegmentSelect);
   const segmentsRef = useRef(segments);
   const creationModeActiveRef = useRef(creationModeActive);
+  const modeRef = useRef(mode);
 
   const renderSegment = useCallback(function renderSegment(segment: Segment, map: L.Map) {
     if (!map) {
@@ -37,6 +40,10 @@ export function useSegmentLayers(
     }).addTo(map);
 
     polyline.on('click', (e) => {
+      if (modeRef.current === 'placeMarker') {
+        // user wants to indicate marker location, not select a segment
+        return;
+      }
       L.DomEvent.stopPropagation(e);
       if (!creationModeActiveRef.current) {
         // Look up the latest segment from the ref — the captured `segment` may have stale
@@ -53,7 +60,8 @@ export function useSegmentLayers(
     onSegmentSelectRef.current = onSegmentSelect;
     segmentsRef.current = segments;
     creationModeActiveRef.current = creationModeActive;
-  }, [onSegmentSelect, segments, creationModeActive]);
+    modeRef.current = mode;
+  }, [onSegmentSelect, segments, creationModeActive, mode]);
 
   useEffect(() => {
     const map = mapRef.current;

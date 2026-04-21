@@ -275,6 +275,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         segments={segments}
         markers={markers}
         selectedSegment={uiState.selectedSegment}
+        selectedMarker={uiState.selectedMarker}
         pendingMarkerLocation={uiState.pendingMarkerLocation}
         onControlPointCountChange={handleControlPointCountChange}
         onMarkerLocationClicked={handleMarkerLocationClicked}
