@@ -88,10 +88,20 @@ export async function PATCH(request: NextRequest) {
     return new NextResponse(null, { status: 204 });
   }
 
-  const { error } = await supabase.from('markers').update(updateData).eq('id', id);
+  const { error, count } = await supabase
+    .from('markers')
+    .update(updateData, { count: 'exact' })
+    .eq('id', id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (typeof count !== 'number') {
+    return NextResponse.json({ error: 'Unexpected missing count.' }, { status: 500 });
+  }
+  if (count === 0) {
+    return NextResponse.json({ error: 'Not found.' }, { status: 404 });
   }
 
   return new NextResponse(null, { status: 204 });
@@ -109,10 +119,20 @@ export async function DELETE(request: NextRequest) {
 
   const { id } = (await request.json()) as { id: string };
 
-  const { error } = await supabase.from('markers').delete().eq('id', id);
+  const { error, count } = await supabase
+    .from('markers')
+    .delete({ count: 'exact' })
+    .eq('id', id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (typeof count !== 'number') {
+    return NextResponse.json({ error: 'Unexpected missing count.' }, { status: 500 });
+  }
+  if (count === 0) {
+    return NextResponse.json({ error: 'Not found.' }, { status: 404 });
   }
 
   return new NextResponse(null, { status: 204 });

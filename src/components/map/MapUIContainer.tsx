@@ -241,6 +241,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        mapRef.current?.cancelCreateSegment();
         uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
       }
       if (event.key === 'Delete') {

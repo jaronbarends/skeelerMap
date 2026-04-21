@@ -82,22 +82,18 @@ export function useSegmentLayers(
         segmentLayersRef.current.delete(id);
       }
     }
-
-    return () => {
-      for (const polyline of segmentLayersRef.current.values()) {
-        polyline.remove();
-      }
-      segmentLayersRef.current.clear();
-    };
   }, [segments, renderSegment, mapRef]);
 
   // Clear the layer map on unmount so stale polyline refs don't prevent re-render after remount
-  // useEffect(() => {
-  //   const layerMap = segmentLayersRef.current;
-  //   return () => {
-  //     layerMap.clear();
-  //   };
-  // }, []);
+  useEffect(() => {
+    const layerMap = segmentLayersRef.current;
+    return () => {
+      for (const polyline of layerMap.values()) {
+        polyline.remove();
+      }
+      layerMap.clear();
+    };
+  }, []);
 
   return { segmentLayersRef };
 }

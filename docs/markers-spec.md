@@ -178,6 +178,7 @@ interface Props {
   currentUserOwnsMarker: boolean;
   onClose: () => void;
   onEditStart?: () => void;
+  onEditCancel?: () => void;
   onDeleteStart?: () => void;
   onDeleteCancel: () => void;
   onDeleteConfirm: () => void;

@@ -5,7 +5,7 @@ import type { RefObject } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server.browser';
 
 import { getIconByName } from '@/lib/getIconByName';
-import { MapUIMode } from '@/lib/mapUIMode';
+import { isCreateMarkerMode, isCreateSegmentMode, MapUIMode } from '@/lib/mapUIMode';
 import { Marker } from '@/lib/markers';
 import { MARKER_TYPES } from '@/lib/markers';
 
@@ -53,11 +53,15 @@ export function useInitMarkersLayer(
 
       const layer = L.marker([m.lat, m.lng], { icon }).addTo(group);
       layer.on('click', (e) => {
-        L.DomEvent.stopPropagation(e);
         const currentMode = modeRef.current;
-        if (currentMode === 'placeMarker' || currentMode === 'markerForm') {
+        if (
+          // do not allow selecting a marker when in create marker or create segment mode
+          isCreateMarkerMode(currentMode) ||
+          isCreateSegmentMode(currentMode)
+        ) {
           return;
         }
+        L.DomEvent.stopPropagation(e);
         const latestMarker = markersRef.current.find((marker) => marker.id === m.id) ?? m;
         onMarkerSelectRef.current(latestMarker);
       });
@@ -67,5 +71,5 @@ export function useInitMarkersLayer(
       group.remove();
       markerLayerGroupRef.current = null;
     };
-  }, [mapRef, markers]); //
+  }, [mapRef, markers]);
 }

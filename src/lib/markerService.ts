@@ -3,7 +3,10 @@ import { Marker, MarkerType } from '@/lib/markers';
 export async function fetchMarkers(abortSignal: AbortSignal): Promise<Marker[]> {
   try {
     const res = await fetch('/api/markers', { signal: abortSignal });
-    return res.json();
+    if (!res.ok) {
+      return [];
+    }
+    return (await res.json()) as Marker[];
   } catch {
     return [];
   }

@@ -100,6 +100,7 @@ export function useSegmentCreation(
       routePolylines: [],
       routeCoordinates: [],
     };
+    onControlPointCountChange(0);
   }
 
   function getSegmentCoords(): [number, number][] {
