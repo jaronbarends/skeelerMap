@@ -17,10 +17,10 @@ import { Segment } from '@/lib/segments';
 
 import { useInitMarkersLayer } from './useInitMarkersLayer';
 import { useInitPendingMarker } from './useInitPendingMarker';
+import { useInitSegmentEventHandlers } from './useInitSegmentEventHandlers';
+import { useInitSegmentLayers } from './useInitSegmentLayers';
 import { useMapInit } from './useMapInit';
 import { useSegmentCreation } from './useSegmentCreation';
-import { useSegmentLayers } from './useSegmentLayers';
-import { useSegmentSelection } from './useSegmentSelection';
 
 import styles from './MapView.module.css';
 
@@ -111,14 +111,14 @@ export default function MapView({
     addControlPointRef.current = addControlPoint;
   });
 
-  const { segmentLayersRef } = useSegmentLayers(
+  const { segmentLayersRef } = useInitSegmentLayers(
     mapRef,
     segments,
     onSegmentSelect,
     creationModeActive,
     mode
   );
-  useSegmentSelection(
+  useInitSegmentEventHandlers(
     mapRef,
     segmentLayersRef,
     selectedSegment,

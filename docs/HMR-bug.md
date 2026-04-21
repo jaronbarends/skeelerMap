@@ -22,7 +22,7 @@ Endpoint drag markers could **disappear** or feel unreliable after HMR — same 
 - The **React tree** re-renders and hooks re-run,
 - but there is a temporary **mismatch** between **old JS references** and **new CSS module class hashes** (or the reverse), or styles do not land on the Leaflet root **atomically** as expected.
 
-Practical outcome: the Leaflet root (`div.leaflet-container` inside your container) could end up effectively **`position: static` with `height: 0px`**, while the parent layout still *looked* full height. Then:
+Practical outcome: the Leaflet root (`div.leaflet-container` inside your container) could end up effectively **`position: static` with `height: 0px`**, while the parent layout still _looked_ full height. Then:
 
 - you see the **`main` background** as a **dark band** (“black strip”),
 - **hit-testing / dragging** partially fails,
@@ -64,7 +64,7 @@ After layout changes Leaflet must re-measure. `useMapInit` uses a **`ResizeObser
 
 ### Endpoint markers (`L.divIcon`) less dependent on CSS modules
 
-`createEndpointIcon` in `useSegmentSelection.ts` builds **inline-styled** HTML for the marker, with border color from `mapColors.rating`, and uses `className: ''` on `L.divIcon`, so markers are not tied to a module class that HMR might desynchronize.
+`createControlMarkerIcon` in `useInitSegmentEventHandlers.ts` builds **inline-styled** HTML for the marker, with border color from `mapColors.rating`, and uses `className: ''` on `L.divIcon`, so markers are not tied to a module class that HMR might desynchronize.
 
 **Merge tip:** `.controlMarker` in `MapView.module.css` may remain for readability, but **runtime-critical marker styling intentionally lives in inline HTML** — do not force it back to module-only classes without a strong reason.
 
@@ -92,7 +92,7 @@ Conflicts will mostly appear in files that touch **layout**, **map init**, or **
 - Avoid duplicate resize mechanisms.
 - Keep post-init `invalidateSize()` (rAF) + `ResizeObserver` behavior as the baseline unless you replace it with an equivalent, single path.
 
-### `src/components/map/useSegmentSelection.ts`
+### `src/components/map/useInitSegmentEventHandlers.ts`
 
 - In `createEndpointIcon`, **keep** inline-styled HTML and `className: ''` on `divIcon` unless you have another **HMR-safe** approach.
 
@@ -103,7 +103,7 @@ Conflicts will mostly appear in files that touch **layout**, **map init**, or **
    - `MapView.tsx`
    - `MapView.module.css`
    - `useMapInit.ts`
-   - `useSegmentSelection.ts`
+   - `useInitSegmentEventHandlers.ts`
 3. After each save, check:
    - pan/drag works,
    - segment click / details flow works,

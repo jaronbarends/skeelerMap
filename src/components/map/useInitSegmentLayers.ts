@@ -8,7 +8,7 @@ import { MapUIMode } from '@/lib/mapUIMode';
 import { Segment } from '@/lib/segments';
 import { mapColors } from '@/styles/mapColorTokens';
 
-export function useSegmentLayers(
+export function useInitSegmentLayers(
   mapRef: RefObject<L.Map | null>,
   segments: Segment[],
   onSegmentSelect: (segment: Segment) => void,
