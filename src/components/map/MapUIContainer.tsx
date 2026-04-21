@@ -224,6 +224,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const mapRef = useRef<MapHandle>(null);
   const [isPending, setIsPending] = useState<boolean>(false);
   const selectedSegmentRef = useRef<Segment | null>(null);
+  const selectedMarkerRef = useRef<Marker | null>(null);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [markers, setMarkers] = useState<Marker[]>([]);
 
@@ -238,6 +239,20 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     setMarkers(markersResult);
   }, []);
 
+  const segmentIsOwnedByCurrentUser = useCallback(
+    (segment: Segment): boolean => {
+      return currentUserId !== null && segment.userId === currentUserId;
+    },
+    [currentUserId]
+  );
+
+  const markerIsOwnedByCurrentUser = useCallback(
+    (marker: Marker): boolean => {
+      return currentUserId !== null && marker.userId === currentUserId;
+    },
+    [currentUserId]
+  );
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -246,12 +261,17 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       }
       if (event.key === 'Delete') {
         const selectedSegment = selectedSegmentRef.current;
-        if (selectedSegment && currentUserId !== null && selectedSegment.userId === currentUserId) {
+        if (selectedSegment && segmentIsOwnedByCurrentUser(selectedSegment)) {
           uiDispatch({ type: 'START_DELETE_SEGMENT', payload: selectedSegment });
+        } else if (
+          selectedMarkerRef.current &&
+          markerIsOwnedByCurrentUser(selectedMarkerRef.current)
+        ) {
+          uiDispatch({ type: 'START_DELETE_MARKER' });
         }
       }
     },
-    [currentUserId]
+    [segmentIsOwnedByCurrentUser, markerIsOwnedByCurrentUser]
   );
 
   useEffect(() => {
@@ -263,7 +283,8 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
   useEffect(() => {
     selectedSegmentRef.current = uiState.selectedSegment;
-  }, [uiState.selectedSegment]);
+    selectedMarkerRef.current = uiState.selectedMarker;
+  }, [uiState.selectedSegment, uiState.selectedMarker]);
 
   return (
     <div className={styles.component}>
@@ -342,10 +363,12 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
             segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined
           }
           onDeleteStart={
-            segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleDeleteStart : undefined
+            segmentIsOwnedByCurrentUser(uiState.selectedSegment)
+              ? handleStartDeleteSegment
+              : undefined
           }
-          onDeleteCancel={handleDeleteCancel}
-          onDeleteConfirm={handleDeleteConfirm}
+          onDeleteCancel={handleCancelDeleteSegment}
+          onDeleteConfirm={handleConfirmDeleteSegment}
           onRatingSelect={handleRatingUpdate}
           isPending={isPending}
         />
@@ -372,14 +395,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       )}
     </div>
   );
-
-  function segmentIsOwnedByCurrentUser(segment: Segment): boolean {
-    return currentUserId !== null && segment.userId === currentUserId;
-  }
-
-  function markerIsOwnedByCurrentUser(marker: Marker): boolean {
-    return currentUserId !== null && marker.userId === currentUserId;
-  }
 
   function handleControlPointCountChange(count: number) {
     uiDispatch({ type: 'CONTROL_POINT_COUNT_UPDATED', payload: count });
@@ -601,7 +616,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     }
   }
 
-  function handleDeleteStart() {
+  function handleStartDeleteSegment() {
     if (!uiState.selectedSegment) {
       return;
     }
@@ -609,11 +624,11 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     uiDispatch({ type: 'START_DELETE_SEGMENT', payload: uiState.selectedSegment });
   }
 
-  function handleDeleteCancel() {
+  function handleCancelDeleteSegment() {
     uiDispatch({ type: 'CANCEL_DELETE_SEGMENT' });
   }
 
-  async function handleDeleteConfirm() {
+  async function handleConfirmDeleteSegment() {
     const segment = uiState.selectedSegment;
     if (!segment) return;
     try {
