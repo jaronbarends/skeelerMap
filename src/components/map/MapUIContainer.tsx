@@ -327,6 +327,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
               mode={uiState.mapUIMode}
               onCancel={handleCancelCreateMarker}
               onSaveMarker={handleSaveNewMarker}
+              isPending={isPending}
             />
           )}
         </>
