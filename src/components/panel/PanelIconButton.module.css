@@ -11,7 +11,7 @@
 
   &:hover:not(:disabled) {
     scale: 1.25;
-    transition: scale 0.1s ease-in-out;
+    transition: scale 0.3s var(--easing-overshoot-out);
   }
 
   &:focus-visible:not(:disabled) {

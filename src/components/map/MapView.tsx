@@ -39,6 +39,7 @@ interface MapProps {
   segments: Segment[];
   markers: Marker[];
   selectedSegment: Segment | null;
+  selectedMarker: Marker | null;
   pendingMarkerLocation: { lat: number; lng: number } | null;
   onControlPointCountChange: (count: number) => void;
   onMarkerLocationClicked: (lat: number, lng: number) => void;
@@ -59,6 +60,7 @@ export default function MapView({
   segments,
   markers,
   selectedSegment,
+  selectedMarker,
   pendingMarkerLocation,
   onControlPointCountChange,
   onMarkerLocationClicked,
@@ -124,7 +126,7 @@ export default function MapView({
     onSegmentDragEnd
   );
 
-  useInitMarkersLayer(mapRef, markers, mode, onMarkerSelect);
+  useInitMarkersLayer(mapRef, markers, mode, onMarkerSelect, selectedMarker);
   useInitPendingMarker(mapRef, pendingMarkerLocation);
 
   // expose methods to the ref in parent component

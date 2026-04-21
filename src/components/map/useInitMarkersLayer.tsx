@@ -20,20 +20,24 @@ export function useInitMarkersLayer(
   mapRef: RefObject<L.Map | null>,
   markers: Marker[],
   mode: MapUIMode,
-  onMarkerSelect: (marker: Marker) => void
+  onMarkerSelect: (marker: Marker) => void,
+  selectedMarker: Marker | null
 ) {
   // Refs mirror props so Leaflet event callbacks always call the latest
   // version without needing to be listed as effect dependencies.
   const markerLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const markersRef = useRef(markers);
+  const markerInstancesMapRef = useRef<Map<string, L.Marker>>(new Map());
   const modeRef = useRef(mode);
   const onMarkerSelectRef = useRef(onMarkerSelect);
+  const selectedMarkerRef = useRef(selectedMarker);
 
   useEffect(() => {
     markersRef.current = markers;
     modeRef.current = mode;
     onMarkerSelectRef.current = onMarkerSelect;
-  }, [markers, mode, onMarkerSelect]);
+    selectedMarkerRef.current = selectedMarker;
+  }, [markers, mode, onMarkerSelect, selectedMarker]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -49,6 +53,10 @@ export function useInitMarkersLayer(
       const iconName = MARKER_TYPES[m.type].iconName;
       const Icon = getIconByName(iconName);
       const svgHtml = renderToStaticMarkup(<Icon />);
+      // const isSelected = selectedMarkerRef.current?.id === m.id;
+      // const markerClassName = isSelected
+      //   ? `${styles.mapMarker} ${styles.selectedMapMarker}`
+      //   : styles.mapMarker;
       const icon = L.divIcon({
         className: '',
         html: `<div class="${styles.mapMarker}">${svgHtml}</div>`,
@@ -70,6 +78,7 @@ export function useInitMarkersLayer(
         const latestMarker = markersRef.current.find((marker) => marker.id === m.id) ?? m;
         onMarkerSelectRef.current(latestMarker);
       });
+      markerInstancesMapRef.current.set(m.id, layer);
     }
 
     mapRef.current?.on('zoomend', (e) => {
@@ -90,4 +99,13 @@ export function useInitMarkersLayer(
       markerLayerGroupRef.current = null;
     };
   }, [mapRef, markers]);
+
+  useEffect(() => {
+    for (const [id, marker] of markerInstancesMapRef.current) {
+      const el = marker.getElement()?.querySelector(`.${styles.mapMarker}`);
+      if (el) {
+        el.classList.toggle(styles.selectedMapMarker, selectedMarkerRef.current?.id === id);
+      }
+    }
+  }, [selectedMarker]);
 }
