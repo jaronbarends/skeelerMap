@@ -16,15 +16,19 @@ Supabase error messages are in English by default; for Dutch errors, add a trans
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
-### Auth: confirmation failure page
+### Bullet proof maken van sign up / login flow
 
 Currently, a failed email verification redirects to `/?toast=confirmation-failed`
 which is too brief for this error case. A failed confirmation needs a dedicated page
 that explains what went wrong and what the user can do next (e.g. request a new
 verification email, contact support, or try signing up again).
 
+- re-enable email confirmation under Authentication > Configuration > Sign In / Providers > Confirm email
 - Create `/auth/confirmation-failed` page with a clear error message and next steps
+- Add re-send confirmation link
 - Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
+- Add forgot password flow
+- Rate limit exceeded is now handled in rate exceeded SignupForm.tsx's async handleSubmit function. Tell the user to try again after an hour.
 
 ---
 
@@ -73,6 +77,12 @@ Scale polyline weight based on zoom level. Defer unless it becomes a visible pro
 Choose and configure a production tile provider. Current CartoDB usage may violate ToS under real traffic.
 Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
 _Open decision in decisions.md._
+
+### Password requirements
+
+Set password requirements Authentication > Sign In / Providers / Email > Password requirements
+Add indication at pw field
+add realtime check
 
 ### Supabase auth middleware
 

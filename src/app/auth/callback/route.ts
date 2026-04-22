@@ -3,12 +3,20 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUrlWithToast } from '@/lib/toastMessages';
 
+/*
+NOTE: this callback route handles the PKCE code exchange (exchangeCodeForSession). Not just used for account confirmation, but also for email change confirmation or magic links.
+*/
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 
   const successUrl = getUrlWithToast(origin, 'accountConfirmed');
-  const failureUrl = getUrlWithToast(origin, 'accountConfirmationFailed');
+  // const failureUrl = getUrlWithToast(origin, 'accountConfirmationFailed');
+  const failureUrl = new URL(`${origin}/error`);
+  searchParams.forEach((value, key) => {
+    failureUrl.searchParams.set(key, value as string);
+  });
 
   if (!code) {
     return NextResponse.redirect(failureUrl);
