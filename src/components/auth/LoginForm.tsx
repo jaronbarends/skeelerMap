@@ -8,12 +8,13 @@ import Button from '@/components/button/Button';
 import { signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
+import FormError from './FormError';
+
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  // const [error, setError] = useState<string | null>('test error');
+  const [error, setError] = useState<string | null>('');
   const [isPending, setIsPending] = useState(false);
 
   return (
@@ -45,7 +46,7 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {error && <div className="formError">{error}</div>}
+      {error && <FormError message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Inloggen'}
@@ -65,10 +66,10 @@ export default function LoginForm() {
     setError(null);
     setIsPending(true);
 
-    const { error: authError } = await signIn(email, password);
+    const result = await signIn(email, password);
 
-    if (authError) {
-      setError(authError.message);
+    if (!result.success) {
+      setError(result.error.message);
       setIsPending(false);
       return;
     }

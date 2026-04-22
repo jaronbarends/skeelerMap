@@ -28,7 +28,7 @@ verification email, contact support, or try signing up again).
 - Add re-send confirmation link
 - Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
 - Add forgot password flow
-- Rate limit exceeded is now handled in rate exceeded SignupForm.tsx's async handleSubmit function. Tell the user to try again after an hour.
+- Rate limit exceeded is now handled in rate exceeded _SignupForm.tsx_'s async handleSubmit function. Tell the user to try again after an hour.
 
 ---
 
