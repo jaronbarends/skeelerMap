@@ -6,13 +6,7 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### only show "aangemaakt door jou" or "aangemaakt door andere gebruiker" for logged in user
-
 ### when logging out, cancel all current actions
-
-### handle pending segment save
-
-show indicator while saving segment; disable buttons
 
 ### show indicator while loading map data
 
@@ -223,3 +217,13 @@ _Implemented 2026-04-15._
 Add option to add markers on the map. For now, markers represent warnings: dangerous point, dangerous crossing, steep slope.
 
 _Implemented 2026-04-20._
+
+### ~~handle pending segment save~~ ✓ Done
+
+show indicator while saving segment; disable buttons
+
+_Implemented 2026-04-21._
+
+### ~~~~only show "aangemaakt door jou" or "aangemaakt door andere gebruiker" for logged in user~~ ✓ Done
+
+_Implemented 2026-04-22._
