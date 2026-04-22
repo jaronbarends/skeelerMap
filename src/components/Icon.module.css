@@ -1,0 +1,13 @@
+.icon {
+  --icon-size: var(--size-32);
+  width: var(--icon-size);
+  height: var(--icon-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  & > svg {
+    width: 100%;
+    height: 100%;
+  }
+}

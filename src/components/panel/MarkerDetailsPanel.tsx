@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 
+import Icon from '@/components/Icon';
 import Button from '@/components/button/Button';
-import { getIconByName } from '@/lib/getIconByName';
 import type { MarkerDetailsMode } from '@/lib/mapUIMode';
 import { MARKER_TYPES, type Marker, type MarkerType } from '@/lib/markers';
 
@@ -43,17 +43,19 @@ export default function MarkerDetailsPanel({
   onSave,
   isPending,
 }: Props) {
+  const iconName = MARKER_TYPES[marker.type].iconName;
+
   return (
     <Panel>
       {mode === 'markerDetails' && (
         <>
           <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
-            <h1 className="hln-2">{MARKER_TYPES[marker.type].title}</h1>
+            <h1 className={`hln-2 ${styles.heading}`}>
+              <Icon iconName={iconName} />
+              {MARKER_TYPES[marker.type].title}
+            </h1>
           </PanelHeader>
           <PanelBody>
-            <div className={styles.markerDetailIcon}>
-              {getIconByName(MARKER_TYPES[marker.type].iconName)({})}
-            </div>
             {marker.description !== null && <p>{marker.description}</p>}
             <OwnerText
               userIsLoggedIn={userIsLoggedIn}

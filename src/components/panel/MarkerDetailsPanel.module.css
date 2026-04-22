@@ -1,16 +1,7 @@
-.markerDetailIcon {
-  width: var(--size-32);
-  height: var(--size-32);
-  display: inline-flex;
+.heading {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--color-text-primary);
-  margin-bottom: var(--size-12);
-
-  & > svg {
-    width: 100%;
-    height: 100%;
-  }
+  gap: var(--size-8);
 }
 
 .deleteActions {

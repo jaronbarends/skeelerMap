@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
+import Icon from '@/components/Icon';
 import Button from '@/components/button/Button';
-import { getIconByName } from '@/lib/getIconByName';
 import { MARKER_TYPES, type MarkerType } from '@/lib/markers';
 
 import styles from './MarkerForm.module.css';
@@ -44,7 +44,7 @@ export default function MarkerForm({
             role="radio"
             aria-checked={type === markerType}
           >
-            <span className={styles.icon}>{getIconByName(MARKER_TYPES[type].iconName)({})}</span>
+            <Icon iconName={MARKER_TYPES[type].iconName} size={24} />
             <span className={styles.iconTitle}>{MARKER_TYPES[type].title}</span>
           </button>
         ))}
