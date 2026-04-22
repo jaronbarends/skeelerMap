@@ -276,6 +276,12 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   );
 
   useEffect(() => {
+    if (!currentUserId) {
+      uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
+    }
+  }, [currentUserId]);
+
+  useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);

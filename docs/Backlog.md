@@ -6,8 +6,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### when logging out, cancel all current actions
-
 ### show indicator while loading map data
 
 ### use Dutch error messages
@@ -225,5 +223,9 @@ show indicator while saving segment; disable buttons
 _Implemented 2026-04-21._
 
 ### ~~~~only show "aangemaakt door jou" or "aangemaakt door andere gebruiker" for logged in user~~ ✓ Done
+
+_Implemented 2026-04-22._
+
+### ~~when logging out, cancel all current actions~~ ✓ Done
 
 _Implemented 2026-04-22._
