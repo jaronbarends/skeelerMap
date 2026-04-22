@@ -1,11 +1,12 @@
 import { useRef, useEffect } from 'react';
 
+import Icon from '@/components/Icon';
 import Button from '@/components/button/Button';
-import { getIconByName } from '@/lib/getIconByName';
 import type { MarkerDetailsMode } from '@/lib/mapUIMode';
 import { MARKER_TYPES, type Marker, type MarkerType } from '@/lib/markers';
 
 import MarkerForm from './MarkerForm';
+import OwnerText from './OwnerText';
 import Panel from './Panel';
 import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
@@ -17,6 +18,7 @@ interface Props {
   marker: Marker;
   mode: MarkerDetailsMode;
   currentUserOwnsMarker: boolean;
+  userIsLoggedIn: boolean;
   onClose: () => void;
   onEditStart?: () => void;
   onDeleteStart?: () => void;
@@ -31,6 +33,7 @@ export default function MarkerDetailsPanel({
   marker,
   mode,
   currentUserOwnsMarker,
+  userIsLoggedIn,
   onClose,
   onEditStart,
   onDeleteStart,
@@ -40,21 +43,25 @@ export default function MarkerDetailsPanel({
   onSave,
   isPending,
 }: Props) {
+  const iconName = MARKER_TYPES[marker.type].iconName;
+
   return (
     <Panel>
       {mode === 'markerDetails' && (
         <>
           <PanelHeader onClose={onClose} actionButtons={getActionButtons()}>
-            <h1 className="hln-2">{MARKER_TYPES[marker.type].title}</h1>
+            <h1 className={`hln-2 ${styles.heading}`}>
+              <Icon iconName={iconName} />
+              {MARKER_TYPES[marker.type].title}
+            </h1>
           </PanelHeader>
           <PanelBody>
-            <div className={styles.markerDetailIcon}>
-              {getIconByName(MARKER_TYPES[marker.type].iconName)({})}
-            </div>
             {marker.description !== null && <p>{marker.description}</p>}
-            <p>
-              {currentUserOwnsMarker ? 'Aangemaakt door jou' : 'Aangemaakt door andere gebruiker'}
-            </p>
+            <OwnerText
+              userIsLoggedIn={userIsLoggedIn}
+              currentUserIsOwner={currentUserOwnsMarker}
+              objectName="Waarschuwing"
+            />
           </PanelBody>
         </>
       )}

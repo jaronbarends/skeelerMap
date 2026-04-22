@@ -360,6 +360,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           segment={uiState.selectedSegment}
           mode={uiState.mapUIMode}
           currentUserOwnsSegment={segmentIsOwnedByCurrentUser(uiState.selectedSegment)}
+          userIsLoggedIn={currentUserId !== null}
           onClose={handleDetailsClose}
           onEditStart={
             segmentIsOwnedByCurrentUser(uiState.selectedSegment) ? handleEditStart : undefined
@@ -381,6 +382,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           marker={uiState.selectedMarker}
           mode={uiState.mapUIMode}
           currentUserOwnsMarker={markerIsOwnedByCurrentUser(uiState.selectedMarker)}
+          userIsLoggedIn={currentUserId !== null}
           onClose={handleCloseMarkerDetails}
           onEditStart={
             markerIsOwnedByCurrentUser(uiState.selectedMarker) ? handleStartEditMarker : undefined
