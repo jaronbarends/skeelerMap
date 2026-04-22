@@ -53,9 +53,7 @@ export default function MarkerDetailsPanel({
             </div>
             {marker.description !== null && <p>{marker.description}</p>}
             <p>
-              {currentUserOwnsMarker
-                ? 'Aangemaakt door jou'
-                : 'Aangemaakt door andere gebruiker'}
+              {currentUserOwnsMarker ? 'Aangemaakt door jou' : 'Aangemaakt door andere gebruiker'}
             </p>
           </PanelBody>
         </>
@@ -72,6 +70,7 @@ export default function MarkerDetailsPanel({
               defaultDescription={marker.description ?? ''}
               onSave={onSave}
               onCancel={onEditCancel}
+              isPending={isPending}
             />
           </PanelBody>
         </>

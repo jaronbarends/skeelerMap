@@ -11,6 +11,7 @@ interface Props {
   defaultDescription: string;
   onSave: (type: MarkerType, description: string | null) => void;
   onCancel: () => void;
+  isPending: boolean;
 }
 
 export default function MarkerForm({
@@ -18,11 +19,14 @@ export default function MarkerForm({
   defaultDescription,
   onSave,
   onCancel,
+  isPending,
 }: Props) {
   const [markerType, setMarkerType] = useState<MarkerType>(defaultMarkerType);
   const [description, setDescription] = useState<string>(defaultDescription);
 
-  return (
+  return isPending ? (
+    <p>Bezig met opslaan...</p>
+  ) : (
     <form
       className={styles.markerForm}
       onSubmit={(event) => {

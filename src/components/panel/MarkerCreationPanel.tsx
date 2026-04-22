@@ -9,11 +9,12 @@ import PanelHeader from './PanelHeader';
 
 interface Props {
   mode: MapUIMode;
+  isPending: boolean;
   onCancel: () => void;
   onSaveMarker: (type: MarkerType, description: string | null) => void;
 }
 
-export default function MarkerCreationPanel({ mode, onCancel, onSaveMarker }: Props) {
+export default function MarkerCreationPanel({ mode, isPending, onCancel, onSaveMarker }: Props) {
   if (!isCreateMarkerMode(mode)) {
     return null;
   }
@@ -33,6 +34,7 @@ export default function MarkerCreationPanel({ mode, onCancel, onSaveMarker }: Pr
 
         {mode === 'markerForm' && (
           <MarkerForm
+            isPending={isPending}
             defaultMarkerType="danger"
             defaultDescription=""
             onSave={onSaveMarker}
@@ -43,4 +45,3 @@ export default function MarkerCreationPanel({ mode, onCancel, onSaveMarker }: Pr
     </Panel>
   );
 }
-
