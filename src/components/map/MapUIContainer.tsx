@@ -253,11 +253,15 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
     [currentUserId]
   );
 
+  const handleCancelCurrentAction = useCallback(() => {
+    mapRef.current?.cancelCreateSegment();
+    uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
+  }, []);
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        mapRef.current?.cancelCreateSegment();
-        uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
+        handleCancelCurrentAction();
       }
       if (event.key === 'Delete') {
         const selectedSegment = selectedSegmentRef.current;
@@ -272,14 +276,19 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         }
       }
     },
-    [segmentIsOwnedByCurrentUser, markerIsOwnedByCurrentUser, uiState.mapUIMode]
+    [
+      segmentIsOwnedByCurrentUser,
+      markerIsOwnedByCurrentUser,
+      uiState.mapUIMode,
+      handleCancelCurrentAction,
+    ]
   );
 
   useEffect(() => {
     if (!currentUserId) {
-      uiDispatch({ type: 'CANCEL_CURRENT_ACTION' });
+      handleCancelCurrentAction();
     }
-  }, [currentUserId]);
+  }, [currentUserId, handleCancelCurrentAction]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
