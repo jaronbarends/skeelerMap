@@ -265,13 +265,14 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           uiDispatch({ type: 'START_DELETE_SEGMENT', payload: selectedSegment });
         } else if (
           selectedMarkerRef.current &&
-          markerIsOwnedByCurrentUser(selectedMarkerRef.current)
+          markerIsOwnedByCurrentUser(selectedMarkerRef.current) &&
+          uiState.mapUIMode === 'markerDetails' // we don't want to delete markers when they are in the markerForm mode
         ) {
           uiDispatch({ type: 'START_DELETE_MARKER' });
         }
       }
     },
-    [segmentIsOwnedByCurrentUser, markerIsOwnedByCurrentUser]
+    [segmentIsOwnedByCurrentUser, markerIsOwnedByCurrentUser, uiState.mapUIMode]
   );
 
   useEffect(() => {
