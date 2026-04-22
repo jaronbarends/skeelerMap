@@ -1,12 +1,14 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getUrlWithToast } from '@/lib/toastMessages';
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 
-  const successUrl = `${origin}/?toast=account-confirmed`;
-  const failureUrl = `${origin}/?toast=confirmation-failed`;
+  const successUrl = getUrlWithToast(origin, 'accountConfirmed');
+  const failureUrl = getUrlWithToast(origin, 'accountConfirmationFailed');
 
   if (!code) {
     return NextResponse.redirect(failureUrl);
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
           });
         },
       },
-    },
+    }
   );
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);

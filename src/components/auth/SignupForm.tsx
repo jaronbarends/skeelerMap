@@ -14,8 +14,8 @@ export default function SignupForm() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  // const [successMessageVisible, setSuccessMessageVisible] = useState(false);
-  const [successMessageVisible, setSuccessMessageVisible] = useState(true);
+  const [successMessageVisible, setSuccessMessageVisible] = useState(false);
+  // const [successMessageVisible, setSuccessMessageVisible] = useState(true);
 
   if (successMessageVisible) {
     return (
@@ -29,7 +29,6 @@ export default function SignupForm() {
   }
 
   return (
-    // <div className="formPage">
     <form className="form" onSubmit={handleSubmit}>
       <h1>Registreren</h1>
 

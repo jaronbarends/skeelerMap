@@ -126,7 +126,7 @@ Do not implement role-based RLS until the profiles table exists.
 
 ### Use Custom SMTP for supabase emails
 
-To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, SendGrid, or Postmark in your project settings to overcome free tier limitations.
+To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
 
 ---
 

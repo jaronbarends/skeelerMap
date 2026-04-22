@@ -6,6 +6,7 @@ import { type SubmitEvent, useState } from 'react';
 
 import Button from '@/components/button/Button';
 import { signIn } from '@/lib/supabaseAuth';
+import { getUrlWithToast } from '@/lib/toastMessages';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function LoginForm() {
     }
 
     // no need to call setIsPending(false) here: the component unmounts via navigation, so resetting it would cause a state update on an unmounted component.
-    router.push(`/?toast=loggedIn`);
+    router.push(getUrlWithToast('/', 'loggedIn'));
     // push only re-renders client-side. We need to refresh server side AuthControls as well to show correct login state. router.refresh() does that.
     router.refresh();
   }
