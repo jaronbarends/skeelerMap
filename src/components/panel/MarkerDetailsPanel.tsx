@@ -6,6 +6,7 @@ import type { MarkerDetailsMode } from '@/lib/mapUIMode';
 import { MARKER_TYPES, type Marker, type MarkerType } from '@/lib/markers';
 
 import MarkerForm from './MarkerForm';
+import OwnerText from './OwnerText';
 import Panel from './Panel';
 import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
@@ -17,6 +18,7 @@ interface Props {
   marker: Marker;
   mode: MarkerDetailsMode;
   currentUserOwnsMarker: boolean;
+  userIsLoggedIn: boolean;
   onClose: () => void;
   onEditStart?: () => void;
   onDeleteStart?: () => void;
@@ -31,6 +33,7 @@ export default function MarkerDetailsPanel({
   marker,
   mode,
   currentUserOwnsMarker,
+  userIsLoggedIn,
   onClose,
   onEditStart,
   onDeleteStart,
@@ -52,9 +55,11 @@ export default function MarkerDetailsPanel({
               {getIconByName(MARKER_TYPES[marker.type].iconName)({})}
             </div>
             {marker.description !== null && <p>{marker.description}</p>}
-            <p>
-              {currentUserOwnsMarker ? 'Aangemaakt door jou' : 'Aangemaakt door andere gebruiker'}
-            </p>
+            <OwnerText
+              userIsLoggedIn={userIsLoggedIn}
+              currentUserIsOwner={currentUserOwnsMarker}
+              objectName="Waarschuwing"
+            />
           </PanelBody>
         </>
       )}

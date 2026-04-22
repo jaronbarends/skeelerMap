@@ -7,6 +7,7 @@ import type { MapUIMode } from '@/lib/mapUIMode';
 import type { RatingValue, Segment } from '@/lib/segments';
 import { getRatingByValue } from '@/lib/segments';
 
+import OwnerText from './OwnerText';
 import Panel from './Panel';
 import PanelBody from './PanelBody';
 import PanelHeader from './PanelHeader';
@@ -19,6 +20,7 @@ interface Props {
   segment: Segment;
   mode: MapUIMode;
   currentUserOwnsSegment: boolean;
+  userIsLoggedIn: boolean;
   onClose: () => void;
   onEditStart?: () => void;
   onDeleteStart?: () => void;
@@ -32,6 +34,7 @@ export default function SegmentDetailsPanel({
   segment,
   mode,
   currentUserOwnsSegment,
+  userIsLoggedIn,
   onClose,
   onEditStart,
   onDeleteStart,
@@ -49,7 +52,11 @@ export default function SegmentDetailsPanel({
             <h1 className="hln-2">Segment details</h1>
           </PanelHeader>
           <PanelBody>
-            <SegmentDetails segment={segment} currentUserOwnsSegment={currentUserOwnsSegment} />
+            <SegmentDetails
+              segment={segment}
+              currentUserOwnsSegment={currentUserOwnsSegment}
+              userIsLoggedIn={userIsLoggedIn}
+            />
           </PanelBody>
         </>
       )}
@@ -111,8 +118,9 @@ export default function SegmentDetailsPanel({
 interface SegmentDetailsProps {
   segment: Segment;
   currentUserOwnsSegment: boolean;
+  userIsLoggedIn: boolean;
 }
-function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps) {
+function SegmentDetails({ segment, currentUserOwnsSegment, userIsLoggedIn }: SegmentDetailsProps) {
   const [infoIsOpen, setInfoIsOpen] = useState(false);
   const length: number = calculateSegmentLength(segment.coordinates);
   const rating = getRatingByValue(segment.ratingValue);
@@ -139,11 +147,11 @@ function SegmentDetails({ segment, currentUserOwnsSegment }: SegmentDetailsProps
           <em>{rating.label}</em> houdt in: {rating.description}
         </p>
       )}
-      <p>
-        {currentUserOwnsSegment
-          ? 'Segment aangemaakt door jou'
-          : 'Segment aangemaakt door andere gebruiker'}
-      </p>
+      <OwnerText
+        userIsLoggedIn={userIsLoggedIn}
+        currentUserIsOwner={currentUserOwnsSegment}
+        objectName="Segment"
+      />
     </>
   );
 
