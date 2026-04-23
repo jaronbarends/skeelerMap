@@ -10,6 +10,8 @@ import { getUrlWithToast } from '@/lib/toastMessages';
 
 import FormError from './FormError';
 
+import styles from './LoginForm.module.css';
+
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -43,6 +45,9 @@ export default function LoginForm() {
             autoComplete="current-password"
             required
           />
+        </div>
+        <div className={`formItem ${styles.forgotPassword}`}>
+          <Link href="/wachtwoord-vergeten">Wachtwoord vergeten?</Link>
         </div>
       </div>
 
