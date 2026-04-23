@@ -35,10 +35,18 @@ verification email, contact support, or try signing up again).
 - use constants for recurring form errors (like password not matching)
 - add pending state to all submitbuttons
 - add title to success states after sending mail (signup, request reset)
+- see if we need components for recurring form items (input fields, button)
+- remove old auth/callback urls from Authentication > URL Configuration
 
 ---
 
 ## Medium priority
+
+### toast closing behavior
+
+- make timeout longer;
+- make dismiss obvious by adding button?
+- add countdown bar
 
 ### Auto-follow location mode
 

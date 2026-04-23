@@ -21,7 +21,7 @@ export async function signUp(email: string, password: string): Promise<AuthResul
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/signup-callback`,
     },
   });
 
@@ -75,8 +75,19 @@ export type SimpleAuthResult =
 export async function resetPasswordForEmail(email: string): Promise<SimpleAuthResult> {
   const supabase = getBrowserClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-wachtwoord`,
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password-callback`,
   });
+
+  if (error) {
+    return getAuthErrorResult(error);
+  }
+
+  return { success: true as const };
+}
+
+export async function resendConfirmationEmail(email: string): Promise<SimpleAuthResult> {
+  const supabase = getBrowserClient();
+  const { error } = await supabase.auth.resend({ type: 'signup', email });
 
   if (error) {
     return getAuthErrorResult(error);
