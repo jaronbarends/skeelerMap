@@ -3,9 +3,5 @@ interface Props {
 }
 
 export default function FormError({ message }: Props) {
-  return (
-    <>
-      <div className="formError">{message}</div>
-    </>
-  );
+  return <div className="formError">{message}</div>;
 }

@@ -1,30 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getUrlWithToast } from '@/lib/toastMessages';
-
-/*
-NOTE: this callback route handles the PKCE code exchange (exchangeCodeForSession). Not just used for account confirmation, but also for email change confirmation or magic links.
-*/
-
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 
-  const successUrl = getUrlWithToast(origin, 'accountConfirmed');
-  // const failureUrl = getUrlWithToast(origin, 'accountConfirmationFailed');
-  const failureUrl = new URL(`${origin}/error`);
-  searchParams.forEach((value, key) => {
-    failureUrl.searchParams.set(key, value as string);
-  });
+  const failureUrl = `${origin}/wachtwoord-vergeten?expired=1`;
 
   if (!code) {
-    console.log('---------------------');
-    console.log('searchParams:', searchParams);
-    console.log('---------------------');
     return NextResponse.redirect(failureUrl);
   }
 
+  const successUrl = `${origin}/nieuw-wachtwoord`;
   const response = NextResponse.redirect(successUrl);
 
   const supabase = createServerClient(

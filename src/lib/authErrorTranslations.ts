@@ -12,11 +12,13 @@ export const authErrorTranslations: Record<string, ErrorTranslation> = {
   },
   email_not_confirmed: {
     description: 'Signing in is not allowed for this user as the email address is not confirmed.',
-    message: 'Je account is nog niet bevestigd. Controleer je e-mail om je account te bevestigen.',
+    message:
+      'Je account is nog niet bevestigd. Klik op de link in de e-mail die je eerder hebt ontvangen om je account te bevestigen.',
   },
   invalid_credentials: {
     description: 'Login credentials or grant type not recognized.',
-    message: 'Je  e-mailadres of wachtwoord is onjuist.',
+    message:
+      'Je  e-mailadres of wachtwoord is onjuist. Controleer je inloggegevens en probeer het opnieuw.',
   },
   over_email_send_rate_limit: {
     description:

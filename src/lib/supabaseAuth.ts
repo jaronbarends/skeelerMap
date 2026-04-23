@@ -47,27 +47,51 @@ export async function signIn(email: string, password: string): Promise<AuthResul
   return getAuthResult(data, error);
 }
 
+function getAuthErrorResult(error: AuthError): { success: false; error: { code: string; message: string } } {
+  // Provide a fallback 'unknown' code if error.code is undefined
+  const errorCode = error.code ?? 'unknown';
+  return {
+    success: false as const,
+    error: { code: errorCode, message: getErrorMessageByCode(errorCode) },
+  };
+}
+
 function getAuthResult(data: AuthResponse['data'], error: AuthError | null): AuthResult {
   if (error) {
-    // Provide a fallback 'unknown' code if error.code is undefined
-    const errorCode = error.code ?? 'unknown';
-    const message = getErrorMessageByCode(errorCode);
-
-    return {
-      success: false as const,
-      error: {
-        code: errorCode,
-        message,
-      },
-    };
+    return getAuthErrorResult(error);
   }
-  return {
-    success: true as const,
-    data,
-  };
+  return { success: true as const, data };
 }
 
 export async function signOut() {
   const supabase = getBrowserClient();
   return supabase.auth.signOut();
+}
+
+export type SimpleAuthResult =
+  | { success: true }
+  | { success: false; error: { code: string; message: string } };
+
+export async function resetPasswordForEmail(email: string): Promise<SimpleAuthResult> {
+  const supabase = getBrowserClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-wachtwoord`,
+  });
+
+  if (error) {
+    return getAuthErrorResult(error);
+  }
+
+  return { success: true as const };
+}
+
+export async function updatePassword(password: string): Promise<SimpleAuthResult> {
+  const supabase = getBrowserClient();
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return getAuthErrorResult(error);
+  }
+
+  return { success: true as const };
 }
