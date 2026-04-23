@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState } from 'react';
 
 import Button from '@/components/button/Button';
-import { signIn } from '@/lib/supabaseAuth';
+import { type AuthResult, signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
 import FormError from './FormError';
@@ -66,7 +66,7 @@ export default function LoginForm() {
     setError(null);
     setIsPending(true);
 
-    const result = await signIn(email, password);
+    const result: AuthResult = await signIn(email, password);
 
     if (!result.success) {
       setError(result.error.message);

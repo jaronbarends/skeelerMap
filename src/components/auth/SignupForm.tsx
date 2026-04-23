@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { type SubmitEvent, useState } from 'react';
 
 import Button from '@/components/button/Button';
-import { signUp } from '@/lib/supabaseAuth';
+import { type AuthResult, signUp } from '@/lib/supabaseAuth';
 
 import styles from './SignupForm.module.css';
 
@@ -95,10 +95,9 @@ export default function SignupForm() {
 
     setIsPending(true);
 
-    const { error: authError } = await signUp(email, password);
-
-    if (authError) {
-      setError(authError.message);
+    const result: AuthResult = await signUp(email, password);
+    if (!result.success) {
+      setError(result.error.message);
       setIsPending(false);
       return;
     }
