@@ -19,6 +19,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (!code) {
+    console.log('---------------------');
+    console.log('searchParams:', searchParams);
+    console.log('---------------------');
     return NextResponse.redirect(failureUrl);
   }
 
