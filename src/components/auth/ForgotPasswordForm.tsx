@@ -31,7 +31,7 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
     <form className="form" onSubmit={handleSubmit}>
       <h1>{title}</h1>
 
-      <p className="formIntro">{intro}</p>
+      <p>{intro}</p>
 
       <div className="formGroup">
         <div className="formItem">
