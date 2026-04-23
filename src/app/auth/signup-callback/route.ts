@@ -12,11 +12,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
 
   const successUrl = getUrlWithToast(origin, 'accountConfirmed');
-  // const failureUrl = getUrlWithToast(origin, 'accountConfirmationFailed');
-  const failureUrl = new URL(`${origin}/error`);
-  searchParams.forEach((value, key) => {
-    failureUrl.searchParams.set(key, value as string);
-  });
+  const failureUrl = `${origin}/bevestigings-link-opnieuw-aanvragen`;
 
   if (!code) {
     return NextResponse.redirect(failureUrl);
