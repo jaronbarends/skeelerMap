@@ -8,27 +8,9 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ### show indicator while loading map data
 
-### use Dutch error messages
-
-Supabase error messages are in English by default; for Dutch errors, add a translation layer on top of authError.message.
-
-### re-evaluate error messages on change
+### live-check error messages on change
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
-
-### Bullet proof maken van sign up / login flow
-
-Currently, a failed email verification redirects to `/?toast=confirmation-failed`
-which is too brief for this error case. A failed confirmation needs a dedicated page
-that explains what went wrong and what the user can do next (e.g. request a new
-verification email, contact support, or try signing up again).
-
-- re-enable email confirmation under Authentication > Configuration > Sign In / Providers > Confirm email
-- Create `/auth/confirmation-failed` page with a clear error message and next steps
-- Add re-send confirmation link
-- Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
-- Add forgot password flow
-- Rate limit exceeded is now handled in rate exceeded _SignupForm.tsx_'s async handleSubmit function. Tell the user to try again after an hour.
 
 ### check what happens with segments of deleted users
 
@@ -155,7 +137,9 @@ Do not implement role-based RLS until the profiles table exists.
 
 To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
 
----
+### Zoom-based polyline weight scaling
+
+## When we get many segments, maybe the polylines should get a different weight when zooming out a lot
 
 ## Icebox
 
@@ -256,3 +240,13 @@ _Implemented 2026-04-22._
 ### ~~when logging out, cancel all current actions~~ ✓ Done
 
 _Implemented 2026-04-22._
+
+### ~~Bullet proof maken van sign up / login flow~~ ✓ Done
+
+Dedicated error page, forgot password flow, re-send confirmation, Dutch error messages, generic auth callback, Resend for email delivery.
+_Implemented 2026-04-24._
+
+### ~~use Dutch error messages~~ ✓ Done
+
+Translation layer in `src/lib/authErrorTranslations.ts` on top of Supabase `authError.message`.
+_Implemented 2026-04-24._

@@ -204,16 +204,6 @@
 
 ---
 
-## Out of scope (explicit)
-
-- Segment list view / summary statistics (present in PoC, intentionally removed)
-- Zoom-based polyline weight scaling (revisit only if it becomes a visible problem)
-- Custom API layer (using BaaS instead)
-- Drag-to-edit segment endpoints (v1.1)
-- Editing intermediate control points (not planned — stored data is routed geometry only)
-
----
-
 ## Auth
 
 ### Auth approach: Supabase email/password
