@@ -122,5 +122,9 @@ function getAuthResult(data: AuthResponse['data'], error: AuthError | null): Aut
 }
 
 function getCallbackUrl(type: AuthCallbackType) {
-  return `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=${type}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    throw new Error('NEXT_PUBLIC_SITE_URL is not set');
+  }
+  return `${siteUrl}/auth/callback?type=${type}`;
 }

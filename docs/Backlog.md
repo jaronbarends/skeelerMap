@@ -12,7 +12,7 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
-### check what happens with segments of deleted users
+### Add possibilty to resend confirmation email
 
 ### form tech debt
 
@@ -22,6 +22,7 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 - add title to success states after sending mail (signup, request reset)
 - see if we need components for recurring form items (input fields, button)
 - remove old auth/callback urls from Authentication > URL Configuration
+- move FormError out of auth
 
 ---
 
@@ -77,11 +78,16 @@ Choose and configure a production tile provider. Current CartoDB usage may viola
 Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
 _Open decision in decisions.md._
 
+### Handle deleted user's segments
+
+TBD: what do we want? ATM, in supabase we have a constraint on table segments for fk_segments_user_id: delete_rule CASCADE, which deletes their segments when a user is deleted.
+
 ### Password requirements
 
 Set password requirements Authentication > Sign In / Providers / Email > Password requirements
 Add indication at pw field
 add realtime check
+see if we can dynamically import the requirements and show them with the field
 
 ### Supabase auth middleware
 

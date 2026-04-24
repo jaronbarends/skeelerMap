@@ -18,7 +18,7 @@ export const authErrorTranslations: Record<string, ErrorTranslation> = {
   invalid_credentials: {
     description: 'Login credentials or grant type not recognized.',
     message:
-      'Je  e-mailadres of wachtwoord is onjuist. Controleer je inloggegevens en probeer het opnieuw.',
+      'Je e-mailadres of wachtwoord is onjuist. Controleer je inloggegevens en probeer het opnieuw.',
   },
   over_email_send_rate_limit: {
     // it looks like this does not apply to reset password links
