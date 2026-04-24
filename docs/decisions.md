@@ -42,6 +42,18 @@
 **Rationale:** Keep focus on frontend. Auth and data persistence handled by a managed service. Supabase chosen over Firebase for its Postgres-based data model and open-source nature.
 **Status:** Implemented — segments are stored in Supabase.
 
+### Email delivery: Resend
+
+**Date:** 2026-04-24
+**Decision:** Use Resend (resend.com) as the SMTP provider for Supabase auth emails (verification, password reset).
+**Rationale:** Supabase's built-in email service is limited to 2 messages per hour and is not intended for production use. Resend provides a reliable free tier with no meaningful rate limits for this app's scale.
+**Setup:**
+
+- Sending subdomain `skeelermap-auth.jaron.nl` created and verified in Resend
+- DNS records added in Cloudflare (DNS only, not proxied)
+- Configured in Supabase under Authentication > SMTP Settings
+- Sender address: `skeelermap@skeelermap-auth.jaron.nl`
+
 ---
 
 ## Architecture
@@ -253,10 +265,11 @@
 
 **Date:** 2026-04-10
 **Decision:** The root layout (`app/layout.tsx`) provides chrome only — `<Header>` and `{children}`, no `<main>`. Each layout level that needs it owns its own `<main>`:
+
 - Root page (`app/page.tsx`) wraps its map content in a full-width `<main>`.
 - Content pages live in the `app/(content)/` route group, whose layout renders a max-width centered `<main>`.
-**Rationale:** Different pages need structurally different `<main>` elements (full-width map vs constrained content). Putting `<main>` in the root layout forces all pages to share the same structure. Route groups let each section own the right structure without affecting URLs.
-**Color layering:** `body` → `--color-surface-200`; `main` → `--color-surface-150` (global); `<header>` → `--color-surface-100`. Header has `max-width: var(--content-max-width)` centered — on wide screens the body color shows on either side of it (intentional).
+  **Rationale:** Different pages need structurally different `<main>` elements (full-width map vs constrained content). Putting `<main>` in the root layout forces all pages to share the same structure. Route groups let each section own the right structure without affecting URLs.
+  **Color layering:** `body` → `--color-surface-200`; `main` → `--color-surface-150` (global); `<header>` → `--color-surface-100`. Header has `max-width: var(--content-max-width)` centered — on wide screens the body color shows on either side of it (intentional).
 
 ---
 

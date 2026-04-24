@@ -30,8 +30,11 @@ verification email, contact support, or try signing up again).
 - Add forgot password flow
 - Rate limit exceeded is now handled in rate exceeded _SignupForm.tsx_'s async handleSubmit function. Tell the user to try again after an hour.
 
+### check what happens with segments of deleted users
+
 ### form tech debt
 
+- move all auth pages to (content)/(auth)
 - use constants for recurring form errors (like password not matching)
 - add pending state to all submitbuttons
 - add title to success states after sending mail (signup, request reset)
