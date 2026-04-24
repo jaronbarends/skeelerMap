@@ -3,17 +3,19 @@ import type { AuthResponse, AuthError } from '@supabase/supabase-js';
 
 import { getErrorMessageByCode } from './authErrorTranslations';
 
-function getBrowserClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-  );
-}
+export type AuthCallbackType = 'signup' | 'recovery';
 
 // Note: both signInWithPassword and signUp return AuthResponse, so we can use the same type for both; signOut returns { error: AuthError | null }
 export type AuthResult =
   | { success: true; data: AuthResponse['data'] }
   | { success: false; error: { code: string; message: string } };
+
+export type SimpleAuthResult =
+  | { success: true }
+  | { success: false; error: { code: string; message: string } };
+
+const SIGNUP_CALLBACK_URL = getCallbackUrl('signup');
+const RESET_PASSWORD_CALLBACK_URL = getCallbackUrl('recovery');
 
 export async function signUp(email: string, password: string): Promise<AuthResult> {
   const supabase = getBrowserClient();
@@ -21,7 +23,7 @@ export async function signUp(email: string, password: string): Promise<AuthResul
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/signup-callback`,
+      emailRedirectTo: SIGNUP_CALLBACK_URL,
     },
   });
 
@@ -47,35 +49,15 @@ export async function signIn(email: string, password: string): Promise<AuthResul
   return getAuthResult(data, error);
 }
 
-function getAuthErrorResult(error: AuthError): { success: false; error: { code: string; message: string } } {
-  // Provide a fallback 'unknown' code if error.code is undefined
-  const errorCode = error.code ?? 'unknown';
-  return {
-    success: false as const,
-    error: { code: errorCode, message: getErrorMessageByCode(errorCode) },
-  };
-}
-
-function getAuthResult(data: AuthResponse['data'], error: AuthError | null): AuthResult {
-  if (error) {
-    return getAuthErrorResult(error);
-  }
-  return { success: true as const, data };
-}
-
 export async function signOut() {
   const supabase = getBrowserClient();
   return supabase.auth.signOut();
 }
 
-export type SimpleAuthResult =
-  | { success: true }
-  | { success: false; error: { code: string; message: string } };
-
 export async function resetPasswordForEmail(email: string): Promise<SimpleAuthResult> {
   const supabase = getBrowserClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password-callback`,
+    redirectTo: RESET_PASSWORD_CALLBACK_URL,
   });
 
   if (error) {
@@ -87,7 +69,13 @@ export async function resetPasswordForEmail(email: string): Promise<SimpleAuthRe
 
 export async function resendConfirmationEmail(email: string): Promise<SimpleAuthResult> {
   const supabase = getBrowserClient();
-  const { error } = await supabase.auth.resend({ type: 'signup', email });
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: {
+      emailRedirectTo: SIGNUP_CALLBACK_URL,
+    },
+  });
 
   if (error) {
     return getAuthErrorResult(error);
@@ -105,4 +93,34 @@ export async function updatePassword(password: string): Promise<SimpleAuthResult
   }
 
   return { success: true as const };
+}
+
+function getBrowserClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+  );
+}
+
+function getAuthErrorResult(error: AuthError): {
+  success: false;
+  error: { code: string; message: string };
+} {
+  // Provide a fallback 'unknown' code if error.code is undefined
+  const errorCode = error.code ?? 'unknown';
+  return {
+    success: false as const,
+    error: { code: errorCode, message: getErrorMessageByCode(errorCode) },
+  };
+}
+
+function getAuthResult(data: AuthResponse['data'], error: AuthError | null): AuthResult {
+  if (error) {
+    return getAuthErrorResult(error);
+  }
+  return { success: true as const, data };
+}
+
+function getCallbackUrl(type: AuthCallbackType) {
+  return `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=${type}`;
 }

@@ -21,10 +21,11 @@ export const authErrorTranslations: Record<string, ErrorTranslation> = {
       'Je  e-mailadres of wachtwoord is onjuist. Controleer je inloggegevens en probeer het opnieuw.',
   },
   over_email_send_rate_limit: {
+    // it looks like this does not apply to reset password links
     description:
       'Too many emails have been sent to this email address. Ask the user to wait a while before trying again.',
     message:
-      'We kunnen even geen gebruikers aanmaken op dit moment. Probeer het over een uur opnieuw.',
+      'Ons systeem kan op dit moment even geen e-mails versturen (bijvoorbeeld voor het bevestigen van je account of het resetten van je wachtwoord). Probeer het over een uur opnieuw.',
   },
   same_password: {
     description:

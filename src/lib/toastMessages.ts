@@ -1,7 +1,8 @@
 export const TOAST_MESSAGES = {
   loggedIn: 'Je bent nu ingelogd',
   loggedOut: 'Je bent nu uitgelogd',
-  accountConfirmed: 'Je account is bevestigd. Je kunt nu zelf segmenten aanmaken.',
+  accountConfirmed:
+    'Je account is bevestigd en je bent nu ingelogd. Je kunt nu zelf segmenten aanmaken.',
   accountConfirmationFailed: 'Bevestiging mislukt. Probeer opnieuw aan te melden.',
   passwordChanged: 'Je wachtwoord is aangepast. Je bent nu ingelogd.',
 } as const;
