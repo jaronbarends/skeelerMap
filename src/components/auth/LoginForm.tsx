@@ -5,14 +5,18 @@ import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState } from 'react';
 
 import Button from '@/components/button/Button';
-import { signIn } from '@/lib/supabaseAuth';
+import { type AuthResult, signIn } from '@/lib/supabaseAuth';
+import { getUrlWithToast } from '@/lib/toastMessages';
+
+import FormError from './FormError';
+
+import styles from './LoginForm.module.css';
 
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  // const [error, setError] = useState<string | null>('test error');
+  const [error, setError] = useState<string | null>('');
   const [isPending, setIsPending] = useState(false);
 
   return (
@@ -42,9 +46,12 @@ export default function LoginForm() {
             required
           />
         </div>
+        <div className={`formItem ${styles.forgotPassword}`}>
+          <Link href="/wachtwoord-vergeten">Wachtwoord vergeten?</Link>
+        </div>
       </div>
 
-      {error && <div className="formError">{error}</div>}
+      {error && <FormError message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Inloggen'}
@@ -64,16 +71,16 @@ export default function LoginForm() {
     setError(null);
     setIsPending(true);
 
-    const { error: authError } = await signIn(email, password);
+    const result: AuthResult = await signIn(email, password);
 
-    if (authError) {
-      setError(authError.message);
+    if (!result.success) {
+      setError(result.error.message);
       setIsPending(false);
       return;
     }
 
     // no need to call setIsPending(false) here: the component unmounts via navigation, so resetting it would cause a state update on an unmounted component.
-    router.push(`/?toast=loggedIn`);
+    router.push(getUrlWithToast('/', 'loggedIn'));
     // push only re-renders client-side. We need to refresh server side AuthControls as well to show correct login state. router.refresh() does that.
     router.refresh();
   }

@@ -31,14 +31,6 @@
   }
 }
 
-.formError {
-  padding: var(--size-8) var(--size-12);
-  border-radius: var(--radius-4);
-  background: var(--color-surface-error);
-  font-size: var(--font-size-14);
-  color: var(--color-text-error);
-}
-
 .formFooter {
   font-size: var(--font-size-14);
   text-align: center;

@@ -1,51 +1,28 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState } from 'react';
 
 import Button from '@/components/button/Button';
-import { type AuthResult, signUp } from '@/lib/supabaseAuth';
+import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
+import { getUrlWithToast } from '@/lib/toastMessages';
 
-import styles from './SignupForm.module.css';
+import FormError from './FormError';
 
-export default function SignupForm() {
-  const [email, setEmail] = useState('');
+export default function NewPasswordForm() {
+  const router = useRouter();
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const [successMessageVisible, setSuccessMessageVisible] = useState(false);
-  // const [successMessageVisible, setSuccessMessageVisible] = useState(true);
-
-  if (successMessageVisible) {
-    return (
-      <>
-        <h1>Account aangemaakt</h1>
-        <p className={styles.successMessage}>
-          Je account is aangemaakt. Controleer je e-mail om je account te bevestigen.
-        </p>
-      </>
-    );
-  }
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <h1>Registreren</h1>
+      <h1>Nieuw wachtwoord opgeven</h1>
 
       <div className="formGroup">
         <div className="formItem">
-          <label htmlFor="email">E-mailadres</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-        </div>
-        <div className="formItem">
-          <label htmlFor="password">Wachtwoord</label>
+          <label htmlFor="password">Nieuw wachtwoord</label>
           <input
             id="password"
             type="password"
@@ -56,7 +33,7 @@ export default function SignupForm() {
           />
         </div>
         <div className="formItem">
-          <label htmlFor="passwordConfirm">Wachtwoord bevestigen</label>
+          <label htmlFor="passwordConfirm">Herhaal wachtwoord</label>
           <input
             id="passwordConfirm"
             type="password"
@@ -68,20 +45,15 @@ export default function SignupForm() {
         </div>
       </div>
 
-      {error && <div className="formError">{error}</div>}
+      {error && <FormError message={error} />}
 
       <Button
-        label={isPending ? 'Bezig…' : 'Registreren'}
+        label={isPending ? 'Bezig…' : 'Wachtwoord aanpassen'}
         variant="primary"
         type="submit"
         disabled={isPending}
       />
-
-      <p className="formFooter">
-        Al een account? <Link href="/inloggen">Inloggen</Link>
-      </p>
     </form>
-    // </div>
   );
 
   async function handleSubmit(e: SubmitEvent) {
@@ -95,13 +67,14 @@ export default function SignupForm() {
 
     setIsPending(true);
 
-    const result: AuthResult = await signUp(email, password);
+    const result: SimpleAuthResult = await updatePassword(password);
+
     if (!result.success) {
       setError(result.error.message);
       setIsPending(false);
       return;
     }
 
-    setSuccessMessageVisible(true);
+    router.push(getUrlWithToast('/', 'passwordChanged'));
   }
 }

@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-04-20
-**Current phase:** Auth implemented; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
+**Last updated:** 2026-04-24
+**Current phase:** Auth implemented and hardened; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
 
 ---
 
@@ -29,6 +29,13 @@
 - Auth: Supabase email/password — signup at `/registreren`, login at `/inloggen`, email verification
   via `/auth/callback`. Write operations (POST, PATCH, DELETE) require authentication;
   RLS enforced in Supabase.
+- Auth error messages translated to Dutch via `src/lib/authErrorTranslations.ts`
+- Forgot password flow: `/wachtwoord-vergeten` (request reset email), `/nieuw-wachtwoord` (set new password)
+- Re-send confirmation email: `/bevestigings-link-opnieuw-aanvragen` with `ResendConfirmationForm`
+- Generic `/error` page for auth errors (e.g. failed email verification) with explanation and next steps
+- Generic auth callback at `/auth/callback` handles all Supabase auth events (signup, password reset, etc.)
+- Toast messages consolidated in `src/lib/toastMessages.ts`
+- Email delivery via Resend (custom SMTP) — sender `skeelermap@skeelermap-auth.jaron.nl`
 - Segment creation requires auth: logged-out users see a panel prompting login/registration when tapping “Segment toevoegen”
 - Menubar: app name "SkeelerMap" + tagline "Vind en beoordeel skeelerpaden" (stacked left);
   auth controls right ("Inloggen" / "Uitloggen"). MenuBar is a Server Component;

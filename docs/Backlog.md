@@ -8,27 +8,31 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ### show indicator while loading map data
 
-### use Dutch error messages
-
-Supabase error messages are in English by default; for Dutch errors, add a translation layer on top of authError.message.
-
-### re-evaluate error messages on change
+### live-check error messages on change
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
-### Auth: confirmation failure page
+### Add possibilty to resend confirmation email
 
-Currently, a failed email verification redirects to `/?toast=confirmation-failed`
-which is too brief for this error case. A failed confirmation needs a dedicated page
-that explains what went wrong and what the user can do next (e.g. request a new
-verification email, contact support, or try signing up again).
+### form tech debt
 
-- Create `/auth/confirmation-failed` page with a clear error message and next steps
-- Update `src/app/auth/callback/route.ts` to redirect there instead of `/?toast=confirmation-failed`
+- move all auth pages to (content)/(auth)
+- use constants for recurring form errors (like password not matching)
+- add pending state to all submitbuttons
+- add title to success states after sending mail (signup, request reset)
+- see if we need components for recurring form items (input fields, button)
+- remove old auth/callback urls from Authentication > URL Configuration
+- move FormError out of auth
 
 ---
 
 ## Medium priority
+
+### toast closing behavior
+
+- make timeout longer;
+- make dismiss obvious by adding button?
+- add countdown bar
 
 ### Auto-follow location mode
 
@@ -73,6 +77,17 @@ Scale polyline weight based on zoom level. Defer unless it becomes a visible pro
 Choose and configure a production tile provider. Current CartoDB usage may violate ToS under real traffic.
 Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
 _Open decision in decisions.md._
+
+### Handle deleted user's segments
+
+TBD: what do we want? ATM, in supabase we have a constraint on table segments for fk_segments_user_id: delete_rule CASCADE, which deletes their segments when a user is deleted.
+
+### Password requirements
+
+Set password requirements Authentication > Sign In / Providers / Email > Password requirements
+Add indication at pw field
+add realtime check
+see if we can dynamically import the requirements and show them with the field
 
 ### Supabase auth middleware
 
@@ -126,9 +141,11 @@ Do not implement role-based RLS until the profiles table exists.
 
 ### Use Custom SMTP for supabase emails
 
-To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, SendGrid, or Postmark in your project settings to overcome free tier limitations.
+To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
 
----
+### Zoom-based polyline weight scaling
+
+## When we get many segments, maybe the polylines should get a different weight when zooming out a lot
 
 ## Icebox
 
@@ -229,3 +246,13 @@ _Implemented 2026-04-22._
 ### ~~when logging out, cancel all current actions~~ ✓ Done
 
 _Implemented 2026-04-22._
+
+### ~~Bullet proof maken van sign up / login flow~~ ✓ Done
+
+Dedicated error page, forgot password flow, re-send confirmation, Dutch error messages, generic auth callback, Resend for email delivery.
+_Implemented 2026-04-24._
+
+### ~~use Dutch error messages~~ ✓ Done
+
+Translation layer in `src/lib/authErrorTranslations.ts` on top of Supabase `authError.message`.
+_Implemented 2026-04-24._

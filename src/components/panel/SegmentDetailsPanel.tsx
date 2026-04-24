@@ -44,6 +44,7 @@ export default function SegmentDetailsPanel({
   isPending,
 }: Props) {
   const currentRatingValue: number = segment.ratingValue;
+  console.log('segment:', segment);
   return (
     <Panel>
       {mode === 'segmentDetails' && (
