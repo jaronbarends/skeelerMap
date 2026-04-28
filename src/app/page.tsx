@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
-import MapUIContainer from '@/components/map/MapUIContainer';
 import Toast from '@/components/Toast';
+import MapUIContainer from '@/components/map/MapUIContainer';
 import { getUser } from '@/lib/supabaseAuth.server';
 
 export default async function Home() {
