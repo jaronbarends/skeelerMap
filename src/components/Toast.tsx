@@ -19,7 +19,7 @@ export default function Toast() {
   const toastKey: ToastKey | null = isToastKey(rawToastKey) ? rawToastKey : null;
   const message = toastKey ? getToastMessage(toastKey) : null;
   const [isVisible, setIsVisible] = useState(!!message);
-  const [isPaused, setisPaused] = useState(!isVisible);
+  const [isPaused, setIsPaused] = useState(!isVisible);
 
   const { percentage, isComplete } = useCountdownTimer({
     durationMs: AUTO_DISMISS_MS,
@@ -29,7 +29,7 @@ export default function Toast() {
 
   const dismiss = useCallback(() => {
     setIsVisible(false);
-    setisPaused(true);
+    setIsPaused(true);
     const params = new URLSearchParams(searchParams.toString());
     params.delete('toast');
     const newUrl = params.size > 0 ? `${pathname}?${params.toString()}` : pathname;
@@ -47,7 +47,7 @@ export default function Toast() {
     if (message) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(true);
-      setisPaused(false);
+      setIsPaused(false);
     }
   }, [message]);
 
@@ -60,10 +60,10 @@ export default function Toast() {
       <button
         className={styles.toast}
         onClick={dismiss}
-        onMouseEnter={() => setisPaused(true)}
-        onMouseLeave={() => setisPaused(false)}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
-        {getIconByName('circleCheck')({ className: styles.icon })} {message}
+        {getIconByName('circleCheck')()} {message}
         <ProgressBar percentage={percentage} />
       </button>
     </div>
@@ -120,7 +120,7 @@ function useCountdownTimer({ durationMs, isPaused, resetToken }: UseCountdownTim
       });
     }, intervalMs);
     return () => clearInterval(intervalRef.current);
-  }, [isPaused, durationMs, intervalMs, stepMs, resetToken]);
+  }, [isPaused, durationMs, intervalMs, stepMs]);
 
   return {
     percentage: progressMs / durationMs,
