@@ -1,4 +1,5 @@
 import {
+  FaCircleCheck,
   FaCircleInfo,
   FaLocationCrosshairs,
   FaPenToSquare,
@@ -12,10 +13,11 @@ import TrafficSignDanger from '@/assets/icons/traffic-sign-danger.svg';
 import TrafficSignSlope from '@/assets/icons/traffic-sign-slope.svg';
 
 const ICONS = {
+  circleCheck: FaCircleCheck,
+  circleInfo: FaCircleInfo,
   close: FaXmark,
   delete: FaRegTrashCan,
   edit: FaPenToSquare,
-  info: FaCircleInfo,
   plus: FaPlus,
   userLocation: FaLocationCrosshairs,
   trafficSignSlope: TrafficSignSlope,

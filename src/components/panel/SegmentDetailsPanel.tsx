@@ -124,7 +124,7 @@ function SegmentDetails({ segment, currentUserOwnsSegment, userIsLoggedIn }: Seg
   const [infoIsOpen, setInfoIsOpen] = useState(false);
   const length: number = calculateSegmentLength(segment.coordinates);
   const rating = getRatingByValue(segment.ratingValue);
-  const infoIcon = getIconByName('info');
+  const infoIcon = getIconByName('circleInfo');
   return (
     <>
       <dl className={styles.specs} data-rating={segment.ratingValue}>
