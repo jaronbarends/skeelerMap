@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
-import Toast from '@/components/Toast';
 import MapUIContainer from '@/components/map/MapUIContainer';
+import ToastWrapper from '@/components/toast/ToastWrapper';
 import { getUser } from '@/lib/supabaseAuth.server';
 
 export default async function Home() {
@@ -11,7 +11,7 @@ export default async function Home() {
     <main>
       <MapUIContainer currentUserId={user?.id ?? null} />
       <Suspense>
-        <Toast />
+        <ToastWrapper />
       </Suspense>
     </main>
   );
