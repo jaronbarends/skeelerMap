@@ -1,13 +1,13 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 import { type ToastKey, isToastKey, getToastMessage } from '@/lib/toastMessages';
 
 import styles from './Toast.module.css';
 
-const AUTO_DISMISS_MS = 4000;
+const AUTO_DISMISS_MS = 10 * 1000;
 
 export default function Toast() {
   const searchParams = useSearchParams();
@@ -17,24 +17,37 @@ export default function Toast() {
   const rawToastKey = searchParams.get('toast');
   const toastKey: ToastKey | null = isToastKey(rawToastKey) ? rawToastKey : null;
   const message = toastKey ? getToastMessage(toastKey) : null;
+  const [isVisible, setIsVisible] = useState(!!message);
+  const [isPaused, setisPaused] = useState(!isVisible);
 
-  const [visible, setVisible] = useState(!!message);
+  const { percentage, isComplete } = useCountdownTimer({
+    durationMs: AUTO_DISMISS_MS,
+    isPaused,
+  });
+
+  const dismiss = useCallback(() => {
+    setIsVisible(false);
+    setisPaused(true);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('toast');
+    const newUrl = params.size > 0 ? `${pathname}?${params.toString()}` : pathname;
+    router.replace(newUrl);
+  }, [searchParams, pathname, router]);
 
   useEffect(() => {
-    if (!visible) {
+    if (!isVisible) {
       return;
     }
-    const timer = setTimeout(dismiss, AUTO_DISMISS_MS);
-    return () => clearTimeout(timer);
-  }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isVisible]);
 
   useEffect(() => {
-    if (message) {
-      setVisible(true);
+    if (isComplete) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      dismiss();
     }
-  }, [message]);
+  }, [isComplete, dismiss]);
 
-  if (!visible || !message) {
+  if (!isVisible || !message) {
     return null;
   }
 
@@ -42,15 +55,56 @@ export default function Toast() {
     <div className={styles.wrapper} aria-live="polite">
       <button className={styles.toast} onClick={dismiss}>
         {message}
+        <ProgressBar percentage={percentage} />
       </button>
     </div>
   );
+}
 
-  function dismiss() {
-    setVisible(false);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('toast');
-    const newUrl = params.size > 0 ? `${pathname}?${params.toString()}` : pathname;
-    router.replace(newUrl);
-  }
+function ProgressBar({ percentage }: { percentage: number }) {
+  const countdownPercentage = 100 - percentage * 100;
+  return (
+    <div className={styles.progressBar}>
+      <div className={styles.progressBarTrack} style={{ width: `${countdownPercentage}%` }} />
+    </div>
+  );
+}
+
+interface UseCountdownTimerProps {
+  durationMs: number;
+  isPaused: boolean;
+}
+
+function useCountdownTimer({ durationMs, isPaused }: UseCountdownTimerProps): {
+  percentage: number;
+  isComplete: boolean;
+} {
+  const [progressMs, setProgressMs] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+  const intervalMs = 20;
+  const stepMs = intervalMs;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+
+  useEffect(() => {
+    if (isPaused) {
+      clearInterval(intervalRef.current);
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setProgressMs((prev) => {
+        const newProgressMs = prev + stepMs;
+        if (newProgressMs >= durationMs) {
+          setIsComplete(true);
+          clearInterval(intervalRef.current);
+        }
+        return newProgressMs;
+      });
+    }, intervalMs);
+    return () => clearInterval(intervalRef.current);
+  }, [isPaused, durationMs, intervalMs, stepMs]);
+
+  return {
+    percentage: progressMs / durationMs,
+    isComplete,
+  };
 }
