@@ -12,6 +12,9 @@
 .toast {
   overflow: hidden;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
   background: var(--color-surface-200);
   color: var(--color-text-primary);
   padding: var(--size-12) var(--size-16);
@@ -41,5 +44,4 @@
   width: 100%;
   height: 100%;
   background: var(--color-primary);
-  /* opacity: 0.2; */
 }

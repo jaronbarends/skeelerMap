@@ -3,11 +3,12 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 
+import { getIconByName } from '@/lib/getIconByName';
 import { type ToastKey, isToastKey, getToastMessage } from '@/lib/toastMessages';
 
 import styles from './Toast.module.css';
 
-const AUTO_DISMISS_MS = 10 * 1000;
+const AUTO_DISMISS_MS = 4 * 1000;
 
 export default function Toast() {
   const searchParams = useSearchParams();
@@ -23,6 +24,7 @@ export default function Toast() {
   const { percentage, isComplete } = useCountdownTimer({
     durationMs: AUTO_DISMISS_MS,
     isPaused,
+    resetToken: toastKey,
   });
 
   const dismiss = useCallback(() => {
@@ -35,17 +37,19 @@ export default function Toast() {
   }, [searchParams, pathname, router]);
 
   useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-  }, [isVisible]);
-
-  useEffect(() => {
-    if (isComplete) {
+    if (isComplete && isVisible) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       dismiss();
     }
-  }, [isComplete, dismiss]);
+  }, [isComplete, isVisible, dismiss]);
+
+  useEffect(() => {
+    if (message) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsVisible(true);
+      setisPaused(false);
+    }
+  }, [message]);
 
   if (!isVisible || !message) {
     return null;
@@ -53,8 +57,13 @@ export default function Toast() {
 
   return (
     <div className={styles.wrapper} aria-live="polite">
-      <button className={styles.toast} onClick={dismiss}>
-        {message}
+      <button
+        className={styles.toast}
+        onClick={dismiss}
+        onMouseEnter={() => setisPaused(true)}
+        onMouseLeave={() => setisPaused(false)}
+      >
+        {getIconByName('circleCheck')({ className: styles.icon })} {message}
         <ProgressBar percentage={percentage} />
       </button>
     </div>
@@ -73,9 +82,10 @@ function ProgressBar({ percentage }: { percentage: number }) {
 interface UseCountdownTimerProps {
   durationMs: number;
   isPaused: boolean;
+  resetToken: string | null;
 }
 
-function useCountdownTimer({ durationMs, isPaused }: UseCountdownTimerProps): {
+function useCountdownTimer({ durationMs, isPaused, resetToken }: UseCountdownTimerProps): {
   percentage: number;
   isComplete: boolean;
 } {
@@ -84,6 +94,15 @@ function useCountdownTimer({ durationMs, isPaused }: UseCountdownTimerProps): {
   const intervalMs = 20;
   const stepMs = intervalMs;
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+
+  useEffect(() => {
+    if (resetToken) {
+      clearInterval(intervalRef.current);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setProgressMs(0);
+      setIsComplete(false);
+    }
+  }, [resetToken]);
 
   useEffect(() => {
     if (isPaused) {
@@ -101,7 +120,7 @@ function useCountdownTimer({ durationMs, isPaused }: UseCountdownTimerProps): {
       });
     }, intervalMs);
     return () => clearInterval(intervalRef.current);
-  }, [isPaused, durationMs, intervalMs, stepMs]);
+  }, [isPaused, durationMs, intervalMs, stepMs, resetToken]);
 
   return {
     percentage: progressMs / durationMs,
