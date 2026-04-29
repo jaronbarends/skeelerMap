@@ -16,7 +16,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ### form tech debt
 
-- move all auth pages to (content)/(auth)
 - use constants for recurring form errors (like password not matching)
 - add pending state to all submitbuttons
 - add title to success states after sending mail (signup, request reset)
@@ -27,12 +26,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 ---
 
 ## Medium priority
-
-### toast closing behavior
-
-- make timeout longer;
-- make dismiss obvious by adding button?
-- add countdown bar
 
 ### Auto-follow location mode
 
@@ -256,3 +249,14 @@ _Implemented 2026-04-24._
 
 Translation layer in `src/lib/authErrorTranslations.ts` on top of Supabase `authError.message`.
 _Implemented 2026-04-24._
+
+### form tech debt
+
+- ~~move all auth pages to (content)/(auth)~~ ✓ Done
+
+### ~~toast closing behavior~~ ✓ Done
+
+- make timeout longer;
+- make dismiss obvious by adding button?
+- add countdown bar
+  _Implemented 2026-04-29._
