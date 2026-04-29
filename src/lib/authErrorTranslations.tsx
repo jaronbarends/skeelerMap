@@ -1,6 +1,9 @@
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+
 type ErrorTranslation = {
   description: string; // what the error code means, just for dev reference
-  message: string; // what we show to the user
+  message: ReactNode; // what we show to the user
 };
 
 // error codes overview: https://supabase.com/docs/guides/auth/debugging/error-codes#auth-error-codes-table
@@ -8,12 +11,24 @@ type ErrorTranslation = {
 export const authErrorTranslations: Record<string, ErrorTranslation> = {
   email_exists: {
     description: 'Email address already exists in the system.',
-    message: 'Je hebt je al aangemeld met dit e-mailadres. Ga naar inloggen.',
+    message: (
+      <>
+        Je hebt je al aangemeld met dit e-mailadres. Je kunt nu{' '}
+        <Link href="/inloggen">Inloggen</Link>.
+      </>
+    ),
   },
   email_not_confirmed: {
     description: 'Signing in is not allowed for this user as the email address is not confirmed.',
-    message:
-      'Je account is nog niet bevestigd. Klik op de link in de e-mail die je eerder hebt ontvangen om je account te bevestigen.',
+    message: (
+      <>
+        Je account is nog niet bevestigd. Klik op de link in de e-mail die je eerder hebt ontvangen
+        om je account te bevestigen.{' '}
+        <Link href="/bevestigings-link-opnieuw-aanvragen">
+          Bevestigingslink opnieuw aanvragen
+        </Link>
+      </>
+    ),
   },
   invalid_credentials: {
     description: 'Login credentials or grant type not recognized.',
@@ -39,7 +54,7 @@ export const authErrorTranslations: Record<string, ErrorTranslation> = {
   },
 };
 
-export function getErrorMessageByCode(errorCode: string) {
+export function getErrorMessageByCode(errorCode: string): ReactNode {
   const message = authErrorTranslations[errorCode]?.message;
   return message || `Er is een onbekende fout opgetreden. Foutcode: ${errorCode}`;
 }

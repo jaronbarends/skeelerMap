@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { type SubmitEvent, useState, useTransition } from 'react';
+import { type ReactNode, type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type AuthResult, signUp } from '@/lib/supabaseAuth';
+
+import FormError from './FormError';
 
 import styles from './SignupForm.module.css';
 
@@ -12,7 +14,7 @@ export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ReactNode | null>(null);
   const [isPending, startTransition] = useTransition();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   // const [successMessageVisible, setSuccessMessageVisible] = useState(true);
@@ -68,7 +70,7 @@ export default function SignupForm() {
         </div>
       </div>
 
-      {error && <div className="formError">{error}</div>}
+      {error && <FormError message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Registreren'}

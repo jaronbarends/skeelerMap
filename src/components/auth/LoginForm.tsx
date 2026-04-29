@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type SubmitEvent, useState, useTransition } from 'react';
+import { type ReactNode, type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
@@ -16,7 +16,7 @@ export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>('');
+  const [error, setError] = useState<ReactNode | null>('');
   const [isPending, startTransition] = useTransition();
 
   return (

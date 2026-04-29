@@ -28,11 +28,15 @@
 
   --color-text-primary: var(--color-white);
   --color-text-secondary: var(--color-gray-700);
+  --color-text-on-light: var(--color-gray-100);
 
   --color-text-default: var(--color-text-secondary);
   --color-headings-default: var(--color-text-primary);
   --color-text-link: var(--color-blue-70);
-  --color-text-error: var(--color-gray-100);
+  --color-text-info: var(--color-text-on-light);
+  --color-text-success: var(--color-text-on-light);
+  --color-text-warning: var(--color-text-on-light);
+  --color-text-error: var(--color-text-on-light);
 
   --color-surface-100: var(--color-gray-100);
   --color-surface-150: var(--color-gray-150);

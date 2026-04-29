@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { AuthResponse, AuthError } from '@supabase/supabase-js';
+import type { ReactNode } from 'react';
 
 import { getErrorMessageByCode } from './authErrorTranslations';
 
@@ -8,11 +9,11 @@ export type AuthCallbackType = 'signup' | 'recovery';
 // Note: both signInWithPassword and signUp return AuthResponse, so we can use the same type for both; signOut returns { error: AuthError | null }
 export type AuthResult =
   | { success: true; data: AuthResponse['data'] }
-  | { success: false; error: { code: string; message: string } };
+  | { success: false; error: { code: string; message: ReactNode } };
 
 export type SimpleAuthResult =
   | { success: true }
-  | { success: false; error: { code: string; message: string } };
+  | { success: false; error: { code: string; message: ReactNode } };
 
 const SIGNUP_CALLBACK_URL = getCallbackUrl('signup');
 const RESET_PASSWORD_CALLBACK_URL = getCallbackUrl('recovery');
@@ -104,7 +105,7 @@ function getBrowserClient() {
 
 function getAuthErrorResult(error: AuthError): {
   success: false;
-  error: { code: string; message: string };
+  error: { code: string; message: ReactNode };
 } {
   // Provide a fallback 'unknown' code if error.code is undefined
   const errorCode = error.code ?? 'unknown';
