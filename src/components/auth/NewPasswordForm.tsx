@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
@@ -14,7 +14,7 @@ export default function NewPasswordForm() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   return (
     <form className="form" onSubmit={handleSubmit}>
@@ -56,7 +56,7 @@ export default function NewPasswordForm() {
     </form>
   );
 
-  async function handleSubmit(e: SubmitEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setError(null);
 
@@ -65,16 +65,13 @@ export default function NewPasswordForm() {
       return;
     }
 
-    setIsPending(true);
-
-    const result: SimpleAuthResult = await updatePassword(password);
-
-    if (!result.success) {
-      setError(result.error.message);
-      setIsPending(false);
-      return;
-    }
-
-    router.push(getUrlWithToast('/', 'passwordChanged'));
+    startTransition(async () => {
+      const result: SimpleAuthResult = await updatePassword(password);
+      if (!result.success) {
+        setError(result.error.message);
+        return;
+      }
+      router.push(getUrlWithToast('/', 'passwordChanged'));
+    });
   }
 }

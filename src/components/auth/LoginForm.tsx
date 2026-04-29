@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
@@ -17,7 +17,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>('');
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   return (
     <form className="form" onSubmit={handleSubmit}>
@@ -66,22 +66,19 @@ export default function LoginForm() {
     </form>
   );
 
-  async function handleSubmit(e: SubmitEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setError(null);
-    setIsPending(true);
 
-    const result: AuthResult = await signIn(email, password);
-
-    if (!result.success) {
-      setError(result.error.message);
-      setIsPending(false);
-      return;
-    }
-
-    // no need to call setIsPending(false) here: the component unmounts via navigation, so resetting it would cause a state update on an unmounted component.
-    router.push(getUrlWithToast('/', 'loggedIn'));
-    // push only re-renders client-side. We need to refresh server side AuthControls as well to show correct login state. router.refresh() does that.
-    router.refresh();
+    startTransition(async () => {
+      const result: AuthResult = await signIn(email, password);
+      if (!result.success) {
+        setError(result.error.message);
+        return;
+      }
+      router.push(getUrlWithToast('/', 'loggedIn'));
+      // push only re-renders client-side. We need to refresh server side AuthControls as well to show correct login state. router.refresh() does that.
+      router.refresh();
+    });
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resetPasswordForEmail } from '@/lib/supabaseAuth';
@@ -15,7 +15,7 @@ interface Props {
 export default function ForgotPasswordForm({ linkExpired }: Props) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
   if (successMessageVisible) {
@@ -62,19 +62,17 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
     </form>
   );
 
-  async function handleSubmit(e: SubmitEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setError(null);
-    setIsPending(true);
 
-    const result: SimpleAuthResult = await resetPasswordForEmail(email);
-
-    if (!result.success) {
-      setError(result.error.message);
-      setIsPending(false);
-      return;
-    }
-
-    setSuccessMessageVisible(true);
+    startTransition(async () => {
+      const result: SimpleAuthResult = await resetPasswordForEmail(email);
+      if (!result.success) {
+        setError(result.error.message);
+        return;
+      }
+      setSuccessMessageVisible(true);
+    });
   }
 }
