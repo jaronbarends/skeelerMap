@@ -6,7 +6,7 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resetPasswordForEmail } from '@/lib/supabaseAuth';
 
-import FormFeedback from './FormFeedback';
+import FormFeedback, { type Feedback } from './FormFeedback';
 
 interface Props {
   linkExpired?: boolean;
@@ -14,7 +14,7 @@ interface Props {
 
 export default function ForgotPasswordForm({ linkExpired }: Props) {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isPending, startTransition] = useTransition();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
@@ -47,7 +47,7 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
         </div>
       </div>
 
-      {error && <FormFeedback message={error} />}
+      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Verzenden'}
@@ -64,12 +64,12 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
 
   function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setError(null);
+    setFeedback(null);
 
     startTransition(async () => {
       const result: SimpleAuthResult = await resetPasswordForEmail(email);
       if (!result.success) {
-        setError(result.error.message);
+        setFeedback(result.error.feedback);
         return;
       }
       setSuccessMessageVisible(true);

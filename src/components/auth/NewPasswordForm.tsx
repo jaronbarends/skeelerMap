@@ -7,13 +7,13 @@ import Button from '@/components/button/Button';
 import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import FormFeedback from './FormFeedback';
+import FormFeedback, { type Feedback } from './FormFeedback';
 
 export default function NewPasswordForm() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -45,7 +45,7 @@ export default function NewPasswordForm() {
         </div>
       </div>
 
-      {error && <FormFeedback message={error} />}
+      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Wachtwoord aanpassen'}
@@ -58,17 +58,17 @@ export default function NewPasswordForm() {
 
   function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setError(null);
+    setFeedback(null);
 
     if (password !== passwordConfirm) {
-      setError('Wachtwoorden komen niet overeen');
+      setFeedback({ message: 'Wachtwoorden komen niet overeen', type: 'error' });
       return;
     }
 
     startTransition(async () => {
       const result: SimpleAuthResult = await updatePassword(password);
       if (!result.success) {
-        setError(result.error.message);
+        setFeedback(result.error.feedback);
         return;
       }
       router.push(getUrlWithToast('/', 'passwordChanged'));

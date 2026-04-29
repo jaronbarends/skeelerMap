@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type ReactNode, type SubmitEvent, useState, useTransition } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import FormFeedback from './FormFeedback';
+import FormFeedback, { type Feedback } from './FormFeedback';
 
 import styles from './LoginForm.module.css';
 
@@ -16,7 +16,7 @@ export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<ReactNode | null>('');
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -51,7 +51,7 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {error && <FormFeedback message={error} />}
+      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Inloggen'}
@@ -68,12 +68,12 @@ export default function LoginForm() {
 
   function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setError(null);
+    setFeedback(null);
 
     startTransition(async () => {
       const result: AuthResult = await signIn(email, password);
       if (!result.success) {
-        setError(result.error.message);
+        setFeedback(result.error.feedback);
         return;
       }
       router.push(getUrlWithToast('/', 'loggedIn'));

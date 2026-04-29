@@ -2,7 +2,12 @@ import type { ReactNode } from 'react';
 
 import styles from './FormFeedback.module.css';
 
-type FeedbackType = 'error' | 'warning' | 'success' | 'info';
+export type FeedbackType = 'error' | 'warning' | 'success' | 'info';
+
+export interface Feedback {
+  message: ReactNode;
+  type: FeedbackType;
+}
 
 interface Props {
   message: ReactNode;
