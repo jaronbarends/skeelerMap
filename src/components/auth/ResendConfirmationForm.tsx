@@ -6,7 +6,7 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resendConfirmationEmail } from '@/lib/supabaseAuth';
 
-import FormError from './FormError';
+import FormFeedback from './FormFeedback';
 
 export default function ResendConfirmationForm() {
   const [email, setEmail] = useState('');
@@ -43,7 +43,7 @@ export default function ResendConfirmationForm() {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {error && <FormFeedback message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Opnieuw versturen'}

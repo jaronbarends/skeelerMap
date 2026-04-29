@@ -7,7 +7,7 @@ import Button from '@/components/button/Button';
 import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import FormError from './FormError';
+import FormFeedback from './FormFeedback';
 
 export default function NewPasswordForm() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function NewPasswordForm() {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {error && <FormFeedback message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Wachtwoord aanpassen'}

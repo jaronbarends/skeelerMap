@@ -6,7 +6,7 @@ import { type ReactNode, type SubmitEvent, useState, useTransition } from 'react
 import Button from '@/components/button/Button';
 import { type AuthResult, signUp } from '@/lib/supabaseAuth';
 
-import FormError from './FormError';
+import FormFeedback from './FormFeedback';
 
 import styles from './SignupForm.module.css';
 
@@ -70,7 +70,7 @@ export default function SignupForm() {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {error && <FormFeedback message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Registreren'}

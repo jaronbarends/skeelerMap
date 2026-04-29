@@ -6,7 +6,7 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resetPasswordForEmail } from '@/lib/supabaseAuth';
 
-import FormError from './FormError';
+import FormFeedback from './FormFeedback';
 
 interface Props {
   linkExpired?: boolean;
@@ -47,7 +47,7 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {error && <FormFeedback message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Verzenden'}

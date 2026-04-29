@@ -8,7 +8,7 @@ import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import FormError from './FormError';
+import FormFeedback from './FormFeedback';
 
 import styles from './LoginForm.module.css';
 
@@ -51,7 +51,7 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {error && <FormFeedback message={error} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Inloggen'}
