@@ -17,7 +17,7 @@ export default function ToastWrapper() {
 
   return (
     <div className={styles.wrapper} aria-live="polite">
-      <Toast onDismiss={onDismiss} message={message} />;
+      <Toast onDismiss={onDismiss} message={message} />
     </div>
   );
 }

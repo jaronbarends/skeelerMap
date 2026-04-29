@@ -17,8 +17,10 @@ export function useCountdownTimer({ durationMs, isPaused, resetToken }: UseCount
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   useEffect(() => {
+    clearInterval(intervalRef.current);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setProgressMs(0);
+    setIsComplete(false);
   }, [resetToken]);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function useCountdownTimer({ durationMs, isPaused, resetToken }: UseCount
       });
     }, intervalMs);
     return () => clearInterval(intervalRef.current);
-  }, [isPaused, durationMs, intervalMs, stepMs]);
+  }, [isPaused, durationMs, intervalMs, stepMs, resetToken]);
 
   return {
     percentage: progressMs / durationMs,
