@@ -6,6 +6,7 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resendConfirmationEmail } from '@/lib/supabaseAuth';
 
+import SimpleContent from '../SimpleContent';
 import FormFeedback, { type Feedback } from './FormFeedback';
 
 export default function ResendConfirmationForm() {
@@ -16,7 +17,10 @@ export default function ResendConfirmationForm() {
 
   if (successMessageVisible) {
     return (
-      <p>We hebben je een nieuwe link gestuurd om je account te bevestigen. Check je e-mail.</p>
+      <SimpleContent>
+        <h1>Link verzonden</h1>
+        <p>We hebben je een nieuwe link gestuurd om je account te bevestigen. Check je e-mail.</p>
+      </SimpleContent>
     );
   }
 

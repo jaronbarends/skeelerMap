@@ -8,6 +8,7 @@ import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
+import SimpleContent from '../SimpleContent';
 import FormFeedback, { type Feedback } from './FormFeedback';
 
 import styles from './LoginForm.module.css';
@@ -21,7 +22,9 @@ export default function LoginForm() {
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <h1>Inloggen</h1>
+      <SimpleContent>
+        <h1>Inloggen</h1>
+      </SimpleContent>
 
       <div className="formGroup">
         <div className="formItem">

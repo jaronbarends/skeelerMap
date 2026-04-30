@@ -12,15 +12,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
-### Add possibilty to resend confirmation email
-
-### form tech debt
-
-- use constants for recurring form errors (like password not matching)
-- add title to success states after sending mail (signup, request reset)
-- see if we need components for recurring form items (input fields, button)
-- move FormError out of auth
-
 ---
 
 ## Medium priority
@@ -253,6 +244,10 @@ _Implemented 2026-04-24._
 - ~~move all auth pages to (content)/(auth)~~ ✓ Done
 - ~~remove old auth/callback urls from Authentication > URL Configuration~~ ✓ Done
 - ~~add pending state to all submitbuttons~~ ✓ Done
+- ~~add title to success states after sending mail (signup, request reset)~~ ✓ Done
+- ~~use constants for recurring form errors (like password not matching)~~ ✓ Done
+- ~~see if we need components for recurring form items (input fields, button)~~ ✓ Done
+- ~~move FormError out of auth~~ ✓ Done
 
 ### ~~toast closing behavior~~ ✓ Done
 
@@ -260,3 +255,7 @@ _Implemented 2026-04-24._
 - make dismiss obvious by adding button?
 - add countdown bar
   _Implemented 2026-04-29._
+
+### ~~Add possibilty to resend confirmation email~~ ✓ Done
+
+_Implemented 2026-04-29._
