@@ -1,10 +1,12 @@
 import {
   FaCircleCheck,
+  FaCircleExclamation,
   FaCircleInfo,
   FaLocationCrosshairs,
   FaPenToSquare,
   FaPlus,
   FaRegTrashCan,
+  FaTriangleExclamation,
   FaXmark,
 } from 'react-icons/fa6';
 
@@ -14,8 +16,10 @@ import TrafficSignSlope from '@/assets/icons/traffic-sign-slope.svg';
 
 const ICONS = {
   circleCheck: FaCircleCheck,
+  circleExclamation: FaCircleExclamation,
   circleInfo: FaCircleInfo,
   close: FaXmark,
+  triangleExclamation: FaTriangleExclamation,
   delete: FaRegTrashCan,
   edit: FaPenToSquare,
   plus: FaPlus,

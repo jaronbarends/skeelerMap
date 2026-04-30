@@ -2,22 +2,22 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { type ToastKey, isToastKey, getToastMessage } from '@/lib/toastMessages';
+import { type ToastKey, isToastKey, getToastData } from '@/lib/toastMessages';
 
 import Toast from './Toast';
 
 import styles from './ToastWrapper.module.css';
 
 export default function ToastWrapper() {
-  const { message, onDismiss } = useInitToast();
+  const { toastData, onDismiss } = useInitToast();
 
-  if (!message) {
+  if (!toastData) {
     return null;
   }
 
   return (
     <div className={styles.wrapper} aria-live="polite">
-      <Toast onDismiss={onDismiss} message={message} />
+      <Toast onDismiss={onDismiss} message={toastData.message} type={toastData.type} />
     </div>
   );
 }
@@ -26,8 +26,8 @@ function useInitToast() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const message = getMessageFromSearchParams();
-  return { message, onDismiss };
+  const toastData = getToastDataFromSearchParams();
+  return { toastData, onDismiss };
 
   function onDismiss() {
     const params = new URLSearchParams(searchParams.toString());
@@ -36,10 +36,9 @@ function useInitToast() {
     router.replace(newUrl);
   }
 
-  function getMessageFromSearchParams(): string {
+  function getToastDataFromSearchParams() {
     const rawToastKey = searchParams.get('toast');
     const toastKey: ToastKey | null = isToastKey(rawToastKey) ? rawToastKey : null;
-    const message = toastKey ? (getToastMessage(toastKey) ?? '') : '';
-    return message;
+    return toastKey ? getToastData(toastKey) : null;
   }
 }
