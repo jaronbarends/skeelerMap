@@ -17,10 +17,8 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 ### form tech debt
 
 - use constants for recurring form errors (like password not matching)
-- add pending state to all submitbuttons
 - add title to success states after sending mail (signup, request reset)
 - see if we need components for recurring form items (input fields, button)
-- remove old auth/callback urls from Authentication > URL Configuration
 - move FormError out of auth
 
 ---
@@ -253,6 +251,8 @@ _Implemented 2026-04-24._
 ### form tech debt
 
 - ~~move all auth pages to (content)/(auth)~~ ✓ Done
+- ~~remove old auth/callback urls from Authentication > URL Configuration~~ ✓ Done
+- ~~add pending state to all submitbuttons~~ ✓ Done
 
 ### ~~toast closing behavior~~ ✓ Done
 

@@ -1,15 +1,19 @@
+export type ToastType = 'error' | 'warning' | 'success' | 'info';
+
 export const TOAST_MESSAGES = {
-  loggedIn: 'Je bent nu ingelogd',
-  loggedOut: 'Je bent nu uitgelogd',
-  signOutFailed: 'Uitloggen mislukt. Probeer het opnieuw.',
-  accountConfirmed:
-    'Je account is bevestigd en je bent nu ingelogd. Je kunt nu zelf segmenten aanmaken.',
-  passwordChanged: 'Je wachtwoord is aangepast. Je bent nu ingelogd.',
-} as const;
+  loggedIn: { message: 'Je bent nu ingelogd', type: 'success' },
+  loggedOut: { message: 'Je bent nu uitgelogd', type: 'success' },
+  signOutFailed: { message: 'Uitloggen mislukt. Probeer het opnieuw.', type: 'error' },
+  accountConfirmed: {
+    message: 'Je account is bevestigd en je bent nu ingelogd. Je kunt nu zelf segmenten aanmaken.',
+    type: 'success',
+  },
+  passwordChanged: { message: 'Je wachtwoord is aangepast. Je bent nu ingelogd.', type: 'success' },
+} as const satisfies Record<string, { message: string; type: ToastType }>;
 
 export type ToastKey = keyof typeof TOAST_MESSAGES;
 
-export function getToastMessage(key: string | null): string | null {
+export function getToastData(key: string | null): { message: string; type: ToastType } | null {
   if (!key || !(key in TOAST_MESSAGES)) return null;
   return TOAST_MESSAGES[key as ToastKey];
 }

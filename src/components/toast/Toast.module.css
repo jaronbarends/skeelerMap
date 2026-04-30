@@ -1,20 +1,57 @@
 .toast {
+  --color-progressbar-color: var(--color-toast-theme);
+
   overflow: hidden;
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--size-8);
+  gap: var(--size-32);
   background: var(--color-surface-200);
   color: var(--color-text-primary);
   padding: var(--size-12) var(--size-16);
   border-radius: var(--radius-8);
   box-shadow: 0 2px 12px var(--color-shadow);
   font-size: var(--font-size-14);
-  border: none;
-  cursor: pointer;
   pointer-events: auto;
 
+  &[data-type='error'] {
+    --color-toast-theme: var(--color-surface-error);
+  }
+  &[data-type='warning'] {
+    --color-toast-theme: var(--color-surface-warning);
+  }
+  &[data-type='success'] {
+    --color-toast-theme: var(--color-surface-success);
+  }
+  &[data-type='info'] {
+    --color-toast-theme: var(--color-surface-info);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
+}
+
+.icon {
+  display: inline-flex;
+  color: var(--color-toast-theme);
+}
+
+.closeButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--font-size-16);
+  transition: scale 0.3s var(--easing-overshoot-out);
+
   &:hover {
-    opacity: 0.9;
+    scale: 1.1;
   }
 }
