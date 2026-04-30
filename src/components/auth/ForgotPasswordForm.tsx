@@ -6,6 +6,7 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resetPasswordForEmail } from '@/lib/supabaseAuth';
 
+import SimpleContent from '../SimpleContent';
 import FormFeedback, { type Feedback } from './FormFeedback';
 
 interface Props {
@@ -19,7 +20,12 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
   if (successMessageVisible) {
-    return <p>Check je e-mail — we hebben je een link gestuurd.</p>;
+    return (
+      <SimpleContent>
+        <h1>Link verzonden</h1>
+        <p>Check je e-mail — we hebben je een link gestuurd om je wachtwoord aan te passen.</p>
+      </SimpleContent>
+    );
   }
 
   const title = linkExpired ? 'Link niet meer geldig' : 'Wachtwoord vergeten?';

@@ -6,9 +6,8 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type AuthResult, signUp } from '@/lib/supabaseAuth';
 
+import SimpleContent from '../SimpleContent';
 import FormFeedback, { type Feedback } from './FormFeedback';
-
-import styles from './SignupForm.module.css';
 
 export default function SignupForm() {
   const [email, setEmail] = useState('');
@@ -17,16 +16,13 @@ export default function SignupForm() {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isPending, startTransition] = useTransition();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
-  // const [successMessageVisible, setSuccessMessageVisible] = useState(true);
 
   if (successMessageVisible) {
     return (
-      <>
+      <SimpleContent>
         <h1>Account aangemaakt</h1>
-        <p className={styles.successMessage}>
-          Je account is aangemaakt. Controleer je e-mail om je account te bevestigen.
-        </p>
-      </>
+        <p>Je account is aangemaakt. Controleer je e-mail om je account te bevestigen.</p>
+      </SimpleContent>
     );
   }
 
