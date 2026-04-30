@@ -1,17 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resendConfirmationEmail } from '@/lib/supabaseAuth';
 
-import FormError from './FormError';
+import FormFeedback, { type Feedback } from './FormFeedback';
 
 export default function ResendConfirmationForm() {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
   if (successMessageVisible) {
@@ -43,7 +43,7 @@ export default function ResendConfirmationForm() {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Opnieuw versturen'}
@@ -58,19 +58,17 @@ export default function ResendConfirmationForm() {
     </form>
   );
 
-  async function handleSubmit(e: SubmitEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setError(null);
-    setIsPending(true);
+    setFeedback(null);
 
-    const result: SimpleAuthResult = await resendConfirmationEmail(email);
-
-    if (!result.success) {
-      setError(result.error.message);
-      setIsPending(false);
-      return;
-    }
-
-    setSuccessMessageVisible(true);
+    startTransition(async () => {
+      const result: SimpleAuthResult = await resendConfirmationEmail(email);
+      if (!result.success) {
+        setFeedback(result.error.feedback);
+        return;
+      }
+      setSuccessMessageVisible(true);
+    });
   }
 }

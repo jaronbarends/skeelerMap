@@ -13,9 +13,14 @@
   --color-white: #ffffff;
   --color-black: #000000;
   --color-red: #ff3b3b;
+  --color-yellow: #f5d800;
+  --color-green: #22c55e;
 
   --color-blue-70: color-mix(in oklab, var(--color-blue) 70%, white);
   --color-red-60: color-mix(in oklab, var(--color-red) 60%, white);
+  --color-yellow-60: color-mix(in oklab, var(--color-yellow) 60%, white);
+  --color-green-60: color-mix(in oklab, var(--color-green) 60%, white);
+  --color-blue-60: color-mix(in oklab, var(--color-blue) 60%, white);
 
   --color-gray-100: #1a1a1a;
   --color-gray-150: #222222;
@@ -28,16 +33,23 @@
 
   --color-text-primary: var(--color-white);
   --color-text-secondary: var(--color-gray-700);
+  --color-text-on-light: var(--color-gray-100);
 
   --color-text-default: var(--color-text-secondary);
   --color-headings-default: var(--color-text-primary);
   --color-text-link: var(--color-blue-70);
-  --color-text-error: var(--color-gray-100);
+  --color-text-info: var(--color-text-on-light);
+  --color-text-success: var(--color-text-on-light);
+  --color-text-warning: var(--color-text-on-light);
+  --color-text-error: var(--color-text-on-light);
 
   --color-surface-100: var(--color-gray-100);
   --color-surface-150: var(--color-gray-150);
   --color-surface-200: var(--color-gray-200);
   --color-surface-error: var(--color-red-60);
+  --color-surface-info: var(--color-blue-60);
+  --color-surface-success: var(--color-green-60);
+  --color-surface-warning: var(--color-yellow-60);
 
   --color-shadow: rgba(0, 0, 0, 0.4);
 

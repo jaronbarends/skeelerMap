@@ -1,20 +1,20 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import FormError from './FormError';
+import FormFeedback, { type Feedback } from './FormFeedback';
 
 export default function NewPasswordForm() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   return (
     <form className="form" onSubmit={handleSubmit}>
@@ -45,7 +45,7 @@ export default function NewPasswordForm() {
         </div>
       </div>
 
-      {error && <FormError message={error} />}
+      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Wachtwoord aanpassen'}
@@ -56,25 +56,22 @@ export default function NewPasswordForm() {
     </form>
   );
 
-  async function handleSubmit(e: SubmitEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setError(null);
+    setFeedback(null);
 
     if (password !== passwordConfirm) {
-      setError('Wachtwoorden komen niet overeen');
+      setFeedback({ message: 'Wachtwoorden komen niet overeen', type: 'error' });
       return;
     }
 
-    setIsPending(true);
-
-    const result: SimpleAuthResult = await updatePassword(password);
-
-    if (!result.success) {
-      setError(result.error.message);
-      setIsPending(false);
-      return;
-    }
-
-    router.push(getUrlWithToast('/', 'passwordChanged'));
+    startTransition(async () => {
+      const result: SimpleAuthResult = await updatePassword(password);
+      if (!result.success) {
+        setFeedback(result.error.feedback);
+        return;
+      }
+      router.push(getUrlWithToast('/', 'passwordChanged'));
+    });
   }
 }

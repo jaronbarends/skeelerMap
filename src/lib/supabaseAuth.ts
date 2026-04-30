@@ -1,18 +1,20 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { AuthResponse, AuthError } from '@supabase/supabase-js';
 
-import { getErrorMessageByCode } from './authErrorTranslations';
+import type { Feedback } from '@/components/auth/FormFeedback';
+
+import { getFeedbackByCode } from './authFeedbackTranslations';
 
 export type AuthCallbackType = 'signup' | 'recovery';
 
-// Note: both signInWithPassword and signUp return AuthResponse, so we can use the same type for both; signOut returns { error: AuthError | null }
+// Note: both signInWithPassword and signUp return AuthResponse, so we can use the same type for both
 export type AuthResult =
   | { success: true; data: AuthResponse['data'] }
-  | { success: false; error: { code: string; message: string } };
+  | { success: false; error: { code: string; feedback: Feedback } };
 
 export type SimpleAuthResult =
   | { success: true }
-  | { success: false; error: { code: string; message: string } };
+  | { success: false; error: { code: string; feedback: Feedback } };
 
 const SIGNUP_CALLBACK_URL = getCallbackUrl('signup');
 const RESET_PASSWORD_CALLBACK_URL = getCallbackUrl('recovery');
@@ -34,7 +36,7 @@ export async function signUp(email: string, password: string): Promise<AuthResul
       success: false as const,
       error: {
         code: 'email_exists',
-        message: getErrorMessageByCode('email_exists'),
+        feedback: getFeedbackByCode('email_exists'),
       },
     };
   }
@@ -49,9 +51,10 @@ export async function signIn(email: string, password: string): Promise<AuthResul
   return getAuthResult(data, error);
 }
 
-export async function signOut() {
+export async function signOut(): Promise<SimpleAuthResult> {
   const supabase = getBrowserClient();
-  return supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  return getSimpleAuthResult(error);
 }
 
 export async function resetPasswordForEmail(email: string): Promise<SimpleAuthResult> {
@@ -59,12 +62,7 @@ export async function resetPasswordForEmail(email: string): Promise<SimpleAuthRe
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: RESET_PASSWORD_CALLBACK_URL,
   });
-
-  if (error) {
-    return getAuthErrorResult(error);
-  }
-
-  return { success: true as const };
+  return getSimpleAuthResult(error);
 }
 
 export async function resendConfirmationEmail(email: string): Promise<SimpleAuthResult> {
@@ -77,22 +75,13 @@ export async function resendConfirmationEmail(email: string): Promise<SimpleAuth
     },
   });
 
-  if (error) {
-    return getAuthErrorResult(error);
-  }
-
-  return { success: true as const };
+  return getSimpleAuthResult(error);
 }
 
 export async function updatePassword(password: string): Promise<SimpleAuthResult> {
   const supabase = getBrowserClient();
   const { error } = await supabase.auth.updateUser({ password });
-
-  if (error) {
-    return getAuthErrorResult(error);
-  }
-
-  return { success: true as const };
+  return getSimpleAuthResult(error);
 }
 
 function getBrowserClient() {
@@ -104,14 +93,21 @@ function getBrowserClient() {
 
 function getAuthErrorResult(error: AuthError): {
   success: false;
-  error: { code: string; message: string };
+  error: { code: string; feedback: Feedback };
 } {
   // Provide a fallback 'unknown' code if error.code is undefined
   const errorCode = error.code ?? 'unknown';
   return {
     success: false as const,
-    error: { code: errorCode, message: getErrorMessageByCode(errorCode) },
+    error: { code: errorCode, feedback: getFeedbackByCode(errorCode) },
   };
+}
+
+function getSimpleAuthResult(error: AuthError | null): SimpleAuthResult {
+  if (error) {
+    return getAuthErrorResult(error);
+  }
+  return { success: true as const };
 }
 
 function getAuthResult(data: AuthResponse['data'], error: AuthError | null): AuthResult {

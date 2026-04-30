@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, useTransition } from 'react';
 
 import Button from '@/components/button/Button';
 import { type AuthResult, signUp } from '@/lib/supabaseAuth';
+
+import FormFeedback, { type Feedback } from './FormFeedback';
 
 import styles from './SignupForm.module.css';
 
@@ -12,8 +14,8 @@ export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   // const [successMessageVisible, setSuccessMessageVisible] = useState(true);
 
@@ -68,7 +70,7 @@ export default function SignupForm() {
         </div>
       </div>
 
-      {error && <div className="formError">{error}</div>}
+      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Registreren'}
@@ -84,24 +86,22 @@ export default function SignupForm() {
     // </div>
   );
 
-  async function handleSubmit(e: SubmitEvent) {
+  function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setError(null);
+    setFeedback(null);
 
     if (password !== passwordConfirm) {
-      setError('Wachtwoorden komen niet overeen');
+      setFeedback({ message: 'Wachtwoorden komen niet overeen', type: 'error' });
       return;
     }
 
-    setIsPending(true);
-
-    const result: AuthResult = await signUp(email, password);
-    if (!result.success) {
-      setError(result.error.message);
-      setIsPending(false);
-      return;
-    }
-
-    setSuccessMessageVisible(true);
+    startTransition(async () => {
+      const result: AuthResult = await signUp(email, password);
+      if (!result.success) {
+        setFeedback(result.error.feedback);
+        return;
+      }
+      setSuccessMessageVisible(true);
+    });
   }
 }

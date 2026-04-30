@@ -1,0 +1,29 @@
+.formFeedback {
+  --color-text: var(--color-text-error);
+  --color-surface: var(--color-surface-error);
+
+  padding: var(--size-8) var(--size-12);
+  border-radius: var(--radius-4);
+  font-size: var(--font-size-14);
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  &[data-type='warning'] {
+    --color-text: var(--color-text-warning);
+    --color-surface: var(--color-surface-warning);
+  }
+
+  &[data-type='success'] {
+    --color-text: var(--color-text-success);
+    --color-surface: var(--color-surface-success);
+  }
+
+  &[data-type='info'] {
+    --color-text: var(--color-text-info);
+    --color-surface: var(--color-surface-info);
+  }
+
+  a {
+    color: var(--color-text);
+  }
+}
