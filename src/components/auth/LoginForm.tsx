@@ -11,8 +11,6 @@ import { getUrlWithToast } from '@/lib/toastMessages';
 import SimpleContent from '../SimpleContent';
 import FormFeedback, { type Feedback } from './FormFeedback';
 
-import styles from './LoginForm.module.css';
-
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -49,7 +47,7 @@ export default function LoginForm() {
             required
           />
         </div>
-        <div className={`formItem ${styles.forgotPassword}`}>
+        <div className="formItem formSecondaryText">
           <Link href="/wachtwoord-vergeten">Wachtwoord vergeten?</Link>
         </div>
       </div>

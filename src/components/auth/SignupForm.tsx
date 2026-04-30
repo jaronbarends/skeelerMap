@@ -55,6 +55,7 @@ export default function SignupForm() {
             autoComplete="new-password"
             required
           />
+          <p className="formSecondaryText">Wachtwoord moet minimaal 8 tekens lang zijn.</p>
         </div>
         <div className="formItem">
           <label htmlFor="passwordConfirm">Wachtwoord bevestigen</label>

@@ -69,7 +69,7 @@ TBD: what do we want? ATM, in supabase we have a constraint on table segments fo
 Set password requirements Authentication > Sign In / Providers / Email > Password requirements
 Add indication at pw field
 add realtime check
-see if we can dynamically import the requirements and show them with the field
+allowed symbols by supabase: !@#$%^&\*()\_+-=[]{};'\:"|<>?,./`~
 
 ### Supabase auth middleware
 
