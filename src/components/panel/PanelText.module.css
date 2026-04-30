@@ -1,0 +1,5 @@
+.panelText {
+  display: flex;
+  gap: var(--size-8);
+  align-items: center;
+}

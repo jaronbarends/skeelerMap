@@ -1,3 +1,4 @@
+import PanelText from '@/components/panel/PanelText';
 import { RATINGS, RatingValue, type Rating } from '@/lib/segments';
 
 import styles from './RatingSection.module.css';
@@ -27,7 +28,9 @@ export default function RatingSection({
   const showRatingButtons = isReadyToRate && !isPending;
   return (
     <>
-      <p>{instruction}</p>
+      <PanelText isPending={Boolean(isPending)}>
+        <p>{instruction}</p>
+      </PanelText>
       {showRatingButtons && (
         <RatingButtons onRatingSelect={onRatingSelect} currentRatingValue={currentRatingValue} />
       )}
