@@ -15,8 +15,16 @@ interface Props {
 }
 
 export default function FormFeedback({ message, type = 'error' }: Props) {
+  const isAssertive = type === 'error' || type === 'warning';
+
   return (
-    <div className={styles.formFeedback} data-type={type}>
+    <div
+      className={styles.formFeedback}
+      data-type={type}
+      role={isAssertive ? 'alert' : 'status'}
+      aria-live={isAssertive ? 'assertive' : 'polite'}
+      aria-atomic="true"
+    >
       {message}
     </div>
   );

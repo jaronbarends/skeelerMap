@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 import type { Feedback, FeedbackType } from '@/components/auth/FormFeedback';
 
@@ -14,7 +14,7 @@ type FeedbackTranslation = {
 export const authFeedbackTranslations: Record<string, FeedbackTranslation> = {
   email_exists: {
     description: 'Email address already exists in the system.',
-    type: 'info',
+    type: 'warning',
     message: (
       <>
         Je hebt je al aangemeld met dit e-mailadres. Je kunt nu{' '}
@@ -29,9 +29,7 @@ export const authFeedbackTranslations: Record<string, FeedbackTranslation> = {
       <>
         Je account is nog niet bevestigd. Klik op de link in de e-mail die je eerder hebt ontvangen
         om je account te bevestigen.{' '}
-        <Link href="/bevestigings-link-opnieuw-aanvragen">
-          Bevestigingslink opnieuw aanvragen
-        </Link>
+        <Link href="/bevestigings-link-opnieuw-aanvragen">Bevestigingslink opnieuw aanvragen</Link>
       </>
     ),
   },
