@@ -1,7 +1,8 @@
 .component {
   --z-map: 0;
-  --z-fab: 1;
-  --z-panel: 2;
+  --z-fab: 10;
+  --z-panel: 20;
+  --z-loading-indicator: 30;
 
   position: relative;
   height: 100%;
