@@ -28,16 +28,31 @@ export default function ForgotPasswordForm({ linkExpired }: Props) {
     );
   }
 
-  const title = linkExpired ? 'Link niet meer geldig' : 'Wachtwoord vergeten?';
-  const intro = linkExpired
-    ? 'De link om je wachtwoord aan te passen is niet meer geldig. Vraag een nieuwe link aan.'
-    : 'Dat gebeurt ons allemaal weleens. Wat is je e-mailadres? Dan zenden we je binnen enkele minuten een linkje om een nieuw wachtwoord in te stellen.';
+  let Content = null;
+  if (linkExpired) {
+    Content = (
+      <>
+        <h1>Link niet meer geldig</h1>
+        <p>
+          De link om je wachtwoord aan te passen is niet meer geldig. Vraag een nieuwe link aan.
+        </p>
+      </>
+    );
+  } else {
+    Content = (
+      <>
+        <h1>Wachtwoord vergeten?</h1>
+        <p>
+          Dat gebeurt ons allemaal weleens. Wat is je <span className="nobr">e-mailadres?</span> Dan
+          zenden we je binnen enkele minuten een linkje om een nieuw wachtwoord in te stellen.
+        </p>
+      </>
+    );
+  }
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <h1>{title}</h1>
-
-      <p>{intro}</p>
+      <SimpleContent>{Content}</SimpleContent>
 
       <div className="formGroup">
         <div className="formItem">

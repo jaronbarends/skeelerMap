@@ -28,7 +28,10 @@ export default function SignupForm() {
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <h1>Registreren</h1>
+      <SimpleContent>
+        <h1>Registreren</h1>
+        <p>Registreer je gratis om zelf segmenten aan te kunnen maken.</p>
+      </SimpleContent>
 
       <div className="formGroup">
         <div className="formItem">
