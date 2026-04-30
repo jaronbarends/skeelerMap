@@ -36,16 +36,18 @@ export default function SegmentCreationPanel({
         {mode === 'drawSegment' && (
           <>
             <p>
-              Klik minstens 2 punten om een segment te maken
-              <br />
-              of{' '}
-              <button
-                className={styles.inlineLinkButton}
-                type="button"
-                onClick={onStartCreateMarker}
-              >
-                voeg een waarschuwing toe
-              </button>
+              Klik minstens 2 punten om een segment te maken{' '}
+              <span className={styles.secondaryText}>
+                (of{' '}
+                <button
+                  className={styles.inlineLinkButton}
+                  type="button"
+                  onClick={onStartCreateMarker}
+                >
+                  voeg een waarschuwing toe
+                </button>
+                )
+              </span>
             </p>
           </>
         )}

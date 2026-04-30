@@ -1,11 +1,3 @@
-/* .formPage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  padding: var(--size-16);
-} */
-
 .form {
   display: flex;
   flex-direction: column;
@@ -31,8 +23,12 @@
   }
 }
 
+.formSecondaryText,
 .formFooter {
   font-size: var(--font-size-14);
-  text-align: center;
   color: var(--color-text-secondary);
+}
+
+.formFooter {
+  text-align: center;
 }

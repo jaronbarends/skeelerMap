@@ -37,6 +37,7 @@
 
   --color-text-default: var(--color-text-secondary);
   --color-headings-default: var(--color-text-primary);
+  --color-headings-default: var(--color-blue-70);
   --color-text-link: var(--color-blue-70);
   --color-text-info: var(--color-text-on-light);
   --color-text-success: var(--color-text-on-light);
