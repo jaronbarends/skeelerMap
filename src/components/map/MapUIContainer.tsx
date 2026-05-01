@@ -234,13 +234,16 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
 
   const fetchMapData = useCallback(async (abortSignal: AbortSignal) => {
     setIsLoading(true);
-    const [segmentsResult, markersResult] = await Promise.all([
-      fetchSegments(abortSignal),
-      fetchMarkers(abortSignal),
-    ]);
-    setSegments(segmentsResult);
-    setMarkers(markersResult);
-    setIsLoading(false);
+    try {
+      const [segmentsResult, markersResult] = await Promise.all([
+        fetchSegments(abortSignal),
+        fetchMarkers(abortSignal),
+      ]);
+      setSegments(segmentsResult);
+      setMarkers(markersResult);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const segmentIsOwnedByCurrentUser = useCallback(
