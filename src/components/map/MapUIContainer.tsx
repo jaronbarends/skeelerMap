@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
+import LoadingIndicator from '@/components/map/LoadingIndicator';
 import type { MapHandle } from '@/components/map/MapView';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
 import MarkerCreationPanel from '@/components/panel/MarkerCreationPanel';
@@ -227,16 +228,22 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const selectedMarkerRef = useRef<Marker | null>(null);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [markers, setMarkers] = useState<Marker[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const fetchMapData = useCallback(async (abortSignal: AbortSignal) => {
-    const [segmentsResult, markersResult] = await Promise.all([
-      fetchSegments(abortSignal),
-      fetchMarkers(abortSignal),
-    ]);
-    setSegments(segmentsResult);
-    setMarkers(markersResult);
+    setIsLoading(true);
+    try {
+      const [segmentsResult, markersResult] = await Promise.all([
+        fetchSegments(abortSignal),
+        fetchMarkers(abortSignal),
+      ]);
+      setSegments(segmentsResult);
+      setMarkers(markersResult);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const segmentIsOwnedByCurrentUser = useCallback(
@@ -344,6 +351,8 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           tooltip="Centreer op locatie"
         />
       </FabContainer>
+
+      {isLoading && <LoadingIndicator>Bezig met laden...</LoadingIndicator>}
 
       {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
 

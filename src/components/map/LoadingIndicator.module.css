@@ -1,0 +1,10 @@
+.loader {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  padding: var(--size-16);
+  border-radius: var(--radius-8);
+  transform: translateX(-50%);
+  background-color: var(--color-surface-100);
+  z-index: var(--z-loading-indicator);
+}

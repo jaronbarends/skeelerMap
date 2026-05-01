@@ -1,0 +1,27 @@
+.pendingText {
+  display: flex;
+  align-items: center;
+  gap: var(--size-12);
+}
+
+.spinner {
+  --spinner-size: var(--size-16);
+
+  display: inline-block;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border: 3px solid var(--color-gray-700);
+  border-top-color: var(--color-white);
+  border-top-color: transparent;
+  border-radius: var(--radius-circle);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

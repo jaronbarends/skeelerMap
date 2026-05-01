@@ -5,6 +5,7 @@ import Button from '@/components/button/Button';
 import type { MarkerDetailsMode } from '@/lib/mapUIMode';
 import { MARKER_TYPES, type Marker, type MarkerType } from '@/lib/markers';
 
+import PendingText from '@/components/PendingText';
 import MarkerForm from './MarkerForm';
 import OwnerText from './OwnerText';
 import Panel from './Panel';
@@ -89,7 +90,9 @@ export default function MarkerDetailsPanel({
           </PanelHeader>
           <PanelBody>
             {isPending ? (
-              <p>Waarschuwing aan het verwijderen...</p>
+              <PendingText>
+                <p>Waarschuwing aan het verwijderen...</p>
+              </PendingText>
             ) : (
               <>
                 <p>Weet je zeker dat je deze waarschuwing wil verwijderen?</p>
