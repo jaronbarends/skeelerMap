@@ -84,59 +84,41 @@ Update `docs/status.md`:
 
 ### Component architecture
 
-- When writing React components, always place its return statement as early as
-  possible in the component body, and define any internal functions after the
-  return statement (hoisted function declarations), rather than before it.
-- Structure components logically: keep exports, subcomponents, helpers, and types
-  well-organized. Extract subcomponents when JSX is complex, reused, or has its
-  own behavior; keep simple, one-off JSX inline for readability. When a
-  subcomponent is only used once, keep it in the same file.
+- When writing React components, always place its return statement as early as possible in the component body, and define any internal functions after the return statement (hoisted function declarations), rather than before it.
+- Structure components logically: keep exports, subcomponents, helpers, and types well-organized. Extract subcomponents when JSX is complex, reused, or has its own behavior; keep simple, one-off JSX inline for readability. When a subcomponent is only used once, keep it in the same file.
 
----
-
-## TypeScript guidelines
+## TypeScript Usage
 
 - Use TypeScript for all code
 - Avoid enums; use const maps instead
 - Implement proper type safety and inference
 - Use `satisfies` operator for type validation
 
----
-
 ## Next.js guidelines
 
-- The project uses Next.js 15 with App Router
+- The project uses Next 15 with App Router
 - Favor React Server Components (RSC) where possible
-- Minimize `use client` directives
+- Minimize 'use client' directives
 
-### State management
+### State Management
 
+- Use `useActionState` instead of deprecated `useFormState`
+- Leverage enhanced `useFormStatus` with new properties (data, method, action)
+- Implement URL state management with 'nuqs'
 - Minimize client-side state
-- Use `nuqs` for URL state only when the state is meaningful to persist or share
-  via URL (e.g. map center/zoom for shareable links). Do not use it for transient
-  UI state (e.g. drawing mode, selection state, panel visibility).
-
----
 
 ## CSS guidelines
 
-- Do not use Tailwind CSS
-- Organize CSS in separate files
-- Use CSS modules for component styles
-- Use class selectors over ID selectors for styling
-- Use Flexbox and Grid for layout
-- Use CSS variables for consistent theming
+- Do not use Tailwind css
+- Organize css in separate files
+- When using React, use CSS modules
+- Use class selectors over ID selectors for styling.
+- Use Flexbox and Grid for layout.
+- Use CSS variables for consistent theming.
 
----
+## overrides for earlier instructions
 
-## importing files
-
-- Use absolute paths for imports with the `@/` prefix (e.g. `@/app/components/Foo`), unless you are importing CSS files from the same directory (use relative `./` then)
-
----
-
-## Overrides and project-specific notes
-
-- Minimizing client-side state should not create friction when client-side state
-  is genuinely the right choice — map interactions (drawing mode, selection state,
-  panel visibility) are expected to be client-side.
+- about minimizing client-side state: don't let this instruction create friction when client-side state is genuinly the right choice (e.g. for map interactions)
+- Use `nuqs` for URL state only when the state is meaningful to persist or share via URL
+  (e.g. map center/zoom for shareable links). Do not use it for transient UI state
+  (e.g. drawing mode, selection state, panel visibility).

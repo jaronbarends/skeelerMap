@@ -4,7 +4,7 @@ import { RefObject } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server.browser';
 import { FaLocationDot } from 'react-icons/fa6';
 
-import styles from './MapView.module.css';
+import styles from '@/components/map/MapView.module.css';
 
 export function useInitPendingMarker(
   mapRef: RefObject<L.Map | null>,

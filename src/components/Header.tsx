@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { getUser } from '@/lib/supabaseAuth.server';
 
-import AuthControls from './auth/AuthControls';
+import AuthControls from '@/components/auth/AuthControls';
 
 import styles from './Header.module.css';
 
