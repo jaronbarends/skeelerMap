@@ -21,11 +21,13 @@ _Post-MVP behavior noted in decisions.md._
 
 ### [techdebt] move inlineLinkButton somewhere else
 
-### [techdebt] in MapUIContainer `getMapUIModeForControlPointCount` feels bloated
+### ~~[techdebt] in MapUIContainer `getMapUIModeForControlPointCount` feels bloated~~ ✓ Done
 
-### [techdebt]
+_Moved to `src/lib/mapUIReducer.ts` 2026-05-01._
 
-discuss: UIActions and uiReducer from MapUIContainer to separate file(s)?
+### ~~[techdebt] UIActions and uiReducer from MapUIContainer to separate file(s)?~~ ✓ Done
+
+_Extracted to `src/lib/mapUIReducer.ts` 2026-05-01._
 
 ### Location permission flow
 

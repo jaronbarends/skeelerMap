@@ -1,6 +1,6 @@
 # Project status
 
-**Last updated:** 2026-04-24
+**Last updated:** 2026-05-01
 **Current phase:** Auth implemented and hardened; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
 
 ---
@@ -37,16 +37,18 @@
 - Toast messages consolidated in `src/lib/toastMessages.ts`
 - Email delivery via Resend (custom SMTP) — sender `skeelermap@skeelermap-auth.jaron.nl`
 - Segment creation requires auth: logged-out users see a panel prompting login/registration when tapping “Segment toevoegen”
+- UI state machine (`UIState`, `UIAction`, `uiReducer`, `initialUiState`, `getMapUIModeForControlPointCount`) extracted from `MapUIContainer.tsx` into `src/lib/mapUIReducer.ts`
 - Menubar: app name "SkeelerMap" + tagline "Vind en beoordeel skeelerpaden" (stacked left);
   auth controls right ("Inloggen" / "Uitloggen"). MenuBar is a Server Component;
   `AuthControls` is a Client Component child.
 - Toast component: map-level feedback, triggered via `?toast=` query param on `/`.
-  Auto-dismisses after 4s.
+  Auto-dismisses after 4s; dismiss button and countdown bar included.
 - Supabase auth helpers split into `src/lib/supabaseAuth.ts` (browser) and
   `src/lib/supabaseAuth.server.ts` (server)
 - Segments have `user_id` (FK to auth.users); RLS policies enforce ownership on writes
 - Ownership-aware UI: edit/delete controls only shown for segments owned by the current user;
-  `get_segments` RPC returns `user_id`; `currentUserId` passed server-side from `page.tsx`
+  `get_segments` RPC returns `user_id`; `currentUserId` passed server-side from `page.tsx`;
+  "aangemaakt door jou/andere gebruiker" label hidden for logged-out users
 - DRY button and form styling: `Button` component (`src/components/button/`); global stylesheets
   `src/styles/elements.forms.css`, `src/styles/components.forms.css`, `src/styles/elements.type.css`;
   auth forms (`LoginForm`, `SignupForm`) and panel buttons refactored to use these
@@ -61,6 +63,7 @@
   `position-area: left center`). Anchor name is generated per-instance via `useId()`.
 - Toast on logout: logging out triggers a toast "Je bent nu uitgelogd." via `?toast=loggedOut`
   redirect, reusing the existing `?toast=` mechanism.
+- Logging out cancels all active UI actions (drawing mode, selection, panels)
 
 ## What's decided
 
