@@ -15,12 +15,12 @@ import { isCreateSegmentMode } from '@/lib/mapUIMode';
 import type { Marker } from '@/lib/markers';
 import { Segment } from '@/lib/segments';
 
-import { useInitMarkersLayer } from './useInitMarkersLayer';
-import { useInitPendingMarker } from './useInitPendingMarker';
-import { useInitSegmentEventHandlers } from './useInitSegmentEventHandlers';
-import { useInitSegmentLayers } from './useInitSegmentLayers';
-import { useMapInit } from './useMapInit';
-import { useSegmentCreation } from './useSegmentCreation';
+import { useInitMarkersLayer } from '@/components/map/useInitMarkersLayer';
+import { useInitPendingMarker } from '@/components/map/useInitPendingMarker';
+import { useInitSegmentEventHandlers } from '@/components/map/useInitSegmentEventHandlers';
+import { useInitSegmentLayers } from '@/components/map/useInitSegmentLayers';
+import { useMapInit } from '@/components/map/useMapInit';
+import { useSegmentCreation } from '@/components/map/useSegmentCreation';
 
 import styles from './MapView.module.css';
 

@@ -6,12 +6,12 @@ import type { MarkerDetailsMode } from '@/lib/mapUIMode';
 import { MARKER_TYPES, type Marker, type MarkerType } from '@/lib/markers';
 
 import PendingText from '@/components/PendingText';
-import MarkerForm from './MarkerForm';
-import OwnerText from './OwnerText';
-import Panel from './Panel';
-import PanelBody from './PanelBody';
-import PanelHeader from './PanelHeader';
-import type { ActionButton } from './PanelHeader';
+import MarkerForm from '@/components/panel/MarkerForm';
+import OwnerText from '@/components/panel/OwnerText';
+import Panel from '@/components/panel/Panel';
+import PanelBody from '@/components/panel/PanelBody';
+import PanelHeader from '@/components/panel/PanelHeader';
+import type { ActionButton } from '@/components/panel/PanelHeader';
 
 import styles from './MarkerDetailsPanel.module.css';
 

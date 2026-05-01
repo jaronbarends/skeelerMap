@@ -8,8 +8,8 @@ import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import SimpleContent from '../SimpleContent';
-import FormFeedback, { type Feedback } from './FormFeedback';
+import SimpleContent from '@/components/SimpleContent';
+import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 
 export default function LoginForm() {
   const router = useRouter();

@@ -7,7 +7,7 @@ import Button from '@/components/button/Button';
 import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
 
-import FormFeedback, { type Feedback } from './FormFeedback';
+import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 
 export default function NewPasswordForm() {
   const router = useRouter();

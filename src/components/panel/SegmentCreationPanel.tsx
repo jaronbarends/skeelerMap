@@ -1,10 +1,10 @@
 import { isCreateSegmentMode, type MapUIMode } from '@/lib/mapUIMode';
 import type { RatingValue } from '@/lib/segments';
 
-import Panel from './Panel';
-import PanelBody from './PanelBody';
-import PanelHeader from './PanelHeader';
-import RatingSection from './RatingSection';
+import Panel from '@/components/panel/Panel';
+import PanelBody from '@/components/panel/PanelBody';
+import PanelHeader from '@/components/panel/PanelHeader';
+import RatingSection from '@/components/panel/RatingSection';
 
 import styles from './SegmentCreationPanel.module.css';
 

@@ -2,10 +2,10 @@ import Button from '@/components/button/Button';
 import { isCreateMarkerMode, type MapUIMode } from '@/lib/mapUIMode';
 import type { MarkerType } from '@/lib/markers';
 
-import MarkerForm from './MarkerForm';
-import Panel from './Panel';
-import PanelBody from './PanelBody';
-import PanelHeader from './PanelHeader';
+import MarkerForm from '@/components/panel/MarkerForm';
+import Panel from '@/components/panel/Panel';
+import PanelBody from '@/components/panel/PanelBody';
+import PanelHeader from '@/components/panel/PanelHeader';
 
 interface Props {
   mode: MapUIMode;

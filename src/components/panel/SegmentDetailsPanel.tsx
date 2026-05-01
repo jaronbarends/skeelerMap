@@ -8,12 +8,12 @@ import type { RatingValue, Segment } from '@/lib/segments';
 import { getRatingByValue } from '@/lib/segments';
 
 import PendingText from '@/components/PendingText';
-import OwnerText from './OwnerText';
-import Panel from './Panel';
-import PanelBody from './PanelBody';
-import PanelHeader from './PanelHeader';
-import type { ActionButton } from './PanelHeader';
-import RatingSection from './RatingSection';
+import OwnerText from '@/components/panel/OwnerText';
+import Panel from '@/components/panel/Panel';
+import PanelBody from '@/components/panel/PanelBody';
+import PanelHeader from '@/components/panel/PanelHeader';
+import type { ActionButton } from '@/components/panel/PanelHeader';
+import RatingSection from '@/components/panel/RatingSection';
 
 import styles from './SegmentDetailsPanel.module.css';
 

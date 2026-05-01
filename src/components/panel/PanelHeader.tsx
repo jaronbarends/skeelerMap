@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { IconName } from '@/lib/getIconByName';
 
-import PanelIconButton from './PanelIconButton';
+import PanelIconButton from '@/components/panel/PanelIconButton';
 
 import styles from './PanelHeader.module.css';
 

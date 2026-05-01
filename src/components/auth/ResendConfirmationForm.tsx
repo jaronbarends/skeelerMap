@@ -6,8 +6,8 @@ import { type SubmitEvent, useState, useTransition } from 'react';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, resendConfirmationEmail } from '@/lib/supabaseAuth';
 
-import SimpleContent from '../SimpleContent';
-import FormFeedback, { type Feedback } from './FormFeedback';
+import SimpleContent from '@/components/SimpleContent';
+import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 
 export default function ResendConfirmationForm() {
   const [email, setEmail] = useState('');

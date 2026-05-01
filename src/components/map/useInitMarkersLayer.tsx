@@ -14,7 +14,7 @@ import {
 import { Marker } from '@/lib/markers';
 import { MARKER_TYPES } from '@/lib/markers';
 
-import styles from './MapView.module.css';
+import styles from '@/components/map/MapView.module.css';
 
 export function useInitMarkersLayer(
   mapRef: RefObject<L.Map | null>,

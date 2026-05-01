@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { type ToastKey, isToastKey, getToastData } from '@/lib/toastMessages';
 
-import Toast from './Toast';
+import Toast from '@/components/toast/Toast';
 
 import styles from './ToastWrapper.module.css';
 
