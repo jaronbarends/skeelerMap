@@ -179,10 +179,12 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         loginRequiredPanelOpen: false,
         pendingMarkerLocation: null,
       };
-    default:
+    default: {
+      const _exhaustive: never = action;
       // eslint-disable-next-line no-console
-      console.error(`Unknown action type: ${(action as { type: unknown }).type}`);
+      console.error(`Unknown action type: ${(_exhaustive as { type: unknown }).type}`);
       return state;
+    }
   }
 }
 
