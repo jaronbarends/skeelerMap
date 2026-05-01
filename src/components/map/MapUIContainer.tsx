@@ -349,7 +349,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         />
       </FabContainer>
 
-      {!isLoading && <LoadingIndicator>Bezig met laden...</LoadingIndicator>}
+      {isLoading && <LoadingIndicator>Bezig met laden...</LoadingIndicator>}
 
       {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
 

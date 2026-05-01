@@ -1,5 +1,8 @@
-import PanelText from '@/components/panel/PanelText';
+import { type ReactNode } from 'react';
+
 import { RATINGS, RatingValue, type Rating } from '@/lib/segments';
+
+import PendingText from '@/components/PendingText';
 
 import styles from './RatingSection.module.css';
 
@@ -16,21 +19,23 @@ export default function RatingSection({
   onRatingSelect,
   currentRatingValue,
 }: Props) {
-  let instruction: string;
+  let panelText: ReactNode;
   if (isPending) {
-    instruction = 'Segment aan het opslaan...';
+    panelText = (
+      <PendingText>
+        <p>Segment aan het opslaan...</p>
+      </PendingText>
+    );
   } else if (isReadyToRate) {
-    instruction = 'Kies kwaliteit om op te slaan';
+    panelText = <p>Kies kwaliteit om op te slaan</p>;
   } else {
-    instruction = 'Klik minstens 2 punten om een segment te maken';
+    panelText = <p>Klik minstens 2 punten om een segment te maken</p>;
   }
 
   const showRatingButtons = isReadyToRate && !isPending;
   return (
     <>
-      <PanelText isPending={Boolean(isPending)}>
-        <p>{instruction}</p>
-      </PanelText>
+      {panelText}
       {showRatingButtons && (
         <RatingButtons onRatingSelect={onRatingSelect} currentRatingValue={currentRatingValue} />
       )}

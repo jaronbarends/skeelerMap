@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Icon from '@/components/Icon';
 import Button from '@/components/button/Button';
 import { MARKER_TYPES, type MarkerType } from '@/lib/markers';
+import PendingText from '@/components/PendingText';
 
 import styles from './MarkerForm.module.css';
 

@@ -1,3 +1,9 @@
+.pendingText {
+  display: flex;
+  align-items: center;
+  gap: var(--size-12);
+}
+
 .spinner {
   --spinner-size: var(--size-16);
   display: inline-block;

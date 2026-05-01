@@ -7,6 +7,7 @@ import type { MapUIMode } from '@/lib/mapUIMode';
 import type { RatingValue, Segment } from '@/lib/segments';
 import { getRatingByValue } from '@/lib/segments';
 
+import PendingText from '@/components/PendingText';
 import OwnerText from './OwnerText';
 import Panel from './Panel';
 import PanelBody from './PanelBody';
@@ -82,7 +83,9 @@ export default function SegmentDetailsPanel({
           </PanelHeader>
           <PanelBody>
             {isPending ? (
-              <p>Segment aan het verwijderen...</p>
+              <PendingText>
+                <p>Segment aan het verwijderen...</p>
+              </PendingText>
             ) : (
               <>
                 <p>Weet je zeker dat je dit segment wil verwijderen?</p>
