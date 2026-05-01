@@ -1,3 +1,5 @@
+import styles from './OwnerText.module.css';
+
 interface Props {
   userIsLoggedIn: boolean;
   currentUserIsOwner: boolean;
@@ -9,7 +11,7 @@ export default function OwnerText({ userIsLoggedIn, currentUserIsOwner, objectNa
     return null;
   }
   return (
-    <p>
+    <p className={styles.component}>
       {currentUserIsOwner
         ? `${objectName} aangemaakt door jou`
         : `${objectName} aangemaakt door andere gebruiker`}

@@ -1,8 +1,7 @@
 import { type ReactNode } from 'react';
 
-import { RATINGS, RatingValue, type Rating } from '@/lib/segments';
-
 import PendingText from '@/components/PendingText';
+import { RATINGS, RatingValue, type Rating } from '@/lib/segments';
 
 import styles from './RatingSection.module.css';
 

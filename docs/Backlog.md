@@ -6,8 +6,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### show indicator while loading map data
-
 ### live-check error messages on change
 
 `setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
@@ -87,14 +85,6 @@ template for this.
 **Risk without this:** low for now — tokens are valid for 1 hour and the user base
 is small. Revisit before launch.
 
-### Error and success styling
-
-The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
-
-### Only show user-info when user is logged in
-
-In SegmentDetailsPanel (and if we already have it, MarkerDetailsPanel), only show the user information ('Segment aangemaakt door jou' or 'Segment aangemaakt door andere gebruiker') if the user is logged in.
-
 ---
 
 ## Low priority
@@ -120,10 +110,6 @@ Needed as a clean extension point for user metadata — in particular, a `role` 
 admin vs. regular user permissions. Admin users would be able to edit/delete all segments;
 regular users can only edit/delete their own.
 Do not implement role-based RLS until the profiles table exists.
-
-### Use Custom SMTP for supabase emails
-
-To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
 
 ### Zoom-based polyline weight scaling
 
@@ -259,3 +245,19 @@ _Implemented 2026-04-24._
 ### ~~Add possibilty to resend confirmation email~~ ✓ Done
 
 _Implemented 2026-04-29._
+
+### ~~show indicator while loading map data~~ ✓ Done
+
+_Implemented 2026-05-01._
+
+### ~~Only show user-info when user is logged in~~ ✓ Done
+
+In SegmentDetailsPanel (and if we already have it, MarkerDetailsPanel), only show the user information ('Segment aangemaakt door jou' or 'Segment aangemaakt door andere gebruiker') if the user is logged in.
+
+### ~~Error and success styling~~ ✓ Done
+
+The success messages in Toast.tsx should indicate success more: maybe add green background or checkmark. The error messages in the form should have a red background. Investigate if we have more occurences of succes / error feedback and apply there too.
+
+### ~~Use Custom SMTP for supabase emails~~ ✓ Done
+
+To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
