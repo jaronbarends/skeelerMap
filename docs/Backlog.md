@@ -6,10 +6,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### live-check error messages on change
-
-`setError` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
-
 ---
 
 ## Medium priority
@@ -21,13 +17,9 @@ _Post-MVP behavior noted in decisions.md._
 
 ### [techdebt] move inlineLinkButton somewhere else
 
-### ~~[techdebt] in MapUIContainer `getMapUIModeForControlPointCount` feels bloated~~ ✓ Done
+### live-check error messages on change
 
-_Moved to `src/lib/mapUIReducer.ts` 2026-05-01._
-
-### ~~[techdebt] UIActions and uiReducer from MapUIContainer to separate file(s)?~~ ✓ Done
-
-_Extracted to `src/lib/mapUIReducer.ts` 2026-05-01._
+`setFeedback` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
 ### Location permission flow
 
@@ -263,3 +255,11 @@ The success messages in Toast.tsx should indicate success more: maybe add green 
 ### ~~Use Custom SMTP for supabase emails~~ ✓ Done
 
 To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
+
+### ~~[techdebt] in MapUIContainer `getMapUIModeForControlPointCount` feels bloated~~ ✓ Done
+
+_Moved to `src/lib/mapUIReducer.ts` 2026-05-01._
+
+### ~~[techdebt] UIActions and uiReducer from MapUIContainer to separate file(s)?~~ ✓ Done
+
+_Extracted to `src/lib/mapUIReducer.ts` 2026-05-01._

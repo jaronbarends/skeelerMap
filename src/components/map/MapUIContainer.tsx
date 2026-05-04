@@ -12,11 +12,7 @@ import MarkerCreationPanel from '@/components/panel/MarkerCreationPanel';
 import MarkerDetailsPanel from '@/components/panel/MarkerDetailsPanel';
 import SegmentCreationPanel from '@/components/panel/SegmentCreationPanel';
 import SegmentDetailsPanel from '@/components/panel/SegmentDetailsPanel';
-import {
-  isCreateMarkerMode,
-  isCreateSegmentMode,
-  isMarkerDetailsMode,
-} from '@/lib/mapUIMode';
+import { isCreateMarkerMode, isCreateSegmentMode, isMarkerDetailsMode } from '@/lib/mapUIMode';
 import { initialUiState, uiReducer } from '@/lib/mapUIReducer';
 import { createMarker, fetchMarkers, removeMarker, updateMarker } from '@/lib/markerService';
 import type { Marker, MarkerType } from '@/lib/markers';
@@ -47,8 +43,15 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       ]);
       setSegments(segmentsResult);
       setMarkers(markersResult);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      // eslint-disable-next-line no-console
+      console.error('fetchMapData failed:', error);
     } finally {
-      setIsLoading(false);
+      // in strict mode, useMapInit's cleanup function of the unmounting component and the useEffect of the remounted component are run synchronously. The finally is async, so it will be executed after the remounted component's useEffect calls fetchMapData again. Prevent setting isLoading to false in that case.
+      if (!abortSignal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
