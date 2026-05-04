@@ -9,7 +9,7 @@
 
 - Next.js 15 + App Router + TypeScript
 - Leaflet (plain, not react-leaflet) — full-screen map, Netherlands default, user location dot
-- OpenStreetMap tile layer; CartoDB Voyager can be set in `tilesProvider.ts`
+- OpenStreetMap tile layer; CartoDB Voyager can be set in `tilesProvider.ts`. CartoDB is not allowed for production.
 - Color system: `src/styles/colors.css` (CSS custom properties), read in TSX via `getComputedStyle`
 - `leaflet/dist/leaflet.css` imported in `layout.tsx` (required — see decisions.md)
 - Open Sans via `next/font/google`
@@ -82,7 +82,6 @@
 ## What's open
 
 - Location permission flow (deferred)
-- Tile provider for production (deferred)
 
 ## Next step
 

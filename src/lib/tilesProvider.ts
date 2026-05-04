@@ -7,7 +7,7 @@ interface TilesProvider {
 const ROUTING_URL = 'https://routing.openstreetmap.de/routed-bike/route/v1/driving/';
 
 const OSM: TilesProvider = {
-  url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   routingUrl: ROUTING_URL,

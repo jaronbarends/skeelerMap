@@ -46,12 +46,6 @@ Note: a `denied` permission cannot be re-triggered via JS — the user must rese
 
 Scale polyline weight based on zoom level. Defer unless it becomes a visible problem.
 
-### Production tile provider
-
-Choose and configure a production tile provider. Current CartoDB usage may violate ToS under real traffic.
-Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
-_Open decision in decisions.md._
-
 ### Handle deleted user's segments
 
 TBD: what do we want? ATM, in supabase we have a constraint on table segments for fk_segments_user_id: delete_rule CASCADE, which deletes their segments when a user is deleted.
@@ -263,3 +257,9 @@ _Moved to `src/lib/mapUIReducer.ts` 2026-05-01._
 ### ~~[techdebt] UIActions and uiReducer from MapUIContainer to separate file(s)?~~ ✓ Done
 
 _Extracted to `src/lib/mapUIReducer.ts` 2026-05-01._
+
+### ~~Production tile provider~~ ✓ Done
+
+Choose and configure a production tile provider. Current CartoDB usage may violate ToS under real traffic.
+Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
+_decided on OSM 2026-05-04._

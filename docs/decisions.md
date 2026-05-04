@@ -9,17 +9,11 @@
 **Rationale:** The app will eventually include multiple pages (FAQ, etc.) and user accounts requiring auth. Next.js handles route protection, API routes for auth, and multi-page structure well. Also a deliberate learning goal alongside the app itself.
 **Alternatives considered:** Plain React + Vite — appropriate if this were only a single-view map tool, but ruled out given the broader product scope.
 
-### Tile provider: TBD
+### Tile provider
 
-**Date:** 2026-03-26
-**Status:** OPEN — currently using CartoDB Positron (no API key required) for development.
-**Decision needed:** Choose a production tile provider before launch.
-**Options considered:**
-
-- CartoDB (Positron/Dark Matter) — free, no API key, but terms of service require attribution and limit heavy traffic
-- Stadia Maps — free tier with API key, good quality
-- Maptiler — free tier with API key
-- Mapbox — free tier with API key, most features
+**Date:** 2026-05-04
+**Decision:** Using OpenStreetMap. If we ever run into problems, OpenFreeMap could be an alternative. This would require some rework (see tile-provider-research.md). We keep CartoDB as an option in tileProvider.ts to use during development.
+**Rationale:** See tile-provider-research.md
 
 ### Leaflet CSS import location: layout.tsx (global)
 
