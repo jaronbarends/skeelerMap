@@ -45,6 +45,8 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       setMarkers(markersResult);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
+      // eslint-disable-next-line no-console
+      console.error('fetchMapData failed:', error);
     } finally {
       // in strict mode, useMapInit's cleanup function of the unmounting component and the useEffect of the remounted component are run synchronously. The finally is async, so it will be executed after the remounted component's useEffect calls fetchMapData again. Prevent setting isLoading to false in that case.
       if (!abortSignal.aborted) {
