@@ -33,6 +33,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
+  const [autoFollowIsActive, setAutoFollowIsActive] = useState(true);
 
   const fetchMapData = useCallback(async (abortSignal: AbortSignal) => {
     setIsLoading(true);
@@ -130,6 +131,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         selectedSegment={uiState.selectedSegment}
         selectedMarker={uiState.selectedMarker}
         pendingMarkerLocation={uiState.pendingMarkerLocation}
+        autoFollowIsActive={autoFollowIsActive}
         onControlPointCountChange={handleControlPointCountChange}
         onMarkerLocationClicked={handleMarkerLocationClicked}
         onMarkerSelect={handleSelectMarker}
@@ -138,6 +140,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         onSegmentDeselect={handleSegmentDeselect}
         onSegmentDragUpdate={updateSegmentCoordinates}
         onSegmentDragEnd={handleSegmentDragEnd}
+        onPauseAutoFollow={() => setAutoFollowIsActive(false)}
       />
       <FabContainer>
         <FabButton
@@ -153,7 +156,10 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           tooltip="Segment toevoegen"
         />
         <FabButton
-          onClick={() => mapRef.current?.centerOnLocation()}
+          onClick={() => {
+            setAutoFollowIsActive(true);
+            mapRef.current?.centerOnLocation();
+          }}
           ariaLabel="Centreer op locatie"
           disabled={false}
           iconName="userLocation"

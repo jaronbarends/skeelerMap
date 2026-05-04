@@ -13,7 +13,9 @@ const DEFAULT_ZOOM = 12;
 export function useMapInit(
   containerRef: RefObject<HTMLDivElement | null>,
   fetchMapData: (abortSignal: AbortSignal) => Promise<void>,
-  onMapClick: (latlng: L.LatLng) => void
+  onMapClick: (latlng: L.LatLng) => void,
+  autoFollowIsActive: boolean,
+  onPauseAutoFollow: () => void
 ): {
   mapRef: RefObject<L.Map | null>;
   centerOnLocation: () => void;
@@ -25,6 +27,12 @@ export function useMapInit(
   // without needing to be listed as effect dependencies.
   const onMapClickRef = useRef(onMapClick);
   onMapClickRef.current = onMapClick;
+
+  const autoFollowIsActiveRef = useRef(autoFollowIsActive);
+  autoFollowIsActiveRef.current = autoFollowIsActive;
+
+  const onPauseAutoFollowRef = useRef(onPauseAutoFollow);
+  onPauseAutoFollowRef.current = onPauseAutoFollow;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -42,6 +50,8 @@ export function useMapInit(
     map.on('click', (e) => {
       onMapClickRef.current(e.latlng);
     });
+    map.on('dragstart', () => onPauseAutoFollowRef.current());
+    map.on('zoomstart', () => onPauseAutoFollowRef.current());
 
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
@@ -85,6 +95,11 @@ export function useMapInit(
 
   function onPositionUpdate(latlng: L.LatLngExpression) {
     lastPositionRef.current = latlng;
+    // panTo on every GPS update causes significantly more tile requests than a static map;
+    // revisit when switching to a production tile provider (backlog: tile provider decision)
+    if (autoFollowIsActiveRef.current && mapRef.current) {
+      mapRef.current.panTo(latlng, { animate: false });
+    }
   }
 }
 
