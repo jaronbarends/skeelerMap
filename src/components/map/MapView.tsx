@@ -10,17 +10,16 @@ import {
   type Ref,
 } from 'react';
 
-import type { MapUIMode } from '@/lib/mapUIMode';
-import { isCreateSegmentMode } from '@/lib/mapUIMode';
-import type { Marker } from '@/lib/markers';
-import { Segment } from '@/lib/segments';
-
 import { useInitMarkersLayer } from '@/components/map/useInitMarkersLayer';
 import { useInitPendingMarker } from '@/components/map/useInitPendingMarker';
 import { useInitSegmentEventHandlers } from '@/components/map/useInitSegmentEventHandlers';
 import { useInitSegmentLayers } from '@/components/map/useInitSegmentLayers';
 import { useMapInit } from '@/components/map/useMapInit';
 import { useSegmentCreation } from '@/components/map/useSegmentCreation';
+import type { MapUIMode } from '@/lib/mapUIMode';
+import { isCreateSegmentMode } from '@/lib/mapUIMode';
+import type { Marker } from '@/lib/markers';
+import { Segment } from '@/lib/segments';
 
 import styles from './MapView.module.css';
 
@@ -31,7 +30,7 @@ export interface MapHandle {
   centerOnLocation: () => void;
 }
 
-interface MapProps {
+interface MapViewProps {
   ref?: Ref<MapHandle>;
   creationModeActive: boolean;
   mode: MapUIMode;
@@ -41,6 +40,7 @@ interface MapProps {
   selectedSegment: Segment | null;
   selectedMarker: Marker | null;
   pendingMarkerLocation: { lat: number; lng: number } | null;
+  autoFollowIsActive: boolean;
   onControlPointCountChange: (count: number) => void;
   onMarkerLocationClicked: (lat: number, lng: number) => void;
   onMarkerSelect: (marker: Marker) => void;
@@ -49,6 +49,7 @@ interface MapProps {
   onSegmentDeselect: () => void;
   onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
   onSegmentDragEnd: (segmentId: string, newCoordinates: [number, number][]) => void;
+  onPauseAutoFollow: () => void;
 }
 
 // we can't name this component Map, because that might conflict with javascript's Map object
@@ -62,6 +63,7 @@ export default function MapView({
   selectedSegment,
   selectedMarker,
   pendingMarkerLocation,
+  autoFollowIsActive,
   onControlPointCountChange,
   onMarkerLocationClicked,
   onMarkerSelect,
@@ -70,7 +72,8 @@ export default function MapView({
   onSegmentDeselect,
   onSegmentDragUpdate,
   onSegmentDragEnd,
-}: MapProps) {
+  onPauseAutoFollow,
+}: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Critical layout is inline so Fast Refresh / CSS-module hash drift can't break Leaflet sizing.
@@ -100,7 +103,13 @@ export default function MapView({
     [mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect]
   );
 
-  const { mapRef, centerOnLocation } = useMapInit(containerRef, fetchMapData, handleMapClick);
+  const { mapRef, centerOnLocation } = useMapInit(
+    containerRef,
+    fetchMapData,
+    handleMapClick,
+    autoFollowIsActive,
+    onPauseAutoFollow
+  );
   const { addControlPoint, removeTempSegment, getSegmentCoords } = useSegmentCreation(
     mapRef,
     onControlPointCountChange

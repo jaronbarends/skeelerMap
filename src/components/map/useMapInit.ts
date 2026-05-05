@@ -13,7 +13,9 @@ const DEFAULT_ZOOM = 12;
 export function useMapInit(
   containerRef: RefObject<HTMLDivElement | null>,
   fetchMapData: (abortSignal: AbortSignal) => Promise<void>,
-  onMapClick: (latlng: L.LatLng) => void
+  onMapClick: (latlng: L.LatLng) => void,
+  autoFollowIsActive: boolean,
+  onPauseAutoFollow: () => void
 ): {
   mapRef: RefObject<L.Map | null>;
   centerOnLocation: () => void;
@@ -25,6 +27,15 @@ export function useMapInit(
   // without needing to be listed as effect dependencies.
   const onMapClickRef = useRef(onMapClick);
   onMapClickRef.current = onMapClick;
+
+  const autoFollowIsActiveRef = useRef(autoFollowIsActive);
+  autoFollowIsActiveRef.current = autoFollowIsActive;
+
+  const onPauseAutoFollowRef = useRef(onPauseAutoFollow);
+  onPauseAutoFollowRef.current = onPauseAutoFollow;
+
+  // auto follow will be paused on zoom start; setView also triggers a zoom start event, so we need to check if the zoom is programmatic
+  const zoomIsProgrammaticRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -42,6 +53,13 @@ export function useMapInit(
     map.on('click', (e) => {
       onMapClickRef.current(e.latlng);
     });
+    map.on('dragstart', () => onPauseAutoFollowRef.current());
+    map.on('zoomstart', () => {
+      if (zoomIsProgrammaticRef.current) {
+        return;
+      }
+      onPauseAutoFollowRef.current();
+    });
 
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
@@ -55,7 +73,7 @@ export function useMapInit(
       map.invalidateSize();
     });
 
-    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate);
+    const userLocationWatchId = createWatchedLocationMarker(map, onPositionUpdate, setFirstView);
 
     // in React's strict mode, this function will be called twice. In that case we want to abort the fetch request. Otherwise, we would end up with two parallel fetch requests.
     const abortController = new AbortController();
@@ -80,11 +98,28 @@ export function useMapInit(
     if (!map || !position) {
       return;
     }
+    zoomIsProgrammaticRef.current = true;
     map.setView(position, Math.max(map.getZoom(), 15));
+    zoomIsProgrammaticRef.current = false;
+  }
+
+  function setFirstView(latlng: L.LatLngExpression) {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+    zoomIsProgrammaticRef.current = true;
+    map.setView(latlng, Math.max(map.getZoom(), 15));
+    zoomIsProgrammaticRef.current = false;
   }
 
   function onPositionUpdate(latlng: L.LatLngExpression) {
     lastPositionRef.current = latlng;
+    // panTo on every GPS update causes significantly more tile requests than a static map;
+    // revisit when switching to a production tile provider (backlog: tile provider decision)
+    if (autoFollowIsActiveRef.current && mapRef.current) {
+      mapRef.current.panTo(latlng, { animate: false });
+    }
   }
 }
 
@@ -96,7 +131,8 @@ function createTileLayer(map: L.Map) {
 
 function createWatchedLocationMarker(
   map: L.Map,
-  onPositionUpdate: (latlng: L.LatLngExpression) => void
+  onPositionUpdate: (latlng: L.LatLngExpression) => void,
+  setFirstView: (latlng: L.LatLngExpression) => void
 ) {
   if (!navigator.geolocation) {
     return null;
@@ -122,7 +158,7 @@ function createWatchedLocationMarker(
         locationMarker.setLatLng(latlng);
       }
       if (firstFix) {
-        map.setView(latlng, Math.max(map.getZoom(), 15));
+        setFirstView(latlng);
         firstFix = false;
       }
     },
