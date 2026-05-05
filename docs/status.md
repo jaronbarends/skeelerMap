@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-05-01
-**Current phase:** Auth implemented and hardened; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place.
+**Last updated:** 2026-05-04
+**Current phase:** Auth implemented and hardened; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place; auto-follow location mode implemented.
 
 ---
 
@@ -21,6 +21,8 @@
 - Segment selection and editing flow: tap segment → panel with length + edit/delete/close;
   edit rating with current rating indicated; delete with confirmation
 - Location button (FAB, below add-segment button): centers map on user's last known position
+- Auto-follow mode: map pans to user's GPS position on each `watchPosition` update; paused by
+  drag or zoom interaction; resumed by tapping the location FAB
 - Keyboard shortcuts: `Esc` cancels drawing mode; `Delete` deletes selected segment
   (with confirmation)
 - Drag-to-edit segment endpoints: drag start/end point of a saved segment to reposition it;
