@@ -47,6 +47,9 @@
   Auto-dismisses after 4s; dismiss button and countdown bar included.
 - Supabase auth helpers split into `src/lib/supabaseAuth.ts` (browser) and
   `src/lib/supabaseAuth.server.ts` (server)
+- Auth middleware (`src/middleware.ts`): calls `getUser()` on every request to refresh the JWT
+  and persist updated session cookies. `setAll` try/catch in `supabaseAuth.server.ts` remains
+  for Server Component calls, but token rotation is now properly handled by middleware.
 - Segments have `user_id` (FK to auth.users); RLS policies enforce ownership on writes
 - Ownership-aware UI: edit/delete controls only shown for segments owned by the current user;
   `get_segments` RPC returns `user_id`; `currentUserId` passed server-side from `page.tsx`;

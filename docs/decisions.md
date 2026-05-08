@@ -161,7 +161,7 @@
 ## Location permission flow
 
 **Date:** 2025-06
-**Status:** DEFERRED — revisit before implementing location features.
+**Status:** Open - tracked in backlog
 **Questions to resolve:**
 
 - Should we show an explanation of why location is needed before triggering the browser prompt?
@@ -262,4 +262,4 @@
 **Date:** 2026-04-08
 **Decision:** The `setAll` cookie handler in `supabaseAuth.server.ts` is wrapped in a try/catch that silently swallows errors.
 **Rationale:** When `getUser()` is called from a Server Component (e.g. `MenuBar`), Supabase may attempt to refresh the session token and write an updated cookie. Next.js forbids cookie writes outside of Server Actions and Route Handlers, so this throws. The try/catch suppresses the error — the session is still valid for the current request, and the proper place for token rotation is middleware (not yet implemented).
-**Risk:** Without middleware, a refreshed token won't be persisted until the next Route Handler or Server Action that writes cookies. Acceptable for now; revisit when middleware is added.
+**Risk:** Without middleware, a refreshed token won't be persisted until the next Route Handler or Server Action that writes cookies. Resolved: middleware added in `src/middleware.ts` (2026-05-08) handles token rotation on every request.

@@ -6,27 +6,35 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
+### Write a proper README
+
+Human-readable explanation of what the app does, why it was built, and 2–3 explicit
+architectural decisions with their rationale. Pull from decisions.md.
+Not technical docs — written for a potential contributor reading it cold.
+
+### Go live
+
+- Verify email expiry is 86400 seconds (check go-live-checklist.md)
+- Deploy
+
 ---
 
 ## Medium priority
 
-### Auto-follow location mode
+### Add a test suite
 
-Map stays centered on user while moving. Panning/zooming pauses auto-follow. Tapping the location button resumes it.
-_Post-MVP behavior noted in decisions.md._
+Add baseline test coverage as a learning exercise. Scope:
 
-### [techdebt] move inlineLinkButton somewhere else
+- One utility function (unit test with Vitest)
+- One form component (component test with React Testing Library)
+- One E2E happy path with Playwright (e.g. user logs in, adds a segment)
 
-### live-check error messages on change
+### Password requirements
 
-`setFeedback` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
-
-### Location permission flow
-
-Decide and implement what happens before/during the browser location prompt:
-
-- Show explanation before triggering the prompt?
-- Show default map location while waiting, or hold?
+Set password requirements Authentication > Sign In / Providers / Email > Password requirements
+Add indication at pw field
+add realtime check
+allowed symbols by supabase: !@#$%^&\*()\_+-=[]{};'\:"|<>?,./`~
 
 ### Center-on-location FAB: permission-aware visibility
 
@@ -42,44 +50,26 @@ The `PermissionStatus` object supports a `change` event, so the FAB reacts live 
 
 Note: a `denied` permission cannot be re-triggered via JS — the user must reset it manually in browser settings.
 
-### Zoom-based visual scaling
+### live-check error messages on change
 
-Scale polyline weight based on zoom level. Defer unless it becomes a visible problem.
+`setFeedback` is now only called in `handleSubmit`. We want to update the error message when they're corrected.
 
-### Handle deleted user's segments
+### Location permission flow
 
-TBD: what do we want? ATM, in supabase we have a constraint on table segments for fk_segments_user_id: delete_rule CASCADE, which deletes their segments when a user is deleted.
+Decide and implement what happens before/during the browser location prompt:
 
-### Password requirements
-
-Set password requirements Authentication > Sign In / Providers / Email > Password requirements
-Add indication at pw field
-add realtime check
-allowed symbols by supabase: !@#$%^&\*()\_+-=[]{};'\:"|<>?,./`~
-
-### Supabase auth middleware
-
-Add `src/middleware.ts` to handle session token refresh on every request.
-
-Currently, token refresh is attempted in Server Components (e.g. MenuBar) where
-cookie writes are not allowed — the try/catch in `supabaseAuth.server.ts` suppresses
-the resulting error. This means a refreshed token is not persisted, and users may
-be logged out unexpectedly when their token expires.
-
-Middleware runs before any page renders and is allowed to write cookies, making it
-the correct place for token refresh. Supabase's SSR documentation has a standard
-template for this.
-
-**Risk without this:** low for now — tokens are valid for 1 hour and the user base
-is small. Revisit before launch.
-
----
-
-## Low priority
+- Show explanation before triggering the prompt?
+- Show default map location while waiting, or hold?
 
 ### Legend / info panel
 
 Explain the 5 rating levels to the user.
+
+### [techdebt] move inlineLinkButton somewhere else
+
+---
+
+## Low priority
 
 ### Logo / branding
 
@@ -99,13 +89,19 @@ admin vs. regular user permissions. Admin users would be able to edit/delete all
 regular users can only edit/delete their own.
 Do not implement role-based RLS until the profiles table exists.
 
-### Zoom-based polyline weight scaling
-
-## When we get many segments, maybe the polylines should get a different weight when zooming out a lot
+---
 
 ## Icebox
 
 Items that have been considered and explicitly deferred with no near-term plan.
+
+### Re-evaluate Handling deleted user's segments
+
+ATM, in supabase we have a constraint on table segments for fk_segments_user_id: delete_rule CASCADE, which deletes their segments when a user is deleted. Is this still what we want?
+
+### Zoom-based visual scaling
+
+Scale polyline weight based on zoom level. Defer unless it becomes a visible problem.
 
 ### Segment list view / statistics
 
@@ -114,6 +110,8 @@ Present in the PoC, intentionally removed for MVP. Revisit only if there's a cle
 ### Editing intermediate control points
 
 Not planned — stored data is routed geometry only, control points are discarded after routing.
+
+---
 
 ## Done
 
@@ -180,22 +178,19 @@ _Implemented 2026-04-14._
 ### ~~Don't allow drawing segments when not logged in~~ ✓ Done
 
 When user is not logged in, when clicking on add segment button, they should be shown a panel with a text that they need to login (or register) to create segments.
-
 _Implemented 2026-04-15._
 
 ### ~~Add markers (warnings)~~ ✓ Done
 
 Add option to add markers on the map. For now, markers represent warnings: dangerous point, dangerous crossing, steep slope.
-
 _Implemented 2026-04-20._
 
 ### ~~handle pending segment save~~ ✓ Done
 
 show indicator while saving segment; disable buttons
-
 _Implemented 2026-04-21._
 
-### ~~~~only show "aangemaakt door jou" or "aangemaakt door andere gebruiker" for logged in user~~ ✓ Done
+### ~~only show "aangemaakt door jou" or "aangemaakt door andere gebruiker" for logged in user~~ ✓ Done
 
 _Implemented 2026-04-22._
 
@@ -213,24 +208,24 @@ _Implemented 2026-04-24._
 Translation layer in `src/lib/authErrorTranslations.ts` on top of Supabase `authError.message`.
 _Implemented 2026-04-24._
 
-### form tech debt
+### ~~form tech debt~~ ✓ Done
 
-- ~~move all auth pages to (content)/(auth)~~ ✓ Done
-- ~~remove old auth/callback urls from Authentication > URL Configuration~~ ✓ Done
-- ~~add pending state to all submitbuttons~~ ✓ Done
-- ~~add title to success states after sending mail (signup, request reset)~~ ✓ Done
-- ~~use constants for recurring form errors (like password not matching)~~ ✓ Done
-- ~~see if we need components for recurring form items (input fields, button)~~ ✓ Done
-- ~~move FormError out of auth~~ ✓ Done
+- move all auth pages to (content)/(auth)
+- remove old auth/callback urls from Authentication > URL Configuration
+- add pending state to all submitbuttons
+- add title to success states after sending mail (signup, request reset)
+- use constants for recurring form errors (like password not matching)
+- see if we need components for recurring form items (input fields, button)
+- move FormError out of auth
 
 ### ~~toast closing behavior~~ ✓ Done
 
-- make timeout longer;
-- make dismiss obvious by adding button?
+- make timeout longer
+- make dismiss obvious by adding button
 - add countdown bar
   _Implemented 2026-04-29._
 
-### ~~Add possibilty to resend confirmation email~~ ✓ Done
+### ~~Add possibility to resend confirmation email~~ ✓ Done
 
 _Implemented 2026-04-29._
 
@@ -248,7 +243,8 @@ The success messages in Toast.tsx should indicate success more: maybe add green 
 
 ### ~~Use Custom SMTP for supabase emails~~ ✓ Done
 
-To overcome Supabase's free tier limit (2-3 mails per hour), Configure a provider like Resend, ~~SendGrid~~, or Postmark in your project settings to overcome free tier limitations.
+To overcome Supabase's free tier limit (2-3 mails per hour), configure a provider like Resend in project settings.
+_Implemented 2026-04-24._
 
 ### ~~[techdebt] in MapUIContainer `getMapUIModeForControlPointCount` feels bloated~~ ✓ Done
 
@@ -260,6 +256,15 @@ _Extracted to `src/lib/mapUIReducer.ts` 2026-05-01._
 
 ### ~~Production tile provider~~ ✓ Done
 
-Choose and configure a production tile provider. Current CartoDB usage may violate ToS under real traffic.
-Options: Stadia Maps, Maptiler, Mapbox — all have free tiers with API keys.
-_decided on OSM 2026-05-04._
+Choose and configure a production tile provider. Decided on OSM.
+_Decided 2026-05-04._
+
+### ~~Supabase auth middleware~~ ✓ Done
+
+`src/middleware.ts` refreshes the JWT on every request, properly persisting updated session cookies.
+_Implemented 2026-05-08._
+
+### ~~Auto-follow location mode~~ ✓ Done
+
+Map stays centered on user while moving. Panning/zooming pauses auto-follow. Tapping the location button resumes it.
+_Implemented 2026-05-05._

@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(failureUrl);
   }
 
+  // if we get here, the user comes from the email confirmation link, password reset
   const loggedInUserRedirect = await loginUser(request, code, successUrl, failureUrl);
   return loggedInUserRedirect;
 }
