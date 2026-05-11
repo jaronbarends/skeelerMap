@@ -22,7 +22,7 @@
 **Rationale:** In Next.js dev mode, CSS imported inside a client component is injected as a `<style>` tag by the runtime after the first render. This means Leaflet's CSS was not yet applied when `useEffect` fired and `L.map()` initialized — causing tiles to render at incorrect positions. Importing it in `layout.tsx` (a Server Component) makes it a guaranteed first-load stylesheet, matching how the PoC loaded Leaflet CSS via a `<link>` tag.
 **Symptom it fixed:** ~1/3 of tiles visible, remaining tiles at wrong screen positions on every page load.
 
-### Map library: Leaflet (via react-leaflet)
+### Map library: Leaflet
 
 **Date:** 2026-03-26
 **Decision:** Use Leaflet.
