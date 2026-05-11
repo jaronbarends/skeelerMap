@@ -18,7 +18,7 @@ export async function getSupabaseServerClient() {
             });
           } catch {
             // Called from a Server Component — cookie writes are not allowed.
-            // Safe to ignore: the session remains valid for this request.
+            // Safe to ignore: the session remains valid for this request; the JWT will be refreshed in the middleware.
           }
         },
       },
