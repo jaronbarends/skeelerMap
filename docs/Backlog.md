@@ -48,7 +48,7 @@ allowed symbols by supabase: !@#$%^&\*()\_+-=[]{};'\:"|<>?,./`~
 
 ### Investigate alternative location for leaflet.css
 
-In Next.js dev mode, CSS imported inside a Client Component is loaded on demand and injected as a `<style>` tag. This causes a race-condition: when the `useEffect` what calls `L.map()` fires, Leaflet's CSS sometimes wasn't applied yet, and that rendered tiles at the wrong positions. In production this wouldn't be an issue, because Next pre-processes CSS and includes it in the html.
+In Next.js dev mode, CSS imported inside a Client Component is loaded on demand and injected as a `<style>` tag. This causes a race-condition: when the `useEffect` that calls `L.map()` fires, Leaflet's CSS sometimes wasn't applied yet, and that rendered tiles at the wrong positions. In production this wouldn't be an issue, because Next pre-processes CSS and includes it in the html.
 Importing it in server component `layout.tsx` fixes this. This does mean that the css is always added, even for pages that don't need it. Since the map is the core functionality, I think that's okay in this case. Even so, check if `useLayoutEffect` with `requestAnimationFrame` is a better solution.
 
 ### Center-on-location FAB: permission-aware visibility
