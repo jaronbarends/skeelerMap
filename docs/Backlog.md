@@ -12,6 +12,16 @@ Human-readable explanation of what the app does, why it was built, and 2–3 exp
 architectural decisions with their rationale. Pull from decisions.md.
 Not technical docs — written for a potential contributor reading it cold.
 
+### Remove marker bug
+
+Steps to reproduce:
+
+- place a marker
+- select marker, click trash and confirm remove
+- marker is no longer visible
+- change zoom level
+- marker is rendered again. Trying to remove marker results in "kan marker niet verwijderen"
+
 ### Go live
 
 - Verify email expiry is 86400 seconds (check go-live-checklist.md)
@@ -35,6 +45,11 @@ Set password requirements Authentication > Sign In / Providers / Email > Passwor
 Add indication at pw field
 add realtime check
 allowed symbols by supabase: !@#$%^&\*()\_+-=[]{};'\:"|<>?,./`~
+
+### Investigate alternative location for leaflet.css
+
+In Next.js dev mode, CSS imported inside a Client Component is loaded on demand and injected as a `<style>` tag. This causes a race-condition: when the `useEffect` what calls `L.map()` fires, Leaflet's CSS sometimes wasn't applied yet, and that rendered tiles at the wrong positions. In production this wouldn't be an issue, because Next pre-processes CSS and includes it in the html.
+Importing it in server component `layout.tsx` fixes this. This does mean that the css is always added, even for pages that don't need it. Since the map is the core functionality, I think that's okay in this case. Even so, check if `useLayoutEffect` with `requestAnimationFrame` is a better solution.
 
 ### Center-on-location FAB: permission-aware visibility
 
