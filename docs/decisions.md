@@ -4,7 +4,7 @@
 
 ### Framework: Next.js with App Router
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Use Next.js with App Router and TypeScript.
 **Rationale:** The app will eventually include multiple pages (FAQ, etc.) and user accounts requiring auth. Next.js handles route protection, API routes for auth, and multi-page structure well. Also a deliberate learning goal alongside the app itself.
 **Alternatives considered:** Plain React + Vite — appropriate if this were only a single-view map tool, but ruled out given the broader product scope.
@@ -17,23 +17,30 @@
 
 ### Leaflet CSS import location: layout.tsx (global)
 
-**Date:** 2026-03-26
+**Date:** 2026-03-27
 **Decision:** Import `leaflet/dist/leaflet.css` in `src/app/layout.tsx`, not in the map component.
 **Rationale:** In Next.js dev mode, CSS imported inside a client component is injected as a `<style>` tag by the runtime after the first render. This means Leaflet's CSS was not yet applied when `useEffect` fired and `L.map()` initialized — causing tiles to render at incorrect positions. Importing it in `layout.tsx` (a Server Component) makes it a guaranteed first-load stylesheet, matching how the PoC loaded Leaflet CSS via a `<link>` tag.
 **Symptom it fixed:** ~1/3 of tiles visible, remaining tiles at wrong screen positions on every page load.
 
 ### Map library: Leaflet (via react-leaflet)
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Use Leaflet.
 **Rationale:** Already proven in the PoC, including road-following (routing/snapping) and draggable segment endpoints. No blocking limitations encountered.
 **Status:** Consider a formal evaluation if a specific limitation arises.
 
+### Plain Leaflet instead of react-leaflet
+
+**Date:** 2026-03-27
+**Decision:** Use plain Leaflet.
+**Rationale:** Initially used react-leaflet; removed this as possible fix for tile-rendering bug (eventually solved by changing leaflet.css location, see above). Decided to stick to plain leaflet though: react-leaflet is good in declarative flows (where data flows from React to Leaflet, so for displaying existing segments, react-leaflet would be easier). However, most of the Leaflet-related complexity is in segment creation. That is an imperative flow (click to place point, drag endpoint, draw polyline) where the flow is the other way around: Leaflet creates data to store in React state. Plain Leaflet is more suitable for that.
+**Status:** Implemented
+
 ### Backend: Supabase
 
-**Date:** 2025-06 (chosen and implemented 2026-03-31)
+**Date:** 2026-03-26 (chosen and implemented 2026-03-31)
 **Decision:** Use Supabase as the BaaS for storage (and eventually auth).
-**Rationale:** Keep focus on frontend. Auth and data persistence handled by a managed service. Supabase chosen over Firebase for its Postgres-based data model and open-source nature.
+**Rationale:** Keep focus on frontend. Auth and data persistence handled by a managed service. Supabase chosen over Firebase for its Postgres-based data model, open-source nature and PostGIS support for geo queries.
 **Status:** Implemented — segments are stored in Supabase.
 
 ### Email delivery: Resend
@@ -54,18 +61,18 @@
 
 ### UI structure: Full-screen map, contextual panels only
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** No persistent navigation bar or header in MVP. All UI surfaces are triggered contextually (panels, buttons). Map is always full-screen.
 **Rationale:** Maximises usable map area, especially on mobile (iPhone SE is the primary test device).
 
 ### Default map location: Center on the Netherlands
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** When location permission is unavailable or not yet granted, center the map on the Netherlands.
 
 ### Segment data model: Store routed geometry, not control points
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Persisted segment data is the routed polyline geometry (the road-following path). Original user control points are not stored.
 **Rationale:** Simplifies the data model. Start and end points can be derived from the polyline geometry. Drag-to-edit (v1.1) will operate on these endpoints only, not intermediate control points.
 
@@ -75,7 +82,7 @@
 
 ### Core flow (agreed)
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 
 1. User sees full-screen map centered on their location (dot marker).
 2. User taps + button — map enters drawing mode, panel appears with instruction text.
@@ -86,13 +93,13 @@
 
 ### Rating colors
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Reuse the 5 rating colors from the PoC.
 **Action:** Extract colors from PoC code and define as design tokens early in setup.
 
 ### Rating UI visibility during drawing
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Option B — rating buttons only appear after 2+ points are placed.
 **Rationale:** Tested both on iPhone SE. Option A felt cramped; showing the drawing instruction only until 2+ points are placed keeps the panel compact and focused.
 **Option A (rejected):** Rating buttons visible but greyed out from step 2, activate once 2+ points are placed.
@@ -103,7 +110,7 @@
 
 ### Selection state
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Tapping a segment selects it:
 
 - Segment stroke becomes thicker
@@ -112,7 +119,7 @@
 
 ### Edit flow
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:**
 
 1. Tapping edit shows the rating picker (same UI as creation panel)
@@ -121,7 +128,7 @@
 
 ### Delete flow
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:**
 
 1. Tapping the delete (trash) icon shows a confirmation prompt
@@ -130,7 +137,7 @@
 
 ### Close behavior
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Decision:** Tapping × closes the panel and deselects the segment. No changes are made.
 
 ### Drag-to-edit endpoints
@@ -160,7 +167,7 @@
 
 ## Location permission flow
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **Status:** Open - tracked in backlog
 **Questions to resolve:**
 
@@ -171,7 +178,7 @@
 
 ## Location button behavior
 
-**Date:** 2025-06
+**Date:** 2026-03-26
 **MVP:** Centers map on user's current location.
 **Post-MVP (noted for later):**
 
