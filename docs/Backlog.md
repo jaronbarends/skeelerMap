@@ -6,12 +6,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### Write a proper README
-
-Human-readable explanation of what the app does, why it was built, and 2–3 explicit
-architectural decisions with their rationale. Pull from decisions.md.
-Not technical docs — written for a potential contributor reading it cold.
-
 ### Remove marker bug
 
 Steps to reproduce:
@@ -103,6 +97,11 @@ Needed as a clean extension point for user metadata — in particular, a `role` 
 admin vs. regular user permissions. Admin users would be able to edit/delete all segments;
 regular users can only edit/delete their own.
 Do not implement role-based RLS until the profiles table exists.
+
+### Switch auth functions to Server Actions
+
+Migrate signIn, signUp, signOut, updatePassword, and resetPasswordForEmail from browser-client calls in supabaseAuth.ts to Server Actions. Use useActionState in the form components. Eliminates getBrowserClient from the auth flow; aligns with App Router's server-first model.
+Skip for now: middleware already handles token rotation, and the current setup works. Learn the pattern on a new feature first, then revisit.
 
 ---
 
@@ -283,3 +282,10 @@ _Implemented 2026-05-08._
 
 Map stays centered on user while moving. Panning/zooming pauses auto-follow. Tapping the location button resumes it.
 _Implemented 2026-05-05._
+
+### ~~Write a proper README~~ ✓ Done
+
+Human-readable explanation of what the app does, why it was built, and 2–3 explicit
+architectural decisions with their rationale. Pull from decisions.md.
+Not technical docs — written for a potential contributor reading it cold.
+_Implemented 2026-05-11._
