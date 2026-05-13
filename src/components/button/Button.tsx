@@ -6,7 +6,7 @@ import styles from './Button.module.css';
 
 type ButtonVariant = 'primary' | 'danger' | 'secondary' | 'ghost';
 
-interface ButtonProps {
+export interface ButtonProps {
   onClick?: () => void;
   href?: string;
   label: string;

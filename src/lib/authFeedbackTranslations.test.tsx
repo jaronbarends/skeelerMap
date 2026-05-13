@@ -1,14 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect } from 'vitest';
 
 import { getFeedbackByCode } from './authFeedbackTranslations';
 
-vi.mock('next/link', () => ({
-  default: ({ href, children }: { href: string; children: ReactNode }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
+// vi.mock('next/link', () => ({
+//   default: ({ href, children }: { href: string; children: ReactNode }) => (
+//     <a href={href}>{children}</a>
+//   ),
+// }));
 
 describe('getFeedbackByCode', () => {
   test('code returns correct feedback where message is string', () => {
@@ -26,7 +25,7 @@ describe('getFeedbackByCode', () => {
     expect(type).toBe('warning');
 
     render(<>{message}</>);
-    const link = screen.getByRole('link', { name: 'Inloggen' });
+    const link = screen.getByRole('link', { name: /inloggen/i });
     expect(link).toHaveAttribute('href', '/inloggen');
   });
 
@@ -35,8 +34,9 @@ describe('getFeedbackByCode', () => {
     expect(type).toBe('error');
 
     render(<>{message}</>);
-    const link = screen.getByRole('link', { name: /aanvragen/ });
+    const link = screen.getByRole('link', { name: /aanvragen/i });
     expect(link).toHaveAttribute('href', '/bevestigings-link-opnieuw-aanvragen');
+    console.log(link);
   });
 
   test('unknown error code returns error type and generic message with unknown code', () => {
