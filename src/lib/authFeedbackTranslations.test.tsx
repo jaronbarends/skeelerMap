@@ -38,4 +38,14 @@ describe('getFeedbackByCode', () => {
     const link = screen.getByRole('link', { name: /aanvragen/ });
     expect(link).toHaveAttribute('href', '/bevestigings-link-opnieuw-aanvragen');
   });
+
+  test('unknown error code returns error type and generic message with unknown code', () => {
+    const nonExistingCode = 'non_existing_code';
+    const feedback = getFeedbackByCode(nonExistingCode);
+    const expectedFeedback = {
+      type: 'error',
+      message: `Er is een onbekende fout opgetreden. Foutcode: ${nonExistingCode}`,
+    };
+    expect(feedback).toEqual(expectedFeedback);
+  });
 });
