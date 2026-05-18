@@ -3,12 +3,6 @@ import { describe, test, expect } from 'vitest';
 
 import { getFeedbackByCode } from './authFeedbackTranslations';
 
-// vi.mock('next/link', () => ({
-//   default: ({ href, children }: { href: string; children: ReactNode }) => (
-//     <a href={href}>{children}</a>
-//   ),
-// }));
-
 describe('getFeedbackByCode', () => {
   test('code returns correct feedback where message is string', () => {
     const feedback = getFeedbackByCode('invalid_credentials');
@@ -36,7 +30,6 @@ describe('getFeedbackByCode', () => {
     render(<>{message}</>);
     const link = screen.getByRole('link', { name: /aanvragen/i });
     expect(link).toHaveAttribute('href', '/bevestigings-link-opnieuw-aanvragen');
-    console.log(link);
   });
 
   test('unknown error code returns error type and generic message with unknown code', () => {
