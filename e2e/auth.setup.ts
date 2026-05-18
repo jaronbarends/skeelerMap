@@ -9,7 +9,6 @@ setup('authenticate', async ({ page }) => {
     .getByRole('textbox', { name: 'Wachtwoord' })
     .fill(process.env.PLAYWRIGHT_TEST_USER_PASSWORD!);
   await page.getByRole('button', { name: 'Inloggen' }).click();
-  await page.screenshot({ path: 'playwright/.auth/debug.png' });
   await page.waitForURL('/');
 
   await page.context().storageState({ path: 'playwright/.auth/user.json' });

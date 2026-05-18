@@ -1,10 +1,9 @@
-import { isCreateSegmentMode, type MapUIMode } from '@/lib/mapUIMode';
-import type { RatingValue } from '@/lib/segments';
-
 import Panel from '@/components/panel/Panel';
 import PanelBody from '@/components/panel/PanelBody';
 import PanelHeader from '@/components/panel/PanelHeader';
 import RatingSection from '@/components/panel/RatingSection';
+import { isCreateSegmentMode, type MapUIMode } from '@/lib/mapUIMode';
+import type { RatingValue } from '@/lib/segments';
 
 import styles from './SegmentCreationPanel.module.css';
 
@@ -28,7 +27,7 @@ export default function SegmentCreationPanel({
   }
 
   return (
-    <Panel>
+    <Panel testId="segment-creation-panel">
       <PanelHeader onClose={onCancel}>
         <h1 className="hln-2">Segment toevoegen</h1>
       </PanelHeader>

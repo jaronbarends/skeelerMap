@@ -37,7 +37,7 @@ export default defineConfig({
 
     {
       name: 'chromium-logged-out',
-      testMatch: /.*\.logged-out\.spec\.ts/,
+      testMatch: /^.*\.logged-out\.spec\.ts$/,
       use: {
         ...devices['Desktop Chrome'],
       },
@@ -46,7 +46,7 @@ export default defineConfig({
 
     {
       name: 'chromium-logged-in',
-      testMatch: /.*\.logged-in\.spec\.ts/,
+      testMatch: /^(?!.*\.logged-out).*\.spec\.ts$/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
