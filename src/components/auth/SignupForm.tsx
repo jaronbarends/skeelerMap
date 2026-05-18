@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { type SubmitEvent, useState, useTransition } from 'react';
 
-import Button from '@/components/button/Button';
-import { type AuthResult, signUp } from '@/lib/supabaseAuth';
-
 import SimpleContent from '@/components/SimpleContent';
 import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
+import Button from '@/components/button/Button';
+import { type AuthResult, signUp } from '@/lib/supabaseAuth';
 
 export default function SignupForm() {
   const [email, setEmail] = useState('');
@@ -27,7 +26,7 @@ export default function SignupForm() {
   }
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form className="form" onSubmit={handleSubmit} aria-label="Registreren">
       <SimpleContent>
         <h1>Registreren</h1>
         <p>Registreer je gratis om zelf segmenten aan te kunnen maken.</p>
@@ -83,7 +82,6 @@ export default function SignupForm() {
         Al een account? <Link href="/inloggen">Inloggen</Link>
       </p>
     </form>
-    // </div>
   );
 
   function handleSubmit(e: SubmitEvent) {

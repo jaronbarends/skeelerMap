@@ -270,3 +270,13 @@
 **Decision:** The `setAll` cookie handler in `supabaseAuth.server.ts` is wrapped in a try/catch that silently swallows errors.
 **Rationale:** When `getUser()` is called from a Server Component (e.g. `MenuBar`), Supabase may attempt to refresh the session token and write an updated cookie. Next.js forbids cookie writes outside of Server Actions and Route Handlers, so this throws. The try/catch suppresses the error — the session is still valid for the current request, and the proper place for token rotation is middleware (not yet implemented).
 **Risk:** Without middleware, a refreshed token won't be persisted until the next Route Handler or Server Action that writes cookies. Resolved: middleware added in `src/middleware.ts` (2026-05-08) handles token rotation on every request.
+
+---
+
+## Middleware: `getUser` instead of `getClaims`
+
+**Date:** 2026-05-11
+
+**Decision:** Keep `getUser()` in middleware, not `getClaims()`.
+
+**Rationale:** The middleware call exists to trigger session refresh and cookie rotation, not to read user data. `getClaims()` only verifies the JWT locally and does not refresh the session, making it unsuitable here.
