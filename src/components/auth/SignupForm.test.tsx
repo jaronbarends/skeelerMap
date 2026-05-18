@@ -13,8 +13,10 @@ const correctValues = { email: 'a@a.nl', password: 'password123', passwordConfir
 
 describe('SignupForm.tsx', () => {
   describe('Happy flow', () => {
-    test('form renders labels and fields for email, password, repeat password', () => {
+    test('form renders labels and fields for email, password, repeat password and submit button', () => {
       setup();
+      const submitButton = screen.getByRole('button', { name: /registreren/i });
+      expect(submitButton).toBeInTheDocument();
     });
 
     test('form renders no error when passwords are identical', () => {
@@ -23,10 +25,18 @@ describe('SignupForm.tsx', () => {
       expect(screen.queryByText(/wachtwoorden komen niet overeen/i)).not.toBeInTheDocument();
     });
 
-    test('form calls signUp when form is submitted', () => {
+    test('form calls signUp with correct values when form is submitted', () => {
       const { form } = setupWithValues(correctValues);
       fireEvent.submit(form);
       expect(signUp).toHaveBeenCalledWith(correctValues.email, correctValues.password);
+    });
+
+    test('submit button is disabled and shows busy text when form is submitting', () => {
+      const { form } = setupWithValues(correctValues);
+      const submitButton = screen.getByRole('button', { name: /registreren/i });
+      fireEvent.submit(form);
+      expect(submitButton).toBeDisabled();
+      expect(submitButton).toHaveTextContent(/bezig/i);
     });
 
     test('form shows success message and hides form when signUp is successful', async () => {
@@ -34,6 +44,12 @@ describe('SignupForm.tsx', () => {
       fireEvent.submit(form);
       expect(await screen.findByText(/account aangemaakt/i)).toBeInTheDocument();
       expect(form).not.toBeInTheDocument();
+    });
+
+    test('form has link to login page', () => {
+      setup();
+      const loginLink = screen.getByRole('link', { name: /inloggen/i });
+      expect(loginLink).toBeInTheDocument();
     });
   });
 

@@ -82,7 +82,6 @@ export default function SignupForm() {
         Al een account? <Link href="/inloggen">Inloggen</Link>
       </p>
     </form>
-    // </div>
   );
 
   function handleSubmit(e: SubmitEvent) {
