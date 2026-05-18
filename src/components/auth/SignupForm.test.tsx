@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, test, expect, vi } from 'vitest';
 
 import { signUp } from '@/lib/supabaseAuth';
@@ -19,20 +20,20 @@ describe('SignupForm.tsx', () => {
       expect(submitButton).toBeInTheDocument();
     });
 
-    test('form renders no error when passwords are identical', () => {
-      const { form } = setupWithValues(correctValues);
+    test('form renders no error when passwords are identical', async () => {
+      const { form } = await setupWithValues(correctValues);
       fireEvent.submit(form);
       expect(screen.queryByText(/wachtwoorden komen niet overeen/i)).not.toBeInTheDocument();
     });
 
-    test('form calls signUp with correct values when form is submitted', () => {
-      const { form } = setupWithValues(correctValues);
+    test('form calls signUp with correct values when form is submitted', async () => {
+      const { form } = await setupWithValues(correctValues);
       fireEvent.submit(form);
       expect(signUp).toHaveBeenCalledWith(correctValues.email, correctValues.password);
     });
 
-    test('submit button is disabled and shows busy text when form is submitting', () => {
-      const { form } = setupWithValues(correctValues);
+    test('submit button is disabled and shows busy text when form is submitting', async () => {
+      const { form } = await setupWithValues(correctValues);
       const submitButton = screen.getByRole('button', { name: /registreren/i });
       fireEvent.submit(form);
       expect(submitButton).toBeDisabled();
@@ -40,7 +41,7 @@ describe('SignupForm.tsx', () => {
     });
 
     test('form shows success message and hides form when signUp is successful', async () => {
-      const { form } = setupWithValues(correctValues);
+      const { form } = await setupWithValues(correctValues);
       fireEvent.submit(form);
       expect(await screen.findByText(/account aangemaakt/i)).toBeInTheDocument();
       expect(form).not.toBeInTheDocument();
@@ -56,8 +57,36 @@ describe('SignupForm.tsx', () => {
   describe('Error flow', () => {
     // NOTE: we're using default browser validation for email, so we should test that in E2E tests, not here
 
-    test('form renders error when passwords do not match', () => {
-      const { form } = setupWithValues({ ...correctValues, passwordConfirm: 'not-password123' });
+    test('form renders error when signup fails', async () => {
+      const errorMessage = 'some error message';
+      vi.mocked(signUp).mockResolvedValueOnce({
+        success: false,
+        error: { code: 'some_code', feedback: { type: 'error', message: errorMessage } },
+      });
+      const { form } = await setupWithValues(correctValues);
+      fireEvent.submit(form);
+      expect(await screen.findByText(errorMessage)).toBeInTheDocument();
+    });
+
+    test('form does not render success message and does not hide form when sign up fails', async () => {
+      const errorMessage = 'some error message';
+      vi.mocked(signUp).mockResolvedValueOnce({
+        success: false,
+        error: { code: 'some_code', feedback: { type: 'error', message: errorMessage } },
+      });
+      const { form } = await setupWithValues(correctValues);
+      fireEvent.submit(form);
+      await waitFor(() => {
+        expect(screen.queryByText(/account aangemaakt/i)).not.toBeInTheDocument();
+        expect(form).toBeInTheDocument();
+      });
+    });
+
+    test('form renders error when passwords do not match', async () => {
+      const { form } = await setupWithValues({
+        ...correctValues,
+        passwordConfirm: 'not-password123',
+      });
       fireEvent.submit(form);
       expect(screen.getByText(/wachtwoorden komen niet overeen/i)).toBeInTheDocument();
     });
@@ -74,7 +103,7 @@ function setup() {
   return { form, emailInput, passwordInput, passwordConfirmInput };
 }
 
-function setupWithValues({
+async function setupWithValues({
   email,
   password,
   passwordConfirm,
@@ -83,9 +112,10 @@ function setupWithValues({
   password: string;
   passwordConfirm: string;
 }) {
+  const user = userEvent.setup();
   const { form, emailInput, passwordInput, passwordConfirmInput } = setup();
-  fireEvent.change(emailInput, { target: { value: email } });
-  fireEvent.change(passwordInput, { target: { value: password } });
-  fireEvent.change(passwordConfirmInput, { target: { value: passwordConfirm } });
+  await user.type(emailInput, email);
+  await user.type(passwordInput, password);
+  await user.type(passwordConfirmInput, passwordConfirm);
   return { form, emailInput, passwordInput, passwordConfirmInput };
 }
