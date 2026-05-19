@@ -1,12 +1,9 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
 
-import type { Feedback, FeedbackType } from '@/components/auth/FormFeedback';
+import type { Feedback } from '@/components/auth/FormFeedback';
 
-type FeedbackTranslation = {
+type FeedbackTranslation = Feedback & {
   description: string; // what the error code means, just for dev reference
-  message: ReactNode; // what we show to the user
-  type: FeedbackType;
 };
 
 // error codes overview: https://supabase.com/docs/guides/auth/debugging/error-codes#auth-error-codes-table
@@ -15,7 +12,7 @@ export const authFeedbackTranslations: Record<string, FeedbackTranslation> = {
   email_exists: {
     description: 'Email address already exists in the system.',
     type: 'warning',
-    message: (
+    messageNode: (
       <>
         Je hebt je al aangemeld met dit e-mailadres. Je kunt nu{' '}
         <Link href="/inloggen">Inloggen</Link>.
@@ -25,7 +22,7 @@ export const authFeedbackTranslations: Record<string, FeedbackTranslation> = {
   email_not_confirmed: {
     description: 'Signing in is not allowed for this user as the email address is not confirmed.',
     type: 'error',
-    message: (
+    messageNode: (
       <>
         Je account is nog niet bevestigd. Klik op de link in de e-mail die je eerder hebt ontvangen
         om je account te bevestigen.{' '}
