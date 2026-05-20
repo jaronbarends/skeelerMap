@@ -42,6 +42,7 @@ export default function Toast({ onDismiss, message, type }: Props) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       data-type={type}
+      data-testid="toast"
     >
       <span className={styles.content}>
         <ToastIcon type={type} /> {message}

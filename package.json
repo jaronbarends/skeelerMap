@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
-    "test-once": "vitest run"
+    "test-once": "vitest run",
+    "e2e": "npx playwright test",
+    "e2e-watch": "cross-env PWTEST_WATCH=1 playwright test"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@jaronbarends/frontend-tooling-config": "file:../../frontend-tooling-config",
+    "@playwright/test": "^1.60.0",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -32,6 +35,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.1",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.0.0",
     "jsdom": "^29.1.1",

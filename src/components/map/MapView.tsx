@@ -148,5 +148,12 @@ export default function MapView({
   }));
 
   // return the component's DOM element
-  return <div ref={containerRef} className={styles.container} style={containerStyle} />;
+  return (
+    <div
+      ref={containerRef}
+      className={styles.container}
+      style={containerStyle}
+      data-testid="map-container"
+    />
+  );
 }

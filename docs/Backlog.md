@@ -33,6 +33,10 @@ Add baseline test coverage as a learning exercise. Scope:
 - One form component (component test with React Testing Library)
 - One E2E happy path with Playwright (e.g. user logs in, adds a segment)
 
+### Publish frontend-tooling-config
+
+eslint.config uses @jaronbarends/frontend-tooling-config, now imported from file system. publish the package to npm and import from there.
+
 ### Password requirements
 
 Set password requirements Authentication > Sign In / Providers / Email > Password requirements

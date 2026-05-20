@@ -4,28 +4,29 @@ import styles from './FormFeedback.module.css';
 
 export type FeedbackType = 'error' | 'warning' | 'success' | 'info';
 
-export interface Feedback {
-  message: ReactNode;
-  type: FeedbackType;
-}
+export type Feedback =
+  | {
+      message: string;
+      type: FeedbackType;
+    }
+  | {
+      messageNode: ReactNode;
+      type: FeedbackType;
+    };
 
-interface Props {
-  message: ReactNode;
-  type?: FeedbackType;
-}
-
-export default function FormFeedback({ message, type = 'error' }: Props) {
-  const isAssertive = type === 'error' || type === 'warning';
+export default function FormFeedback(feedback: Feedback) {
+  const isAssertive = feedback.type === 'error' || feedback.type === 'warning';
 
   return (
     <div
       className={styles.formFeedback}
-      data-type={type}
+      data-type={feedback.type}
       role={isAssertive ? 'alert' : 'status'}
       aria-live={isAssertive ? 'assertive' : 'polite'}
       aria-atomic="true"
+      data-testid="form-feedback"
     >
-      {message}
+      {'message' in feedback ? feedback.message : feedback.messageNode}
     </div>
   );
 }

@@ -3,11 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState, useTransition } from 'react';
 
+import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 import Button from '@/components/button/Button';
 import { type SimpleAuthResult, updatePassword } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
-
-import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 
 export default function NewPasswordForm() {
   const router = useRouter();
@@ -45,7 +44,7 @@ export default function NewPasswordForm() {
         </div>
       </div>
 
-      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
+      {feedback && <FormFeedback {...feedback} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Wachtwoord aanpassen'}
