@@ -15,19 +15,23 @@ describe('getFeedbackByCode', () => {
   });
 
   test('email already exists feedback is warning and contains link to login page', () => {
-    const { type, message } = getFeedbackByCode('email_exists');
-    expect(type).toBe('warning');
-
-    render(<>{message}</>);
+    const feedback = getFeedbackByCode('email_exists');
+    expect(feedback.type).toBe('warning');
+    if (!('messageNode' in feedback)) {
+      throw new Error('feedback has no messageNode');
+    }
+    render(<>{feedback.messageNode}</>);
     const link = screen.getByRole('link', { name: /inloggen/i });
     expect(link).toHaveAttribute('href', '/inloggen');
   });
 
   test('email not confirmed feedback is type error and contains link to resend link', () => {
-    const { type, message } = getFeedbackByCode('email_not_confirmed');
-    expect(type).toBe('error');
-
-    render(<>{message}</>);
+    const feedback = getFeedbackByCode('email_not_confirmed');
+    expect(feedback.type).toBe('error');
+    if (!('messageNode' in feedback)) {
+      throw new Error('feedback has no messageNode');
+    }
+    render(<>{feedback.messageNode}</>);
     const link = screen.getByRole('link', { name: /aanvragen/i });
     expect(link).toHaveAttribute('href', '/bevestigings-link-opnieuw-aanvragen');
   });

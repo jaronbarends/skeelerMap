@@ -33,11 +33,20 @@ describe('SignupForm.tsx', () => {
     });
 
     test('submit button is disabled and shows busy text when form is submitting', async () => {
-      const { form } = await setupWithValues(correctValues);
+      let resolve!: (value: AuthResult) => void;
+      vi.mocked(signUp).mockImplementationOnce(
+        () =>
+          new Promise((_resolve) => {
+            resolve = _resolve;
+          })
+      );
+      await setupWithValues(correctValues);
       const submitButton = screen.getByRole('button', { name: /registreren/i });
-      fireEvent.submit(form);
+      // use await userEvent.click rather than fireEvent.submit because submit event is not async
+      await userEvent.click(submitButton);
       expect(submitButton).toBeDisabled();
       expect(submitButton).toHaveTextContent(/bezig/i);
+      resolve({ success: true, data: { user: null, session: null } });
     });
 
     test('form shows success message and hides form when signUp is successful', async () => {
