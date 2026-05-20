@@ -4,12 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type SubmitEvent, useState, useTransition } from 'react';
 
+import SimpleContent from '@/components/SimpleContent';
+import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 import Button from '@/components/button/Button';
 import { type AuthResult, signIn } from '@/lib/supabaseAuth';
 import { getUrlWithToast } from '@/lib/toastMessages';
-
-import SimpleContent from '@/components/SimpleContent';
-import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -52,7 +51,7 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
+      {feedback && <FormFeedback {...feedback} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Inloggen'}

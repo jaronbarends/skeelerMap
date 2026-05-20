@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { type SubmitEvent, useState, useTransition } from 'react';
 
-import Button from '@/components/button/Button';
-import { type SimpleAuthResult, resendConfirmationEmail } from '@/lib/supabaseAuth';
-
 import SimpleContent from '@/components/SimpleContent';
 import FormFeedback, { type Feedback } from '@/components/auth/FormFeedback';
+import Button from '@/components/button/Button';
+import { type SimpleAuthResult, resendConfirmationEmail } from '@/lib/supabaseAuth';
 
 export default function ResendConfirmationForm() {
   const [email, setEmail] = useState('');
@@ -47,7 +46,7 @@ export default function ResendConfirmationForm() {
         </div>
       </div>
 
-      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
+      {feedback && <FormFeedback {...feedback} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Opnieuw versturen'}

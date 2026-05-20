@@ -69,7 +69,7 @@ export default function SignupForm() {
         </div>
       </div>
 
-      {feedback && <FormFeedback message={feedback.message} type={feedback.type} />}
+      {feedback && <FormFeedback {...feedback} />}
 
       <Button
         label={isPending ? 'Bezig…' : 'Registreren'}

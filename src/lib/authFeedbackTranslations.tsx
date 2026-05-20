@@ -61,7 +61,8 @@ export const authFeedbackTranslations: Record<string, FeedbackTranslation> = {
 export function getFeedbackByCode(errorCode: string): Feedback {
   const translation = authFeedbackTranslations[errorCode];
   if (translation) {
-    return { message: translation.message, type: translation.type };
+    const { description: _, ...feedback } = translation;
+    return feedback;
   }
   return {
     message: `Er is een onbekende fout opgetreden. Foutcode: ${errorCode}`,
