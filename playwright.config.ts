@@ -45,12 +45,24 @@ export default defineConfig({
 
     {
       name: 'chromium-logged-in',
-      testMatch: /^(?!.*\.logged-out).*\.spec\.ts$/,
+      // exclude all tests containing logged-out or logout
+      testMatch: /^(?!.*\.logged-out)(?!.*logout).*\.spec\.ts$/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
+    },
+
+    // separate test for logout - runs after all logged-in tests so we don't get auth issues when logout clears the auth state
+    {
+      name: 'chromium-logout',
+      testMatch: /logout\.spec\.ts$/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup', 'chromium-logged-in'],
     },
 
     // {

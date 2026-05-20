@@ -167,7 +167,9 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         />
       </FabContainer>
 
-      {isLoading && <LoadingIndicator>Bezig met laden...</LoadingIndicator>}
+      {isLoading && (
+        <LoadingIndicator testId="segments-loading-indicator">Bezig met laden...</LoadingIndicator>
+      )}
 
       {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
 
@@ -376,7 +378,9 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   }
 
   async function handleSaveNewSegment(ratingValue: RatingValue) {
-    if (!mapRef.current) return;
+    if (!mapRef.current) {
+      return;
+    }
     try {
       const coords = mapRef.current.getSegmentCoords();
       setIsPending(true);

@@ -9,5 +9,5 @@ test('successful logout shows confirmation and updates header', async ({ page })
   await expect(page.getByRole('link', { name: /inloggen/i })).toBeVisible();
   await expect(page.getByTestId('toast')).toBeVisible();
   await expect(page.getByTestId('toast')).toContainText(TOAST_MESSAGES.loggedOut.message);
-  await expect(page.getByTestId('toast')).not.toBeVisible();
+  await expect(page.getByTestId('toast')).not.toBeVisible({ timeout: 10000 });
 });

@@ -21,7 +21,7 @@ export default function RatingSection({
   let panelText: ReactNode;
   if (isPending) {
     panelText = (
-      <PendingText>
+      <PendingText testId="save-segment-pending-text">
         <p>Segment aan het opslaan...</p>
       </PendingText>
     );
@@ -49,7 +49,7 @@ interface RatingButtonsProps {
 
 function RatingButtons({ onRatingSelect, currentRatingValue }: RatingButtonsProps) {
   return (
-    <div className={styles.ratings}>
+    <div className={styles.ratings} data-testid="rating-buttons">
       {RATINGS.map((rating) => (
         <RatingButton
           key={rating.value}

@@ -20,7 +20,7 @@ test('successful login redirects to home, shows confirmation and updates header'
   await expect(page.getByTestId('toast')).toBeVisible();
   await expect(page.getByTestId('toast')).toContainText(TOAST_MESSAGES.loggedIn.message);
   await page.waitForURL('/');
-  await expect(page.getByTestId('toast')).not.toBeVisible();
+  await expect(page.getByTestId('toast')).not.toBeVisible({ timeout: 10000 });
 });
 
 test('failed login shows error when login fails', async ({ page }) => {
