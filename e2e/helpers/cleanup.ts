@@ -14,8 +14,7 @@ export async function deleteTestUserSegments() {
     .delete()
     .eq('user_id', process.env.PLAYWRIGHT_TEST_USER_ID!);
   if (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error deleting test user segments:', error);
+    throw new Error(`Error deleting test user segments: ${error.message}`);
   }
   return data;
 }
