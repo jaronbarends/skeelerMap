@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-05-08
-**Current phase:** Auth implemented and hardened; marker support implemented; DRY button and form styling in place; content page layout in place; toast on logout in place; auto-follow location mode implemented.
+**Last updated:** 2026-05-21
+**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed.
 
 ---
 
@@ -69,6 +69,11 @@
 - Toast on logout: logging out triggers a toast "Je bent nu uitgelogd." via `?toast=loggedOut`
   redirect, reusing the existing `?toast=` mechanism.
 - Logging out cancels all active UI actions (drawing mode, selection, panels)
+- Loading indicator: shown while map data (segments, markers) is being fetched
+- Error and success styling: form errors have red background; toast success state has green styling
+- README: human-readable explanation of purpose and 2–3 architectural decisions with rationale
+- Deployed to production (Vercel); go-live checklist completed 2026-05-20
+- Test suite: unit tests with Vitest, component tests with React Testing Library, E2E happy path with Playwright
 
 ## What's decided
 
