@@ -6,16 +6,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## High priority
 
-### Remove marker bug
-
-Steps to reproduce:
-
-- place a marker
-- select marker, click trash and confirm remove
-- marker is no longer visible
-- change zoom level
-- marker is rendered again. Trying to remove marker results in "kan marker niet verwijderen"
-
 ---
 
 ## Medium priority
@@ -281,19 +271,31 @@ architectural decisions with their rationale. Pull from decisions.md.
 Not technical docs — written for a potential contributor reading it cold.
 _Implemented 2026-05-11._
 
-### ~~Go live~~
+### ~~Go live~~ ✓ Done
 
 - Verify email expiry is 86400 seconds (check go-live-checklist.md)
 - Deploy
 
 _Implemented 2026-05-20._
 
-### ~~Add a test suite~~
+### ~~Add a test suite~~ ✓ Done
 
 Add baseline test coverage as a learning exercise. Scope:
 
 - One utility function (unit test with Vitest)
 - One form component (component test with React Testing Library)
 - One E2E happy path with Playwright (e.g. user logs in, adds a segment)
+
+_Implemented 2026-05-21._
+
+### ~~Remove marker bug~~ ✓ Done
+
+Steps to reproduce:
+
+- place a marker
+- select marker, click trash and confirm remove
+- marker is no longer visible
+- change zoom level
+- marker is rendered again. Trying to remove marker results in "kan marker niet verwijderen"
 
 _Implemented 2026-05-21._

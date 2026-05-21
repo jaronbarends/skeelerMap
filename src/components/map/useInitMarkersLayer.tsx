@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server.browser';
 
+import styles from '@/components/map/MapView.module.css';
 import { getIconByName } from '@/lib/getIconByName';
 import {
   isCreateMarkerMode,
@@ -14,8 +15,6 @@ import {
 import { Marker } from '@/lib/markers';
 import { MARKER_TYPES } from '@/lib/markers';
 
-import styles from '@/components/map/MapView.module.css';
-
 export function useInitMarkersLayer(
   mapRef: RefObject<L.Map | null>,
   markers: Marker[],
@@ -23,15 +22,16 @@ export function useInitMarkersLayer(
   onMarkerSelect: (marker: Marker) => void,
   selectedMarker: Marker | null
 ) {
-  // Refs mirror props so Leaflet event callbacks always call the latest
-  // version without needing to be listed as effect dependencies.
   const markerLayerGroupRef = useRef<L.LayerGroup | null>(null);
-  const markersRef = useRef(markers);
   const markerInstancesMapRef = useRef<Map<string, L.Marker>>(new Map());
+
+  // create refs for props, so event callbacks can close over ref values instead of props
+  const markersRef = useRef(markers);
   const modeRef = useRef(mode);
   const onMarkerSelectRef = useRef(onMarkerSelect);
   const selectedMarkerRef = useRef(selectedMarker);
 
+  // update prop-mirroring refs
   useEffect(() => {
     markersRef.current = markers;
     modeRef.current = mode;
@@ -39,6 +39,7 @@ export function useInitMarkersLayer(
     selectedMarkerRef.current = selectedMarker;
   }, [markers, mode, onMarkerSelect, selectedMarker]);
 
+  // update markers layer
   useEffect(() => {
     const map = mapRef.current;
     if (!map) {
@@ -46,6 +47,7 @@ export function useInitMarkersLayer(
     }
 
     markerLayerGroupRef.current?.remove();
+    markerInstancesMapRef.current.clear();
     const group = L.layerGroup().addTo(map);
     markerLayerGroupRef.current = group;
 
@@ -78,25 +80,32 @@ export function useInitMarkersLayer(
       markerInstancesMapRef.current.set(marker.id, markerInstance);
     }
 
-    mapRef.current?.on('zoomend', (e) => {
+    map.on('zoomend', zoomEndHandler);
+
+    function zoomEndHandler(e: L.LeafletEvent) {
+      if (!map) {
+        return;
+      }
       const zoomLevel = e.target.getZoom();
       const shouldShow =
         zoomLevel >= 12 ||
         isCreateMarkerMode(modeRef.current) ||
         isMarkerDetailsMode(modeRef.current);
       if (shouldShow) {
-        group.addTo(map);
+        markerLayerGroupRef.current?.addTo(map);
       } else {
-        group.remove();
+        markerLayerGroupRef.current?.remove();
       }
-    });
+    }
 
     return () => {
       group.remove();
       markerLayerGroupRef.current = null;
+      map.off('zoomend', zoomEndHandler);
     };
   }, [mapRef, markers]);
 
+  // update the selected marker class on the marker element
   useEffect(() => {
     for (const [id, marker] of markerInstancesMapRef.current) {
       const el = marker.getElement()?.querySelector(`.${styles.mapMarker}`);
