@@ -20,14 +20,13 @@ export function useInitSegmentLayers(
   // create Map (js Map, don't confuse with map showing streets) that contains the polylines for the segments
   const segmentLayersRef = useRef<Map<string, L.Polyline>>(new Map());
 
-  // Refs mirror props so Leaflet event callbacks always call the latest version
-  // without needing to be listed as effect dependencies.
+  // create refs for props, so event callbacks can close over ref values instead of props
   const onSegmentSelectRef = useRef(onSegmentSelect);
   const segmentsRef = useRef(segments);
   const creationModeActiveRef = useRef(creationModeActive);
   const modeRef = useRef(mode);
 
-  const renderSegment = useCallback(function renderSegment(segment: Segment, map: L.Map) {
+  const addSegment = useCallback(function addSegment(segment: Segment, map: L.Map) {
     if (!map) {
       // eslint-disable-next-line no-console
       console.error('Map not found');
@@ -56,6 +55,7 @@ export function useInitSegmentLayers(
     segmentLayersRef.current.set(segment.id, polyline);
   }, []);
 
+  // update prop-mirroring refs
   useEffect(() => {
     onSegmentSelectRef.current = onSegmentSelect;
     segmentsRef.current = segments;
@@ -63,6 +63,7 @@ export function useInitSegmentLayers(
     modeRef.current = mode;
   }, [onSegmentSelect, segments, creationModeActive, mode]);
 
+  // update segment layers
   useEffect(() => {
     const map = mapRef.current;
     if (!map) {
@@ -72,14 +73,15 @@ export function useInitSegmentLayers(
     for (const segment of segments) {
       const polyline = segmentLayersRef.current.get(segment.id);
       if (!polyline) {
-        renderSegment(segment, map);
+        addSegment(segment, map);
       } else {
+        // update color if it has changed
         const color =
           mapColors.rating[String(segment.ratingValue) as keyof typeof mapColors.rating];
         if (polyline.options.color !== color) {
           polyline.setStyle({ color });
         }
-        // update coordinates (e.g. after drag)
+        // update coordinates (may have changed after drag)
         polyline.setLatLngs(segment.coordinates);
       }
     }
@@ -90,7 +92,7 @@ export function useInitSegmentLayers(
         segmentLayersRef.current.delete(id);
       }
     }
-  }, [segments, renderSegment, mapRef]);
+  }, [segments, addSegment, mapRef]);
 
   // Clear the layer map on unmount so stale polyline refs don't prevent re-render after remount
   useEffect(() => {
