@@ -47,6 +47,7 @@ export function useInitMarkersLayer(
     }
 
     markerLayerGroupRef.current?.remove();
+    markerInstancesMapRef.current.clear();
     const group = L.layerGroup().addTo(map);
     markerLayerGroupRef.current = group;
 
@@ -79,7 +80,12 @@ export function useInitMarkersLayer(
       markerInstancesMapRef.current.set(marker.id, markerInstance);
     }
 
-    mapRef.current?.on('zoomend', (e) => {
+    map.on('zoomend', zoomEndHandler);
+
+    function zoomEndHandler(e: L.LeafletEvent) {
+      if (!map) {
+        return;
+      }
       const zoomLevel = e.target.getZoom();
       const shouldShow =
         zoomLevel >= 12 ||
@@ -90,11 +96,12 @@ export function useInitMarkersLayer(
       } else {
         markerLayerGroupRef.current?.remove();
       }
-    });
+    }
 
     return () => {
       group.remove();
       markerLayerGroupRef.current = null;
+      map.off('zoomend', zoomEndHandler);
     };
   }, [mapRef, markers]);
 

@@ -145,7 +145,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
       <FabContainer>
         <FabButton
           onClick={handleClickCreateButton}
-          ariaLabel="Segment toevoegen"
+          ariaLabel="Segment of waarschuwing toevoegen"
           disabled={
             uiState.creationModeActive ||
             uiState.selectedSegment !== null ||
@@ -153,7 +153,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
             uiState.loginRequiredPanelOpen
           }
           iconName="plus"
-          tooltip="Segment toevoegen"
+          tooltip="Segment of waarschuwing toevoegen"
         />
         <FabButton
           onClick={() => {
