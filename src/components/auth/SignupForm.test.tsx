@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, test, expect, vi } from 'vitest';
 
-import { signUp } from '@/lib/supabaseAuth';
+import { signUp, type AuthResult } from '@/lib/supabaseAuth';
 
 import SignupForm from './SignupForm';
 
