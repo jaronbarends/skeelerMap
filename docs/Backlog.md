@@ -16,22 +16,9 @@ Steps to reproduce:
 - change zoom level
 - marker is rendered again. Trying to remove marker results in "kan marker niet verwijderen"
 
-### Go live
-
-- Verify email expiry is 86400 seconds (check go-live-checklist.md)
-- Deploy
-
 ---
 
 ## Medium priority
-
-### Add a test suite
-
-Add baseline test coverage as a learning exercise. Scope:
-
-- One utility function (unit test with Vitest)
-- One form component (component test with React Testing Library)
-- One E2E happy path with Playwright (e.g. user logs in, adds a segment)
 
 ### Publish frontend-tooling-config
 
@@ -293,3 +280,20 @@ Human-readable explanation of what the app does, why it was built, and 2–3 exp
 architectural decisions with their rationale. Pull from decisions.md.
 Not technical docs — written for a potential contributor reading it cold.
 _Implemented 2026-05-11._
+
+### ~~Go live~~
+
+- Verify email expiry is 86400 seconds (check go-live-checklist.md)
+- Deploy
+
+_Implemented 2026-05-20._
+
+### ~~Add a test suite~~
+
+Add baseline test coverage as a learning exercise. Scope:
+
+- One utility function (unit test with Vitest)
+- One form component (component test with React Testing Library)
+- One E2E happy path with Playwright (e.g. user logs in, adds a segment)
+
+_Implemented 2026-05-21._
