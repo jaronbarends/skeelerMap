@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from "react";
 
 interface UseCountdownTimerProps {
   durationMs: number;
@@ -6,7 +6,11 @@ interface UseCountdownTimerProps {
   resetToken: string;
 }
 
-export function useCountdownTimer({ durationMs, isPaused, resetToken }: UseCountdownTimerProps): {
+export function useCountdownTimer({
+  durationMs,
+  isPaused,
+  resetToken,
+}: UseCountdownTimerProps): {
   percentage: number;
   isComplete: boolean;
 } {
@@ -14,11 +18,15 @@ export function useCountdownTimer({ durationMs, isPaused, resetToken }: UseCount
   const [isComplete, setIsComplete] = useState(false);
   const intervalMs = 20;
   const stepMs = intervalMs;
-  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     clearInterval(intervalRef.current);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // setProgress gives a linting error for react-hooks/set-state-in-effect (coming from @jaronbarends/frontend-tooling-config) that we want to ignore with eslint-disable-next-line react-hooks/set-state-in-effect
+    // Next's build uses its own ESLint that does not include react-hooks/set-state-in-effect, so build fails because it can't find the rule. So simply ignore next line without specific rule.
+    // eslint-disable-next-line
     setProgressMs(0);
     setIsComplete(false);
   }, [resetToken]);
