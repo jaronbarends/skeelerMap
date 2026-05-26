@@ -10,10 +10,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ## Medium priority
 
-### Publish frontend-tooling-config
-
-eslint.config uses @jaronbarends/frontend-tooling-config, now imported from file system. publish the package to npm and import from there.
-
 ### Password requirements
 
 Set password requirements Authentication > Sign In / Providers / Email > Password requirements
@@ -299,3 +295,9 @@ Steps to reproduce:
 - marker is rendered again. Trying to remove marker results in "kan marker niet verwijderen"
 
 _Implemented 2026-05-21._
+
+### ~~Publish frontend-tooling-config~~ ✓ Done
+
+eslint.config uses @jaronbarends/frontend-tooling-config, now imported from file system. publish the package to npm and import from there.
+
+_Implemented 2026-05-26._

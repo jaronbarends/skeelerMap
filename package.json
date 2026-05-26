@@ -23,7 +23,7 @@
     "react-icons": "^5.6.0"
   },
   "devDependencies": {
-    "@jaronbarends/frontend-tooling-config": "file:../../frontend-tooling-config",
+    "@jaronbarends/frontend-tooling-config": "^1.0.3",
     "@playwright/test": "^1.60.0",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^6.9.1",

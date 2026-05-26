@@ -61,6 +61,7 @@ export const authFeedbackTranslations: Record<string, FeedbackTranslation> = {
 export function getFeedbackByCode(errorCode: string): Feedback {
   const translation = authFeedbackTranslations[errorCode];
   if (translation) {
+    // eslint-disable-next-line unused-imports/no-unused-vars
     const { description: _, ...feedback } = translation;
     return feedback;
   }
