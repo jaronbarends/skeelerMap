@@ -1,16 +1,16 @@
+import { FetchResult } from '@/lib/fetchResult';
 import { Segment } from '@/lib/segments';
 
-type FetchSegmentsResult = { success: true; segments: Segment[] } | { success: false };
-
-export async function fetchSegments(abortSignal: AbortSignal): Promise<FetchSegmentsResult> {
+export async function fetchSegments(abortSignal: AbortSignal): Promise<FetchResult<Segment>> {
   try {
     const res = await fetch('/api/segments', { signal: abortSignal });
     if (!res.ok) {
       return { success: false };
     }
-    return res.json();
+    const segments = await res.json();
+    return { success: true, objects: segments };
   } catch {
-    return { success: true, segments: [] };
+    return { success: false };
   }
 }
 

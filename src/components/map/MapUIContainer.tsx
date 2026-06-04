@@ -44,14 +44,13 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         fetchSegments(abortSignal),
         fetchMarkers(abortSignal),
       ]);
-      if (!segmentsResult.success) {
-        setSupabaseIsAvailable(false);
+      if (segmentsResult.success && markersResult.success) {
+        setSegments(segmentsResult.objects);
+        setMarkers(markersResult.objects);
       } else {
-        setSegments(segmentsResult.segments);
+        setSupabaseIsAvailable(false);
       }
-      setMarkers(markersResult);
     } catch (error) {
-      console.log('error in fetchMapData', error);
       if (error instanceof DOMException && error.name === 'AbortError') return;
       // eslint-disable-next-line no-console
       console.error('fetchMapData failed:', error);
@@ -149,7 +148,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         onSegmentDragEnd={handleSegmentDragEnd}
         onPauseAutoFollow={() => setAutoFollowIsActive(false)}
       />
-      <FeedbackBanner />
+      {!supabaseIsAvailable && <FeedbackBanner />}
       <FabContainer>
         <FabButton
           onClick={handleClickCreateButton}
@@ -175,13 +174,10 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           tooltip="Centreer op locatie"
         />
       </FabContainer>
-
       {isLoading && (
         <LoadingIndicator testId="segments-loading-indicator">Bezig met laden...</LoadingIndicator>
       )}
-
       {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
-
       {uiState.creationModeActive && (
         <>
           {isCreateSegmentMode(uiState.mapUIMode) && (
@@ -204,7 +200,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           )}
         </>
       )}
-
       {uiState.selectedSegment && (
         <SegmentDetailsPanel
           segment={uiState.selectedSegment}
@@ -226,7 +221,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           isPending={isPending}
         />
       )}
-
       {uiState.selectedMarker && isMarkerDetailsMode(uiState.mapUIMode) && (
         <MarkerDetailsPanel
           marker={uiState.selectedMarker}
