@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
+import FeedbackBanner from '@/components/FeedbackBanner';
 import LoadingIndicator from '@/components/map/LoadingIndicator';
 import type { MapHandle } from '@/components/map/MapView';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
@@ -31,6 +32,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const [segments, setSegments] = useState<Segment[]>([]);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [supabaseIsAvailable, setSupabaseIsAvailable] = useState<boolean>(true);
 
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
   const [autoFollowIsActive, setAutoFollowIsActive] = useState(true);
@@ -42,9 +44,14 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         fetchSegments(abortSignal),
         fetchMarkers(abortSignal),
       ]);
-      setSegments(segmentsResult);
+      if (!segmentsResult.success) {
+        setSupabaseIsAvailable(false);
+      } else {
+        setSegments(segmentsResult.segments);
+      }
       setMarkers(markersResult);
     } catch (error) {
+      console.log('error in fetchMapData', error);
       if (error instanceof DOMException && error.name === 'AbortError') return;
       // eslint-disable-next-line no-console
       console.error('fetchMapData failed:', error);
@@ -142,6 +149,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         onSegmentDragEnd={handleSegmentDragEnd}
         onPauseAutoFollow={() => setAutoFollowIsActive(false)}
       />
+      <FeedbackBanner />
       <FabContainer>
         <FabButton
           onClick={handleClickCreateButton}
@@ -150,7 +158,8 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
             uiState.creationModeActive ||
             uiState.selectedSegment !== null ||
             uiState.selectedMarker !== null ||
-            uiState.loginRequiredPanelOpen
+            uiState.loginRequiredPanelOpen ||
+            !supabaseIsAvailable
           }
           iconName="plus"
           tooltip="Segment of waarschuwing toevoegen"

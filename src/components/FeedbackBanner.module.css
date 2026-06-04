@@ -1,0 +1,12 @@
+.feedbackBanner {
+  position: absolute;
+  inset: 0;
+  bottom: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-8);
+  padding: var(--size-12);
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
