@@ -9,7 +9,10 @@ export async function fetchMarkers(abortSignal: AbortSignal): Promise<FetchResul
     }
     const markers = await res.json();
     return { success: true, objects: markers };
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     return { success: false };
   }
 }

@@ -9,7 +9,10 @@ export async function fetchSegments(abortSignal: AbortSignal): Promise<FetchResu
     }
     const segments = await res.json();
     return { success: true, objects: segments };
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     return { success: false };
   }
 }

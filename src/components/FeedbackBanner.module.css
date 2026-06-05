@@ -5,8 +5,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--size-8);
+  gap: var(--size-12);
   padding: var(--size-12);
   background-color: var(--color-error);
   color: var(--color-white);
+
+  :first-child {
+    flex: 0 0 auto;
+  }
 }
