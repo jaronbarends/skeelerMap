@@ -301,3 +301,9 @@ _Implemented 2026-05-21._
 eslint.config uses @jaronbarends/frontend-tooling-config, now imported from file system. publish the package to npm and import from there.
 
 _Implemented 2026-05-26._
+
+### ~~Handle Supabase being paused~~ ✓ Done
+
+When the project doesn't get any traffic for a week, it is paused by Supabase. Show a message when that happens.
+
+_Implemented 2026-06-05._
