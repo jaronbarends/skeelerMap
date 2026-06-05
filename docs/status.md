@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-05-21
-**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed.
+**Last updated:** 2026-06-05
+**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed; Supabase unavailable/paused handling.
 
 ---
 
@@ -74,6 +74,7 @@
 - README: human-readable explanation of purpose and 2–3 architectural decisions with rationale
 - Deployed to production (Vercel); go-live checklist completed 2026-05-20
 - Test suite: unit tests with Vitest, component tests with React Testing Library, E2E happy path with Playwright
+- Supabase unavailable/paused handling: `FeedbackBanner` component shown when Supabase cannot be reached (e.g. project paused); abort errors handled separately from unavailable errors
 
 ## What's decided
 

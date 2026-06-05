@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import L from "leaflet";
+import L from 'leaflet';
 import {
   type CSSProperties,
   useCallback,
@@ -8,20 +8,20 @@ import {
   useImperativeHandle,
   useRef,
   type Ref,
-} from "react";
+} from 'react';
 
-import { useInitMarkersLayer } from "@/components/map/useInitMarkersLayer";
-import { useInitPendingMarker } from "@/components/map/useInitPendingMarker";
-import { useInitSegmentEventHandlers } from "@/components/map/useInitSegmentEventHandlers";
-import { useInitSegmentLayers } from "@/components/map/useInitSegmentLayers";
-import { useMapInit } from "@/components/map/useMapInit";
-import { useSegmentCreation } from "@/components/map/useSegmentCreation";
-import type { MapUIMode } from "@/lib/mapUIMode";
-import { isCreateSegmentMode } from "@/lib/mapUIMode";
-import type { Marker } from "@/lib/markers";
-import { Segment } from "@/lib/segments";
+import { useInitMarkersLayer } from '@/components/map/useInitMarkersLayer';
+import { useInitPendingMarker } from '@/components/map/useInitPendingMarker';
+import { useInitSegmentEventHandlers } from '@/components/map/useInitSegmentEventHandlers';
+import { useInitSegmentLayers } from '@/components/map/useInitSegmentLayers';
+import { useMapInit } from '@/components/map/useMapInit';
+import { useSegmentCreation } from '@/components/map/useSegmentCreation';
+import type { MapUIMode } from '@/lib/mapUIMode';
+import { isCreateSegmentMode } from '@/lib/mapUIMode';
+import type { Marker } from '@/lib/markers';
+import { Segment } from '@/lib/segments';
 
-import styles from "./MapView.module.css";
+import styles from './MapView.module.css';
 
 export interface MapHandle {
   cancelCreateSegment: () => void;
@@ -47,14 +47,8 @@ interface MapViewProps {
   onMarkerDeselect: () => void;
   onSegmentSelect: (segment: Segment) => void;
   onSegmentDeselect: () => void;
-  onSegmentDragUpdate: (
-    segmentId: string,
-    newCoordinates: [number, number][],
-  ) => void;
-  onSegmentDragEnd: (
-    segmentId: string,
-    newCoordinates: [number, number][],
-  ) => void;
+  onSegmentDragUpdate: (segmentId: string, newCoordinates: [number, number][]) => void;
+  onSegmentDragEnd: (segmentId: string, newCoordinates: [number, number][]) => void;
   onPauseAutoFollow: () => void;
 }
 
@@ -84,9 +78,9 @@ export default function MapView({
 
   // Critical layout is inline so Fast Refresh / CSS-module hash drift can't break Leaflet sizing.
   const containerStyle: CSSProperties = {
-    position: "absolute",
+    position: 'absolute',
     inset: 0,
-    zIndex: "var(--z-map)",
+    zIndex: 'var(--z-map)',
   };
 
   // addControlPoint comes from useSegmentCreation below, so we use a ref to avoid
@@ -95,7 +89,7 @@ export default function MapView({
 
   const handleMapClick = useCallback(
     (latlng: L.LatLng) => {
-      if (mode === "placeMarker") {
+      if (mode === 'placeMarker') {
         onMarkerLocationClicked(latlng.lat, latlng.lng);
         return;
       }
@@ -106,7 +100,7 @@ export default function MapView({
         onSegmentDeselect();
       }
     },
-    [mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect],
+    [mode, onMarkerDeselect, onMarkerLocationClicked, onSegmentDeselect]
   );
 
   const { mapRef, centerOnLocation } = useMapInit(
@@ -114,10 +108,12 @@ export default function MapView({
     fetchMapData,
     handleMapClick,
     autoFollowIsActive,
-    onPauseAutoFollow,
+    onPauseAutoFollow
   );
-  const { addControlPoint, removeTempSegment, getSegmentCoords } =
-    useSegmentCreation(mapRef, onControlPointCountChange);
+  const { addControlPoint, removeTempSegment, getSegmentCoords } = useSegmentCreation(
+    mapRef,
+    onControlPointCountChange
+  );
   // Keep the ref current. Using an effect (not render) to satisfy react-hooks/refs.
   // Safe because Leaflet click events only fire after useMapInit's effect runs.
   useEffect(() => {
@@ -129,14 +125,14 @@ export default function MapView({
     segments,
     onSegmentSelect,
     creationModeActive,
-    mode,
+    mode
   );
   useInitSegmentEventHandlers(
     mapRef,
     segmentLayersRef,
     selectedSegment,
     onSegmentDragUpdate,
-    onSegmentDragEnd,
+    onSegmentDragEnd
   );
 
   useInitMarkersLayer(mapRef, markers, mode, onMarkerSelect, selectedMarker);

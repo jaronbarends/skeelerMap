@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, useReducer } from 'react';
 
 import FabButton from '@/components/FabButton';
 import FabContainer from '@/components/FabContainer';
+import FeedbackBanner from '@/components/FeedbackBanner';
 import LoadingIndicator from '@/components/map/LoadingIndicator';
 import type { MapHandle } from '@/components/map/MapView';
 import LoginRequiredPanel from '@/components/panel/LoginRequiredPanel';
@@ -31,6 +32,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
   const [segments, setSegments] = useState<Segment[]>([]);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [supabaseIsAvailable, setSupabaseIsAvailable] = useState<boolean>(true);
 
   const [uiState, uiDispatch] = useReducer(uiReducer, initialUiState);
   const [autoFollowIsActive, setAutoFollowIsActive] = useState(true);
@@ -42,8 +44,12 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         fetchSegments(abortSignal),
         fetchMarkers(abortSignal),
       ]);
-      setSegments(segmentsResult);
-      setMarkers(markersResult);
+      if (segmentsResult.success && markersResult.success) {
+        setSegments(segmentsResult.objects);
+        setMarkers(markersResult.objects);
+      } else {
+        setSupabaseIsAvailable(false);
+      }
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
       // eslint-disable-next-line no-console
@@ -142,6 +148,7 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
         onSegmentDragEnd={handleSegmentDragEnd}
         onPauseAutoFollow={() => setAutoFollowIsActive(false)}
       />
+      {!supabaseIsAvailable && <FeedbackBanner />}
       <FabContainer>
         <FabButton
           onClick={handleClickCreateButton}
@@ -150,7 +157,8 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
             uiState.creationModeActive ||
             uiState.selectedSegment !== null ||
             uiState.selectedMarker !== null ||
-            uiState.loginRequiredPanelOpen
+            uiState.loginRequiredPanelOpen ||
+            !supabaseIsAvailable
           }
           iconName="plus"
           tooltip="Segment of waarschuwing toevoegen"
@@ -166,13 +174,10 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           tooltip="Centreer op locatie"
         />
       </FabContainer>
-
       {isLoading && (
         <LoadingIndicator testId="segments-loading-indicator">Bezig met laden...</LoadingIndicator>
       )}
-
       {uiState.loginRequiredPanelOpen && <LoginRequiredPanel onClose={handleCloseLoginRequired} />}
-
       {uiState.creationModeActive && (
         <>
           {isCreateSegmentMode(uiState.mapUIMode) && (
@@ -195,7 +200,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           )}
         </>
       )}
-
       {uiState.selectedSegment && (
         <SegmentDetailsPanel
           segment={uiState.selectedSegment}
@@ -217,7 +221,6 @@ export default function MapUIContainer({ currentUserId }: { currentUserId: strin
           isPending={isPending}
         />
       )}
-
       {uiState.selectedMarker && isMarkerDetailsMode(uiState.mapUIMode) && (
         <MarkerDetailsPanel
           marker={uiState.selectedMarker}

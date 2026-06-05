@@ -1,14 +1,19 @@
+import { FetchResult } from '@/lib/fetchResult';
 import { Marker, MarkerType } from '@/lib/markers';
 
-export async function fetchMarkers(abortSignal: AbortSignal): Promise<Marker[]> {
+export async function fetchMarkers(abortSignal: AbortSignal): Promise<FetchResult<Marker>> {
   try {
     const res = await fetch('/api/markers', { signal: abortSignal });
     if (!res.ok) {
-      return [];
+      return { success: false };
     }
-    return (await res.json()) as Marker[];
-  } catch {
-    return [];
+    const markers = await res.json();
+    return { success: true, objects: markers };
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
+    return { success: false };
   }
 }
 
