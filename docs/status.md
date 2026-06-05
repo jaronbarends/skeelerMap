@@ -1,7 +1,7 @@
 # Project status
 
 **Last updated:** 2026-06-05
-**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed; Supabase unavailable/paused handling.
+**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed; Supabase unavailable/paused handling; middleware timeout prevention.
 
 ---
 
@@ -75,6 +75,7 @@
 - Deployed to production (Vercel); go-live checklist completed 2026-05-20
 - Test suite: unit tests with Vitest, component tests with React Testing Library, E2E happy path with Playwright
 - Supabase unavailable/paused handling: `FeedbackBanner` component shown when Supabase cannot be reached (e.g. project paused); abort errors handled separately from unavailable errors
+- Middleware timeout prevention: `getUser()` in `src/middleware.ts` is raced against a 1000ms timeout; if Supabase stalls (e.g. project paused), the request passes through unauthenticated instead of hitting Vercel's 1.5s MIDDLEWARE_INVOCATION_TIMEOUT
 
 ## What's decided
 
