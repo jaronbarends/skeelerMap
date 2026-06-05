@@ -4,10 +4,6 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ---
 
-## High priority
-
----
-
 ## Medium priority
 
 ### Password requirements
@@ -305,5 +301,11 @@ _Implemented 2026-05-26._
 ### ~~Handle Supabase being paused~~ ✓ Done
 
 When the project doesn't get any traffic for a week, it is paused by Supabase. Show a message when that happens.
+
+_Implemented 2026-06-05._
+
+### ~~Prevent middleware timeout on Vercel~~ ✓ Done
+
+When Supabase is paused, `getUser()` in middleware could stall until Vercel's 1.5s middleware limit was hit, resulting in a 504 MIDDLEWARE_INVOCATION_TIMEOUT. Added a 1000ms `Promise.race` timeout; if it fires, the request passes through unauthenticated.
 
 _Implemented 2026-06-05._

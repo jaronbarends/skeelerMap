@@ -23,11 +23,19 @@ export async function middleware(request: NextRequest) {
       },
     }
   );
+  const timeout = new Promise((_, reject) => {
+    // Vercel has a default limit of 1.5s for middleware response
+    // if Supabase is paused, this limit will be hit resulting in an error
+    // 504: GATEWAY_TIMEOUT Code: MIDDLEWARE_INVOCATION_TIMEOUT
+    // set timeout to pass on the response before that; user will be considered logged out
+    setTimeout(() => reject(new Error('middleware timeout')), 1000);
+  });
   // call getUser to be able to refresh JWT
   try {
-    await supabase.auth.getUser();
+    await Promise.race([supabase.auth.getUser(), timeout]);
   } catch {
-    // no real need to handle here - user will be informed when they try doing something that requires auth
+    // Supabase slow or down — let the request through unauthenticated
+    return response;
   }
   return response;
 }
