@@ -4,6 +4,12 @@ Post-MVP features in rough priority order. Pick the next item from here and move
 
 ---
 
+## High priority
+
+### Fix redirect link in email
+
+The link in reset password email redirects to localhost, not to vercel. This is because Supabase's email templates use the configured Site URL as a template variable. The Site URL points at localhost; it should point to vercel.
+
 ## Medium priority
 
 ### Password requirements

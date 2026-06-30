@@ -273,6 +273,15 @@
 
 ---
 
+## Supabase Site URL: must be set to production URL
+
+**Date:** 2026-06-30
+**Decision:** Supabase's "Site URL" (Authentication → URL Configuration in the Supabase dashboard) must be set to the production Vercel URL, not `localhost`.
+**Rationale:** Even though `resetPasswordForEmail` passes an explicit `redirectTo` URL, Supabase uses the Site URL setting when constructing the link in the password reset email. When Site URL was set to `http://localhost:3000`, reset email links redirected there instead of the production domain. Changing it to the Vercel URL fixed this.
+**Note:** `NEXT_PUBLIC_SITE_URL` in Vercel controls the `redirectTo` value passed in the API call, but the Supabase dashboard Site URL is a separate, authoritative setting that must match production.
+
+---
+
 ## Middleware: `getUser` instead of `getClaims`
 
 **Date:** 2026-05-11

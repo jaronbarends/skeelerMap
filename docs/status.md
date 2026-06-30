@@ -1,7 +1,7 @@
 # Project status
 
-**Last updated:** 2026-06-05
-**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed; Supabase unavailable/paused handling; middleware timeout prevention.
+**Last updated:** 2026-06-30
+**Current phase:** App live in production; full auth flow; markers; auto-follow location; test suite in place; marker delete bug fixed; Supabase unavailable/paused handling; middleware timeout prevention; Supabase Site URL configured for production.
 
 ---
 
